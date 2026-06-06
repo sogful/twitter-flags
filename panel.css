@@ -1,0 +1,256 @@
+    :root {color-scheme: dark}
+    * {box-sizing: border-box}
+
+    @font-face {font-family: "Chirp"; font-weight: 400; font-display: swap; src: url("fonts/chirp.woff2") format("woff2")}
+    @font-face {font-family: "Chirp"; font-weight: 700; font-display: swap; src: url("fonts/chirpbold.woff2") format("woff2")}
+    @font-face {font-family: "Chirp"; font-weight: 800; font-display: swap; src: url("fonts/chirpheavy.woff2") format("woff2")}
+
+    html, body {
+      margin: 0;
+      height: 100%
+    }
+
+    body {
+      background-color: #000; color: #E5EAEC;
+      font: 14px "Chirp", system-ui, sans-serif;
+      display: flex; flex-direction: column;
+      overflow: hidden; user-select: none;
+    }
+
+    .header {
+      padding: 12px 14px;
+      border-bottom: 1px solid #242E36;
+      display: flex; flex-direction: column;
+      gap: 10px; flex-shrink: 0
+    }
+
+    /*//////////////////////////////////////////////////////////////////////*/
+
+    .row1 {
+      display: flex; gap: 8px;
+      align-items: center
+    }
+
+    .button {
+      background-color: #242E36; color: #E5EAEC;
+      border: none; cursor: pointer;
+      border-radius: 999px; padding: 7px 14px;
+      font: 600 13px "Chirp", system-ui, sans-serif;
+    }
+
+    .button.hot {
+      background-color: #1d9bf0;
+      color: #fff
+    }
+
+    .search, .prefixselect {
+      background: black; color: #E5EAEC;
+      border: 1px solid #37434D;
+      border-radius: 999px; padding: 9px 14px;
+      font: 14px "Chirp", system-ui, sans-serif;
+    }
+    .searchbox {
+      position: relative; display: flex; flex: 1;
+      min-width: 0; align-items: center
+    }
+    .searchicon {
+      position: absolute;
+      left: 13px; width: 18px; height: 18px;
+      fill: #6B7F8E; pointer-events: none}
+    .search {width: 100%; min-width: 0; padding-left: 38px}
+    .prefixselect {cursor: pointer}
+    .search::placeholder {color: #6B7F8E}
+    .search:focus, .prefixselect:focus {outline: none; border-color: #1d9bf0}
+
+    .row2 {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      color: #6B7F8E;
+      font-size: 13px;
+      flex-wrap: wrap
+    }
+
+    .row2 label {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      cursor: pointer
+    }
+
+    .note {
+      margin-left: auto;
+      color: #536471;
+      font-size: 12px
+    }
+
+    .row2.bulk {gap: 8px}
+    .bulkbtn {
+      background-color: #242E36; color: #E5EAEC;
+      border: none; cursor: pointer;
+      border-radius: 999px; padding: 2px 6px;
+      font: 600 12px "Chirp", system-ui, sans-serif;
+    }
+
+    .row2.dev {
+      border-bottom: 1px solid #242E36;
+      padding-bottom: 10px;
+      font-size: 9.75px; gap: 10.5px
+    }
+    .row2.dev label {gap: 3.75px}
+    .row2.dev .checkbox {
+      width: 15px; height: 15px;
+      border-width: 1.5px; border-radius: 3px
+    }
+    .row2.dev .checkbox .tick {width: 15px; height: 15px}
+
+    /*//////////////////////////////////////////////////////////////////////*/
+
+    .footer {
+      display: flex; gap: 10px;
+      align-items: center; padding: 10px 14px;
+      background-color: #1d9bf0; flex-shrink: 0
+    }
+    .footer[hidden] {display: none}
+    .footer .button {background-color: white; color: black}
+    .footer .button.undo {background-color: red; color: white}
+    .footer .button.undo:hover {background-color: #f4212e}
+
+    .footermessage {flex: 1; color: white}
+
+    /*//////////////////////////////////////////////////////////////////////*/
+
+    .list {
+      overflow: auto;
+      padding: 4px 0; flex: 1;
+      scrollbar-width: thin; scrollbar-color: #536471 transparent
+    }
+    .list::-webkit-scrollbar {width: 8px}
+    .list::-webkit-scrollbar-track {background: transparent}
+    .list::-webkit-scrollbar-thumb {background-color: #536471; border-radius: 999px;
+      border: 2px solid transparent; background-clip: padding-box}
+    .list::-webkit-scrollbar-thumb:hover {background-color: #6B7F8E}
+
+    .item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid #242E36
+    }
+    .item.danger {background: rgba(244, 33, 46, .10)}
+    .item.mod {position: relative}
+    .item.mod::before {content: ""; position: absolute;
+      left: 5px; top: 12px; bottom: 12px; width: 4px;
+      border-radius: 999px; background-color: #1d9bf0}
+    .item.mod.danger::before {background-color: #f4212e}
+
+    .info {flex: 1; min-width: 0}
+
+    .name {
+      font-weight: 700;
+      word-break: break-word
+    }
+
+    .controls {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-shrink: 0
+    }
+
+    /*//////////////////////////////////////////////////////////////////////*/
+
+    .editfield {
+      background: black; color: #E5EAEC;
+      border: 1px solid #37434D; border-radius: 8px;
+      padding: 6px 9px; width: 150px;
+      font: 13px "Chirp", system-ui, sans-serif;
+      white-space: pre-wrap; word-break: break-word;
+      resize: none; field-sizing: content; max-height: 160px; overflow: auto
+    }
+    .editfield:focus {outline: none; border-color: #1d9bf0}
+    .editfield.num {width: 90px; field-sizing: auto}
+
+    .checkbox {
+      box-sizing: border-box; display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 20px; height: 20px;
+      border: 2px solid #6B7F8E;
+      border-radius: 4px; cursor: pointer;
+      flex-shrink: 0; background: transparent
+    }
+    .checkbox .tick {
+      width: 20px;
+      height: 20px;
+      fill: #fff;
+      display: none
+    }
+    .checkbox.on {
+      background-color: #1d9bf0;
+      border-color: #1d9bf0
+    }
+    .checkbox.on .tick {
+      display: block
+    }
+    .item.danger .checkbox.on {
+      background-color: #f4212e;
+      border-color: #f4212e
+    }
+
+    .reset {
+      background: none; border: none; cursor: pointer;
+      color: #1d9bf0; padding: 0;
+      width: 20px; height: 20px;
+      display: inline-flex; align-items: center; justify-content: center
+    }
+    .reset svg {width: 18px; height: 18px; fill: currentColor}
+    .item.danger .reset {color: #f4212e}
+    .reset.off {visibility: hidden; pointer-events: none}
+
+    /*//////////////////////////////////////////////////////////////////////*/
+
+    .meta {
+      color: #6B7F8E;
+      margin-top: 4px;
+      font-size: 12px
+    }
+
+    .meta .dangerzone {
+      color: #f4212e;
+      display: inline-flex;
+      align-items: center; gap: 2px
+    }
+    .meta .dangerzone svg {width: 14px; height: 14px; fill: currentColor}
+    .ident {user-select: all}
+
+    .empty {
+      font-style: italic;
+      padding: 4px 10px;
+      color: #6B7F8E;
+      line-height: 1.6
+    }
+    .empty.center {
+      font-style: normal; min-height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 14px; padding: 16px; text-align: center
+    }
+    .empty.center .face {
+      font-size: 64px; line-height: 1;
+      font-weight: 700; color: #E5EAEC
+    }
+
+    .scan {
+      margin-top: 8px;
+      background-color: #1d9bf0;
+      color: #fff; border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font: 600 13px "Chirp", system-ui, sans-serif;
+      cursor: pointer
+    }
+
+    .copied {
+      color: #00ba7c;
+      margin-left: 8px;
+      font-size: 12px
+    }

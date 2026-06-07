@@ -2,7 +2,8 @@
   "use strict";
 
   const LOG = true;
-  const log = (...a) => {if (LOG) try {console.log("%c[twitterflags]", "color:#1d9bf0;font-weight:700", ...a)} catch {}};
+  // very pretty................
+  const log = (...a) => {if (LOG) try {console.log("%c[twitter flags]", "color:#1d9bf0;font-weight:700", ...a)} catch {}};
 
   const flags = {};
   let captured = false;
@@ -23,9 +24,17 @@
       const fs = s && s.featureSwitch;
       if (!fs) return;
       if (!fs.customoverrides || typeof fs.customoverrides !== "object") fs.customoverrides = {};
+      const dc = fs.defaultConfig;
       let c = 0;
-      for (const k in overrides) { fs.customoverrides[k] = overrides[k]; c++ }
-      if (c) log("applied", c, "saved override(s) into customoverrides for this load");
+      for (const k in overrides) {
+        fs.customoverrides[k] = overrides[k];
+        if (dc) {
+          if (dc[k] && typeof dc[k] === "object" && "value" in dc[k]) dc[k].value = overrides[k];
+          else dc[k] = {value: overrides[k]};
+        }
+        c++;
+      }
+      if (c) log("applied", c, "saved override(s) into customoverrides + defaultConfig for this load");
     } catch (e) {log("applyoverrides error:", e && e.message)}
   }
 
@@ -110,7 +119,7 @@
       }
     });
     manInstalled = true;
-  } catch (e) {log("couldnt define manifest accessor:", e && e.message)}
+  } catch (e) {log("couldnt define manifest accessor?! ", e && e.message)}
 
   const somesettings = u => typeof u === "string" && u.indexOf("help/settings") >= 0;
   const veryswag = u => typeof u === "string" && /settings|feature.?switch|manifest/i.test(u);
@@ -144,13 +153,72 @@
     xhrhooked = true;
   } catch (e) { log("could not hook xhr:", e && e.message) }
 
-  log("installed. initial-state:", isInstalled, "manifest:", manInstalled, "fetch:", fetchhooked, "xhr:", xhrhooked,
+  /*//////////////////////////////////////////////////////////////////////*/
+
+  const switchrecievers = ["isTrue", "getValue", "getInt", "getString", "getList", "getStringList", "getDouble", "getFloat", "getLong", "getBoolean", "getJson"];
+
+  function findswitches() {
+    try {
+      const root = document.querySelector("#react-root");
+      const host = root && root.firstElementChild;
+      if (!host) return null;
+      const el = host.wrappedJSObject || host;
+      const key = Object.keys(el).find(x => x.startsWith("__reactProps"));
+      if (!key) return null;
+      const seen = new Set();
+      const stack = [el[key]];
+      let n = 0;
+      while (stack.length && n < 4000) {
+        const cur = stack.pop(); n++;
+        if (!cur || typeof cur !== "object" || seen.has(cur)) continue;
+        seen.add(cur);
+        const fsw = cur.featureSwitches;
+        if (fsw && typeof fsw.isTrue === "function") return fsw;
+        if (Array.isArray(cur)) {for (const c of cur) stack.push(c); continue}
+        stack.push(cur.props, cur.children, cur.contextProviderProps, cur.value);
+      }
+    } catch (e) {log("findswitches error:", e && e.message)}
+    return null;
+  }
+
+  function hookswitches(fsw) {
+    if (!fsw || fsw.tfhooked) return false;
+    let wrapped = 0;
+    for (const name of switchrecievers) {
+      const orig = fsw[name];
+      if (typeof orig !== "function") continue;
+      fsw[name] = function (k) {
+        if (typeof k === "string" && hasoverride(k)) {const v = overrides[k]; return name === "isTrue" ? v === true : v}
+        return orig.apply(this, arguments);
+      };
+      wrapped++;
+    }
+    fsw.tfhooked = true;
+    log("hooked featureSwitches:", wrapped, "getter(s); overrides apply live now");
+    return true;
+  }
+
+  let swhooked = false;
+  function trackswitches() {if (!swhooked) {const fsw = findswitches(); if (fsw) swhooked = hookswitches(fsw)}}
+
+  trackswitches();
+  if (!swhooked) {
+    let obs = null, tries = 0;
+    const stop = () => {if (obs) {obs.disconnect(); obs = null}};
+    try {obs = new MutationObserver(() => {trackswitches(); if (swhooked) stop()}); obs.observe(document.documentElement, {childList: true, subtree: true})} catch {}
+    const iv = setInterval(() => {trackswitches(); if (swhooked || ++tries > 150) {clearInterval(iv); stop()}}, 100);
+  }
+
+  /*//////////////////////////////////////////////////////////////////////*/
+
+  log("installed! initial-state:", isInstalled, "manifest:", manInstalled, "fetch:", fetchhooked, "xhr:", xhrhooked,
     "| expect an 'ingested N flags from initial(set):default' line on full reload. if it never appears, the script is sandboxed out of page context.");
 
   window.twitterflags = flags;
   window.twitterflagsDebug = {
     flags, overrides,
     effective: k => effective(k),
+    findswitches, rehook: () => {const fsw = findswitches(); return fsw ? hookswitches(fsw) : (log("featureSwitches not found yet"), false)},
     set: (k, v) => { overrides[k] = v; saveoverrides(); dirty = true; if (onchange) onchange(); return v },
     clear: k => { delete overrides[k]; saveoverrides(); dirty = true; if (onchange) onchange() },
     clearAll: () => { for (const k in overrides) delete overrides[k]; saveoverrides(); dirty = true; if (onchange) onchange() },

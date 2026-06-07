@@ -26,7 +26,8 @@
   "permissions": ["storage", "sidePanel", "tabs"],
   "host_permissions": ["https://x.com/*", "https://twitter.com/*"],
   "background": {
-    "service_worker": "src/background.js"
+    "service_worker": "src/background.js",
+    "scripts": ["src/background.js"]
   },
   "side_panel": {
     "default_path": "panel.html"

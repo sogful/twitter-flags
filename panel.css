@@ -58,7 +58,14 @@
       left: 13px; width: 18px; height: 18px;
       fill: #6B7F8E; pointer-events: none}
     .search {width: 100%; min-width: 0; padding-left: 38px}
-    .prefixselect {cursor: pointer}
+    .prefixselect {
+      cursor: pointer; appearance: none;
+      padding-right: 38px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M3.543 8.96l1.414-1.42L12 14.59l7.043-7.05 1.414 1.42L12 17.41 3.543 8.96z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px
+    }
     .search::placeholder {color: #6B7F8E}
     .search:focus, .prefixselect:focus {outline: none; border-color: #1d9bf0}
 
@@ -84,7 +91,10 @@
       font-size: 12px
     }
 
-    .row2.bulk {gap: 8px}
+    .bulk {
+      display: flex; gap: 8px;
+      margin-left: auto; align-items: center
+    }
     .bulkbtn {
       background-color: #242E36; color: #E5EAEC;
       border: none; cursor: pointer;

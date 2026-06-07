@@ -5,6 +5,12 @@
   "description": "browse hidden stuff inside the twitter client with a side panel!",
   "author": "cv",
   "homepage_url": "https://coolsite.cv",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "twitterflags@coolsite.cv",
+      "strict_min_version": "128.0"
+    }
+  },
   "icons": {
     "16": "images/icon16.png",
     "48": "images/icon48.png",
@@ -20,10 +26,19 @@
   "permissions": ["storage", "sidePanel", "tabs"],
   "host_permissions": ["https://x.com/*", "https://twitter.com/*"],
   "background": {
-    "service_worker": "src/background.js"
+    "service_worker": "src/background.js",
+    "scripts": ["src/background.js"]
   },
   "side_panel": {
     "default_path": "panel.html"
+  },
+  "sidebar_action": {
+    "default_panel": "panel.html",
+    "default_title": "twitter flags & more",
+    "default_icon": {
+      "16": "images/action16.png",
+      "48": "images/action48.png"
+    }
   },
   "content_scripts": [
     {

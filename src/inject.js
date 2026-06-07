@@ -14,22 +14,22 @@
   let overrides = {};
   try {overrides = JSON.parse(localStorage.getItem("twitterflags.overrides") || "{}") || {}} catch {overrides = {}}
   let dirty = false;
-  const saveOverrides = () => { try {localStorage.setItem("twitterflags.overrides", JSON.stringify(overrides))} catch {}};
-  const hasOverride = k => Object.prototype.hasOwnProperty.call(overrides, k);
-  const effective = k => (hasOverride(k) ? overrides[k] : flags[k]);
+  const saveoverrides = () => { try {localStorage.setItem("twitterflags.overrides", JSON.stringify(overrides))} catch {}};
+  const hasoverride = k => Object.prototype.hasOwnProperty.call(overrides, k);
+  const effective = k => (hasoverride(k) ? overrides[k] : flags[k]);
 
-  function applyOverrides(s) {
+  function applyoverrides(s) {
     try {
       const fs = s && s.featureSwitch;
       if (!fs) return;
-      if (!fs.customOverrides || typeof fs.customOverrides !== "object") fs.customOverrides = {};
+      if (!fs.customoverrides || typeof fs.customoverrides !== "object") fs.customoverrides = {};
       let c = 0;
-      for (const k in overrides) { fs.customOverrides[k] = overrides[k]; c++ }
-      if (c) log("applied", c, "saved override(s) into customOverrides for this load");
-    } catch (e) {log("applyOverrides error:", e && e.message)}
+      for (const k in overrides) { fs.customoverrides[k] = overrides[k]; c++ }
+      if (c) log("applied", c, "saved override(s) into customoverrides for this load");
+    } catch (e) {log("applyoverrides error:", e && e.message)}
   }
 
-  function ingestConfig(cfg, from) {
+  function configingest(cfg, from) {
     if (!cfg || typeof cfg !== "object") return 0;
     let hits = 0;
     for (const k in cfg) {
@@ -48,7 +48,7 @@
   function manifestingest(d, from) {
     if (!d || typeof d !== "object") return 0;
     const cfg = (d.config && typeof d.config === "object") ? d.config : d;
-    return ingestConfig(cfg, from || "manifest");
+    return configingest(cfg, from || "manifest");
   }
 
   function ingestText(text, from) {
@@ -58,7 +58,7 @@
     for (const pool of pools) {
       let local = 0;
       for (const k in pool) if (pool[k] && typeof pool[k] === "object" && "value" in pool[k]) local++;
-      if (local >= 10) total += ingestConfig(pool, from || "fetch");
+      if (local >= 10) total += configingest(pool, from || "fetch");
     }
     return total;
   }
@@ -71,19 +71,19 @@
       const fs = s && s.featureSwitch;
       if (!fs) return 0;
       let n = 0;
-      if (fs.defaultConfig) n += ingestConfig(fs.defaultConfig, from + ":default");
-      if (fs.customOverrides) n += ingestConfig(fs.customOverrides, from + ":override");
+      if (fs.defaultConfig) n += configingest(fs.defaultConfig, from + ":default");
+      if (fs.customoverrides) n += configingest(fs.customoverrides, from + ":override");
       return n;
-    } catch (e) { log("grabState error:", e && e.message); return 0 }
+    } catch (e) {log("grabState error:", e && e.message); return 0}
   }
   let isInstalled = false;
   try {
     let bIS = window[IS];
-    if (bIS !== undefined) {log(IS, "present at install"); grabState(bIS, "initial(pre)"); applyOverrides(bIS)}
+    if (bIS !== undefined) {log(IS, "present at install"); grabState(bIS, "initial(pre)"); applyoverrides(bIS)}
     Object.defineProperty(window, IS, {
       configurable: true,
       get() { return bIS },
-      set(v) { bIS = v; log(IS, "set, featureSwitch:", !!(v && v.featureSwitch)); grabState(v, "initial(set)"); applyOverrides(v) }
+      set(v) { bIS = v; log(IS, "set, featureSwitch:", !!(v && v.featureSwitch)); grabState(v, "initial(set)"); applyoverrides(v) }
     });
     isInstalled = true;
   } catch (e) { log("could not define " + IS + " accessor:", e && e.message) }
@@ -151,9 +151,9 @@
   window.twitterflagsDebug = {
     flags, overrides,
     effective: k => effective(k),
-    set: (k, v) => { overrides[k] = v; saveOverrides(); dirty = true; if (onchange) onchange(); return v },
-    clear: k => { delete overrides[k]; saveOverrides(); dirty = true; if (onchange) onchange() },
-    clearAll: () => { for (const k in overrides) delete overrides[k]; saveOverrides(); dirty = true; if (onchange) onchange() },
+    set: (k, v) => { overrides[k] = v; saveoverrides(); dirty = true; if (onchange) onchange(); return v },
+    clear: k => { delete overrides[k]; saveoverrides(); dirty = true; if (onchange) onchange() },
+    clearAll: () => { for (const k in overrides) delete overrides[k]; saveoverrides(); dirty = true; if (onchange) onchange() },
     status: () => ({ captured, source, count: Object.keys(flags).length, overrides: Object.keys(overrides).length, dirty, isInstalled, manInstalled, fetchhooked, xhrhooked }),
     scan: () => {
       let best = null, bestN = 0;
@@ -167,7 +167,7 @@
         for (const k in o) { try { walk(o[k], depth + 1) } catch {} }
       }
       try { walk(window, 0) } catch {}
-      if (best && bestN >= 10) { const n = ingestConfig(best, "scan"); log("scan found", n, "flags"); return n }
+      if (best && bestN >= 10) { const n = configingest(best, "scan"); log("scan found", n, "flags"); return n }
       log("scan found nothing flag-shaped"); return 0;
     }
   };
@@ -192,13 +192,13 @@
     if (!d || d.source !== UCHAN) return;
     switch (d.cmd) {
       case "getstate": prostate(); break;
-      case "set": overrides[d.name] = d.value; saveOverrides(); dirty = true; prostate(); break;
+      case "set": overrides[d.name] = d.value; saveoverrides(); dirty = true; prostate(); break;
       case "setmany":
         if (d.set && typeof d.set === "object") for (const k in d.set) overrides[k] = d.set[k];
         if (Array.isArray(d.clear)) for (const k of d.clear) delete overrides[k];
-        saveOverrides(); dirty = true; prostate(); break;
-      case "clear": delete overrides[d.name]; saveOverrides(); dirty = true; prostate(); break;
-      case "clearall": for (const k in overrides) delete overrides[k]; saveOverrides(); dirty = true; prostate(); break;
+        saveoverrides(); dirty = true; prostate(); break;
+      case "clear": delete overrides[d.name]; saveoverrides(); dirty = true; prostate(); break;
+      case "clearall": for (const k in overrides) delete overrides[k]; saveoverrides(); dirty = true; prostate(); break;
       case "reload": location.reload(); break;
     }
   });

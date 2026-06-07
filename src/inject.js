@@ -45,7 +45,7 @@
     return hits;
   }
 
-  function ingestManifest(d, from) {
+  function manifestingest(d, from) {
     if (!d || typeof d !== "object") return 0;
     const cfg = (d.config && typeof d.config === "object") ? d.config : d;
     return ingestConfig(cfg, from || "manifest");
@@ -79,7 +79,7 @@
   let isInstalled = false;
   try {
     let bIS = window[IS];
-    if (bIS !== undefined) { log(IS, "present at install"); grabState(bIS, "initial(pre)"); applyOverrides(bIS) }
+    if (bIS !== undefined) {log(IS, "present at install"); grabState(bIS, "initial(pre)"); applyOverrides(bIS)}
     Object.defineProperty(window, IS, {
       configurable: true,
       get() { return bIS },
@@ -90,23 +90,23 @@
 
   const MAN = "__FEATURE_SWITCH_MANIFEST__";
   let manInstalled = false;
-  function wrapResolver(real, tag) {
-    return function (data) { try { ingestManifest(data, tag) } catch { } return real.apply(this, arguments) };
+  function resolvewrap(real, tag) {
+    return function (data) {try {manifestingest(data, tag)} catch {} return real.apply(this, arguments)};
   }
   try {
     let backing = window[MAN];
     if (backing !== undefined) {
       log("manifest already present at install, type:", typeof backing);
-      if (typeof backing === "function") { backing = wrapResolver(backing, "manifest(resolve-pre)"); log("wrapped pre-existing resolver") }
-      else ingestManifest(backing, "manifest(pre)");
+      if (typeof backing === "function") { backing = resolvewrap(backing, "manifest(resolve-pre)"); log("wrapped pre-existing resolver") }
+      else manifestingest(backing, "manifest(pre)");
     }
     Object.defineProperty(window, MAN, {
       configurable: true,
       get() { return backing },
       set(v) {
         log("manifest set, type:", typeof v, v && typeof v === "object" ? "(has config: " + !!v.config + ")" : "");
-        if (typeof v === "function") backing = wrapResolver(v, "manifest(resolve)");
-        else { ingestManifest(v, "manifest(set)"); backing = v }
+        if (typeof v === "function") backing = resolvewrap(v, "manifest(resolve)");
+        else {manifestingest(v, "manifest(set)"); backing = v}
       }
     });
     manInstalled = true;
@@ -122,7 +122,11 @@
       const u = (typeof a[0] === "string" ? a[0] : a[0] && a[0].url) || "";
       if (veryswag(u)) log("fetch ->", u);
       return ofetch.apply(this, a).then(r => {
-        try { if (somesettings(u) || somesettings(r && r.url)) r.clone().text().then(t => { const n = ingestText(t, "fetch"); log("settings fetch parsed", n, "flags") }).catch(() => { }) } catch { }
+        try { 
+          if (somesettings(u) || somesettings(r && r.url)) r.clone().text().then(t => 
+            {const n = ingestText(t, "fetch"); 
+            log("settings fetch parsed", n, "flags")}).catch(() => {})
+        } catch {}
         return r;
       });
     };
@@ -134,7 +138,7 @@
     const oopen = XMLHttpRequest.prototype.open, osend = XMLHttpRequest.prototype.send;
     XMLHttpRequest.prototype.open = function (m, u) { this.xfu = u; if (veryswag(u)) log("xhr ->", u); return oopen.apply(this, arguments) };
     XMLHttpRequest.prototype.send = function () {
-      this.addEventListener("load", () => { try { if (somesettings(this.xfu)) { const n = ingestText(this.responseText, "xhr"); log("settings xhr parsed", n, "flags") } } catch { } });
+      this.addEventListener("load", () => { try { if (somesettings(this.xfu)) { const n = ingestText(this.responseText, "xhr"); log("settings xhr parsed", n, "flags") } } catch {} });
       return osend.apply(this, arguments);
     };
     xhrhooked = true;
@@ -158,11 +162,11 @@
         if (!o || typeof o !== "object" || depth > 4 || seen.has(o)) return;
         seen.add(o);
         let n = 0;
-        for (const k in o) { try { const v = o[k]; if (v && typeof v === "object" && "value" in v && Object.keys(v).length <= 3) n++ } catch { } }
+        for (const k in o) { try { const v = o[k]; if (v && typeof v === "object" && "value" in v && Object.keys(v).length <= 3) n++ } catch {} }
         if (n > bestN) { bestN = n; best = o }
-        for (const k in o) { try { walk(o[k], depth + 1) } catch { } }
+        for (const k in o) { try { walk(o[k], depth + 1) } catch {} }
       }
-      try { walk(window, 0) } catch { }
+      try { walk(window, 0) } catch {}
       if (best && bestN >= 10) { const n = ingestConfig(best, "scan"); log("scan found", n, "flags"); return n }
       log("scan found nothing flag-shaped"); return 0;
     }
@@ -178,8 +182,8 @@
       status: {count: Object.keys(flags).length, isInstalled, manInstalled, fetchhooked, xhrhooked}
     };
   }
-  function poststate() {
-    try {window.postMessage({source: PCHAN, type: "state", payload: snapshot()}, location.origin)} catch { }
+  function prostate() {
+    try {window.postMessage({source: PCHAN, type: "state", payload: snapshot()}, location.origin)} catch {}
   }
 
   window.addEventListener("message", e => {
@@ -187,17 +191,17 @@
     const d = e.data;
     if (!d || d.source !== UCHAN) return;
     switch (d.cmd) {
-      case "getstate": poststate(); break;
-      case "set": overrides[d.name] = d.value; saveOverrides(); dirty = true; poststate(); break;
+      case "getstate": prostate(); break;
+      case "set": overrides[d.name] = d.value; saveOverrides(); dirty = true; prostate(); break;
       case "setmany":
         if (d.set && typeof d.set === "object") for (const k in d.set) overrides[k] = d.set[k];
         if (Array.isArray(d.clear)) for (const k of d.clear) delete overrides[k];
-        saveOverrides(); dirty = true; poststate(); break;
-      case "clear": delete overrides[d.name]; saveOverrides(); dirty = true; poststate(); break;
-      case "clearall": for (const k in overrides) delete overrides[k]; saveOverrides(); dirty = true; poststate(); break;
+        saveOverrides(); dirty = true; prostate(); break;
+      case "clear": delete overrides[d.name]; saveOverrides(); dirty = true; prostate(); break;
+      case "clearall": for (const k in overrides) delete overrides[k]; saveOverrides(); dirty = true; prostate(); break;
       case "reload": location.reload(); break;
     }
   });
-  onchange = () => { try { poststate() } catch { } };
-  poststate();
+  onchange = () => {try {prostate()} catch {}};
+  prostate();
 })();

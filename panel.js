@@ -8,8 +8,8 @@
   let captured = false, source = "none", dirty = false;
   let flags = {}, overrides = {}, status = {};
   let devconfig = { jfDev: false, inspect: false };
-  const hasOverride = k => Object.prototype.hasOwnProperty.call(overrides, k);
-  const effective = k => (hasOverride(k) ? overrides[k] : flags[k]);
+  const hasoverride = k => Object.prototype.hasOwnProperty.call(overrides, k);
+  const effective = k => (hasoverride(k) ? overrides[k] : flags[k]);
 
   /*//////////////////////////////////////////////////////////////////////*/
 
@@ -17,10 +17,10 @@
 
   async function resolveTab() {
     let t;
-    try { [t] = await chrome.tabs.query({ active: true, lastFocusedWindow: true }) } catch { }
+    try { [t] = await chrome.tabs.query({ active: true, lastFocusedWindow: true }) } catch {}
     if (!t || !HOST.test(t.url || "")) {
       let all = [];
-      try { all = await chrome.tabs.query({ lastFocusedWindow: true }) } catch { }
+      try { all = await chrome.tabs.query({ lastFocusedWindow: true }) } catch {}
       t = all.find(x => HOST.test(x.url || "")) || t;
     }
     tabId = t && HOST.test(t.url || "") ? t.id : null;
@@ -29,7 +29,7 @@
 
   function send(cmd, extra) {
     if (!EXT || tabId == null) return;
-    try { chrome.tabs.sendMessage(tabId, Object.assign({ source: UCHAN, cmd }, extra || {})) } catch { }
+    try { chrome.tabs.sendMessage(tabId, Object.assign({ source: UCHAN, cmd }, extra || {})) } catch {}
   }
 
   function ping() {
@@ -37,13 +37,13 @@
     try {
       chrome.tabs.sendMessage(tabId, { source: UCHAN, cmd: "ping" }, resp => {
         void chrome.runtime.lastError;
-        if (resp && resp.source === PCHAN && resp.payload) applyState(resp.payload);
+        if (resp && resp.source === PCHAN && resp.payload) stateapply(resp.payload);
       });
-    } catch { }
+    } catch {}
   }
 
   async function refresh() {
-    if (!EXT) { loadplaceholder(); return }
+    if (!EXT) {loadplaceholder(); return}
     await resolveTab();
     if (tabId == null) {captured = false; render(true); return}
     ping();
@@ -51,7 +51,7 @@
     send("devget");
   }
 
-  function applyState(p) {
+  function stateapply(p) {
     captured = !!p.captured; source = p.source || "none"; dirty = !!p.dirty;
     flags = p.flags || {}; overrides = p.overrides || {}; status = p.status || {};
     render();
@@ -84,7 +84,7 @@
   if (EXT) {
     chrome.runtime.onMessage.addListener(msg => {
       if (!msg || msg.source !== PCHAN) return;
-      if (msg.type === "state") applyState(msg.payload);
+      if (msg.type === "state") stateapply(msg.payload);
       else if (msg.type === "dev") { Object.assign(devconfig, msg.config || {}); syncdev() }
     });
     chrome.tabs.onActivated.addListener(refresh);
@@ -94,8 +94,6 @@
 
   /*//////////////////////////////////////////////////////////////////////*/
 
-  // cosmetic metadata from configs/descriptions.js; fall back to empty so a
-  // missing/unloaded config degrades to auto descriptions instead of blanking ui
   const knowndesc = window.twitterflagsknowndesc || {};
   const dangerknowndesc = window.twitterflagsdangerdesc || {};
 
@@ -134,7 +132,7 @@
     if (type === "number") { const n = Number(raw); return raw.trim() === "" || Number.isNaN(n) ? raw : n }
     if (type === "list") {
       const t = raw.trim();
-      if (t.startsWith("[")) { try { return JSON.parse(t) } catch { } }
+      if (t.startsWith("[")) { try { return JSON.parse(t) } catch {} }
       return t === "" ? [] : t.split(",").map(x => x.trim()).filter(x => x !== "");
     }
     if (type === "json") { try { return JSON.parse(raw) } catch { return raw } }
@@ -168,14 +166,12 @@
       lbl.querySelector(".checkbox").classList.toggle("on", on);
     });
   }
-  // bulk-toggle every safe (non-danger) boolean flag as a throwaway profile; leaves
-  // dangerous flags and non-boolean (number/string/list) values untouched so your
-  // tuned/risky settings survive. "reset" clears only the safe overrides.
-  function bulkSafe(mode) {
+
+  function bulksafe(mode) {
     const set = {}, clear = [];
     for (const name of Object.keys(flags)) {
       if (typeOf(flags[name]) !== "boolean" || dangerFor(name)) continue;
-      if (mode === "reset") { if (hasOverride(name)) { delete overrides[name]; clear.push(name) } }
+      if (mode === "reset") { if (hasoverride(name)) { delete overrides[name]; clear.push(name) } }
       else { const val = mode === "on"; overrides[name] = val; set[name] = val }
     }
     if (!Object.keys(set).length && !clear.length) return;
@@ -183,12 +179,12 @@
   }
   header.addEventListener("click", e => {
     const bb = e.target.closest(".bulkbtn");
-    if (bb) { e.preventDefault(); bulkSafe(bb.getAttribute("data-bulk")); return }
+    if (bb) { e.preventDefault(); bulksafe(bb.getAttribute("data-bulk")); return }
     const lbl = e.target.closest(".checklabel");
     if (!lbl) return;
     e.preventDefault();
     const grp = lbl.getAttribute("data-group"), k = lbl.getAttribute("data-key");
-    if (grp === "dev") {devconfig[k] = !devconfig[k]; paintchecks(); pushDev()}
+    if (grp === "dev") {devconfig[k] = !devconfig[k]; paintchecks(); devpush()}
     else if (grp === "flag") {
       const f = lbl.getAttribute("data-flag");
       if (effective(f) === true) { delete overrides[f]; send("clear", { name: f }) }
@@ -197,13 +193,14 @@
     }
     else {filters[k] = !filters[k]; paintchecks(); render()}
   });
-  function syncdev() { paintchecks() }
-  const pushDev = () => send("devset", { config: devconfig });
+
+  function syncdev() {paintchecks()}
+  const devpush = () => send("devset", {config: devconfig});
   paintchecks();
 
-  const prefixOf = n => n.startsWith("responsive_web_") ? "responsive_web" : n.split("_")[0];
+  const prefof = n => n.startsWith("responsive_web_") ? "responsive_web" : n.split("_")[0];
 
-  function fillPrefixes(counts) {
+  function preffill(counts) {
     const cur = prefixselect.value;
     const big = Object.keys(counts).filter(p => counts[p] >= 3).sort();
     const opts = ["", ...big];
@@ -224,7 +221,7 @@
     if (!a || !b || typeof a !== "object" || typeof b !== "object") return false;
     try { return JSON.stringify(a) === JSON.stringify(b) } catch { return false }
   }
-  const isMod = name => hasOverride(name) && !eq(overrides[name], flags[name]);
+  const isMod = name => hasoverride(name) && !eq(overrides[name], flags[name]);
 
   function updateFoot() { footer.hidden = !dirty }
 
@@ -244,14 +241,14 @@
     }
     const names = Object.keys(flags).sort();
     const counts = {};
-    for (const n of names) { const p = prefixOf(n); counts[p] = (counts[p] || 0) + 1 }
+    for (const n of names) { const p = prefof(n); counts[p] = (counts[p] || 0) + 1 }
     const small = new Set(Object.keys(counts).filter(p => counts[p] <= 2));
-    fillPrefixes(counts);
+    preffill(counts);
     const term = search.value.toLowerCase().trim();
     const pref = prefixselect.value;
     let html = "";
     for (const name of names) {
-      if (pref) { const pf = prefixOf(name); if (pref === "__other__" ? !small.has(pf) : pf !== pref) continue }
+      if (pref) { const pf = prefof(name); if (pref === "__other__" ? !small.has(pf) : pf !== pref) continue }
       if (filters.true && effective(name) !== true) continue;
       const mod = isMod(name);
       if (filters.mod && !mod) continue;
@@ -279,24 +276,36 @@
     const val = parseInput(t, input.value);
     overrides[name] = val; dirty = true; send("set", { name, value: val }); render();
   }
-  list.addEventListener("change", e => { const el = e.target.closest(".editfield"); if (el) commit(el) });
-  list.addEventListener("keydown", e => { if (e.key === "Enter") { const el = e.target.closest(".editfield"); if (el && el.tagName !== "TEXTAREA") { commit(el); e.preventDefault() } } });
+  list.addEventListener("change", e => {const el = e.target.closest(".editfield"); if (el) commit(el)});
+  list.addEventListener("keydown", e => {if (e.key === "Enter") {const el = e.target.closest(".editfield"); 
+  if (el && el.tagName !== "TEXTAREA") {commit(el); e.preventDefault()}}});
+
   list.addEventListener("click", e => {
     const cb = e.target.closest(".checkbox");
-    if (cb) { const n = cb.getAttribute("data-name"); const val = !(effective(n) === true); overrides[n] = val; dirty = true; send("set", { name: n, value: val }); render(); return }
+    
+    if (cb) { const n = cb.getAttribute("data-name"); 
+    const val = !(effective(n) === true); overrides[n] = val; dirty = true; 
+    send("set", {name: n, value: val}); render(); return }
     const resetbtn = e.target.closest(".reset");
-    if (resetbtn) { const n = resetbtn.getAttribute("data-name"); delete overrides[n]; dirty = true; send("clear", { name: n }); render(); return }
+
+    if (resetbtn) {
+      const n = resetbtn.getAttribute("data-name"); 
+      delete overrides[n]; dirty = true; send("clear", {name: n}); render(); return
+    }
     const id = e.target.closest(".ident");
+
     if (id) {
       const n = id.getAttribute("data-name");
-      try { navigator.clipboard.writeText(n) } catch { }
-      if (!id.querySelector(".copied")) { const c = document.createElement("span"); c.className = "copied"; c.textContent = "copied"; id.appendChild(c); setTimeout(() => c.remove(), 900) }
+      try {navigator.clipboard.writeText(n)} catch {}
+      if (!id.querySelector(".copied")) { const c = document.createElement("span"); 
+      c.className = "copied"; c.textContent = "copied"; 
+      id.appendChild(c); setTimeout(() => c.remove(), 900) }
     }
   });
 
   search.oninput = () => render(); prefixselect.onchange = () => render();
   reload.onclick = () => send("reload");
-  undo.onclick = () => { overrides = {}; dirty = true; send("clearall"); render() };
+  undo.onclick = () => {overrides = {}; dirty = true; send("clearall"); render()};
   refresh();
 
 })();

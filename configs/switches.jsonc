@@ -1,18 +1,21 @@
 {
-  // top row: our own dev tools (not real twitter features). "key" = dev config
-  // key, "flag" = a real feature flag surfaced as a shortcut. "title" = hover alt.
+  // top row
   "dev": [
-    {"key": "jfDev", "label": "jetfuel dev mode", "title": "sets sessionStorage jfDev, unlocking the internal jetfuel ads dev menu (needs reload)"},
-    {"key": "inspect", "label": "inspector", "title": "hover any element to see its data-testid, click to copy (esc to exit)"},
+    {"key": "jfDev", "label": "jetfuel dev mode", "title": "sets sessionStorage jfDev, unlocking the super epic emusk rocket emoji mode"},
+    {"key": "inspect", "label": "inspector", "title": "hover any element to see its data-testid"},
     {"key": "exposeDebug", "label": "expose audio", "title": "adds ?exposeDebug=1 so the media stream audio player is reachable"},
-    {"key": "forceDevEnv", "label": "force dev env", "title": "experimental: revives prod-gated dev code, may break the client (needs reload)"}
+    {"key": "forceDevEnv", "label": "force dev environment", "title": "tries to revive prod-gated developer code (needs a reload)"}
   ],
-
-  // filter row: narrows the flag list. "key" matches the filter state in panel.js
+  // filter row
   "filters": [
-    {"key": "true", "label": "enabled", "title": "only flags currently on"},
-    {"key": "safe", "label": "safe", "title": "hide flags that match a risky pattern"},
-    {"key": "danger", "label": "dangerous", "title": "only flags that match a risky pattern"},
-    {"key": "mod", "label": "modified", "title": "only flags you have overridden"}
+    {"key": "true", "label": "enabled"},
+    {"key": "safe", "label": "safe"},
+    {"key": "danger", "label": "dangerous"},
+    {"key": "mod", "label": "modified"}
+  ],
+  "actions": [
+    {"action": "unregister", "label": "unregister sw.js", "title": "unregister the service worker (fresh assets when reloading)"},
+    {"action": "flush", "label": "flush cache", "title": "delete the cached html app shell"},
+    {"action": "refresh", "label": "refresh cache", "title": "reprime the html app shell"}
   ]
 }

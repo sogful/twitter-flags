@@ -2,13 +2,79 @@
 // @name         twitter flags & more
 // @namespace    coolsite.cv
 // @version      2.1
-// @description  browse hidden stuff inside the twitter client with an in-page panel!
+// @description  browse hidden stuff inside the twitter client with a side panel!
 // @author       cv
-// @match        https://x.com/*
-// @match        https://twitter.com/*
-// @icon         data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMTI4IDEyOCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0wIDk2LjZjMS0xIDMuOC0xMy45IDQuNS0xNi40bDEwLjUtNDEgMy41LTE0cTEtNC45IDIuNC05LjZjMi02IDUuNS00LjYgMTAuMi0zLjRMNDEuNSAxNWwzMCA3LjcgMzQuNiA4LjZxOC43IDIgMTcuMyA0LjVjMiAuNiAzLjQgMi4yIDQuNiAzLjh2Mi45Yy02IDcuMy0xMy4xIDE0LjEtMTkgMjEuNy0yIDIuNy03LjMgNy4yLTcuNyAxMC45LjIgMi42IDEuNyA3LjIgMi4zIDEwbDQgMTcuN2MxIDQuNy42IDQuOSAyLjUgMTBhOSA5IDAgMCAxLTMuMyA0Yy02IDEtMTEtLjktMTYuOC0yLjNMNjkuNiAxMDlhODcyIDg3MiAwIDAgMC00OC43LTExLjdjLjMgMi40LTYuOSAyNi44LTggMzAuN0gweiIvPjxwYXRoIGQ9Ik0wIDk2LjZjMS0xIDMuOC0xMy45IDQuNS0xNi40bDEwLjUtNDEgMy41LTE0cTEtNC45IDIuNC05LjZjMi02IDUuNS00LjYgMTAuMi0zLjRMNDEuNSAxNWwzMCA3LjcgMzQuNiA4LjZxOC43IDIgMTcuMyA0LjVjMiAuNiAzLjQgMi4yIDQuNiAzLjh2Mi45Yy02IDcuMy0xMy4xIDE0LjEtMTkgMjEuNy0yIDIuNy03LjMgNy4yLTcuNyAxMC45LjIgMi42IDEuNyA3LjIgMi4zIDEwbDQgMTcuN2MxIDQuNy42IDQuOSAyLjUgMTBhOSA5IDAgMCAxLTMuMyA0Yy02IDEtMTEtLjktMTYuOC0yLjNMNjkuNiAxMDlhODcyIDg3MiAwIDAgMC00OC43LTExLjdjLjMgMi40LTYuOSAyNi44LTggMzAuN0g4YzEtNC43IDIuNi04LjggMy44LTEzLjRsNi0yMy41YzMgLjkgNyAxLjggMTAgMi42TDQ3IDk4LjVsNTcuMiAxNC41Yy0xLjYtOS41LTQuMy0xOS40LTYuMi0yOC45LS44LTMuNy0yLjItOC43LTIuNi0xMi4zcTEuNy0yLjIgMy43LTQuM2M4LTguNyAxNS41LTE4LjkgMjMuNy0yNy4zLTQuNy0xLjUtMTAuMy0yLjgtMTUtNGwtMjUtNi4zYy0xOC43LTQuNy0zOC40LTEwLTU3LTE0LjMtNS40IDIyLjUtMTEuNiA0NS42LTE3LjMgNjhsLTUuNSAyMmExMDcgMTA3IDAgMCAxLTMgMTEuMnoiLz48cGF0aCBmaWxsPSIjMUJBMUYyIiBkPSJNMzMuNSAyOC42YzIyLjcgNi4zIDQ3IDExLjMgNjkuNyAxNy43TDgzLjYgNjljMiA3LjQgMy43IDE2LjYgNS40IDI0LjJxLjUgMi41IDEuMyA1Yy01LjItMS0xMi44LTMtMTguMi00LjVsLTMzLjktOC41QzM0IDg0IDI0LjUgODEuNCAyMC40IDgwLjljMy44LTE3LjIgOS4yLTM1IDEzLTUyLjMiLz48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTQxLjYgNDNjNy41IDguMiA3LjMgOSAxNy41IDEzIDEtMTAuNSAxMC42LTEzLjMgMTcuNy02LjFxMy41LS41IDYuOC0xLjZjLTIgMi4xLTMuNCAzLjQtNS45IDUgMi40LS4xIDQtLjQgNi40LS44bC02IDQuM2MtMiA4LTMuOCAxMS44LTEwIDE3LjhhMjggMjggMCAwIDEtMjQuOSA0LjJjLTQtMS4yLTcuMi0zLjYtMTAuNi01LjggNiAxLjUgOS41IDEuNiAxNS4zLTEuMi00LjUtMi02LTMuMi04LTcuNmw1LjQuM2MtNS40LTIuMi02LjYtNS03LTEwLjdsNC42IDIuOGMtMy42LTQuNS00LjMtOC42LTEuMy0xMy42Ii8+PC9zdmc+
-// @run-at       document-start
-// @grant        none
+// @match         https://x.com/*
+// @match         https://*.x.com/*
+// @match         https://mobile.x.com/*
+// @match         https://twitter.com/*
+// @match         https://*.twitter.com/*
+// @match         https://mobile.twitter.com/*
+// @match         https://twitter.app.link/*
+// @match         https://twitter.test-app.link/*
+// @match         https://twitter-alternate.test-app.link/*
+// @match         https://x.app.link/*
+// @match         https://x-alternate.app.link/*
+// @match         https://x.test-app.link/*
+// @match         https://x-alternate.test-app.link/*
+// @exclude-match https://ads.x.com/*
+// @exclude-match https://ads.twitter.com/*
+// @exclude-match https://ads-api.x.com/*
+// @exclude-match https://ads-api.twitter.com/*
+// @exclude-match https://analytics.x.com/*
+// @exclude-match https://analytics.twitter.com/*
+// @exclude-match https://business.x.com/*
+// @exclude-match https://business.twitter.com/*
+// @exclude-match https://developer.x.com/*
+// @exclude-match https://developer.twitter.com/*
+// @exclude-match https://help.x.com/*
+// @exclude-match https://help.twitter.com/*
+// @exclude-match https://support.x.com/*
+// @exclude-match https://support.twitter.com/*
+// @exclude-match https://blog.x.com/*
+// @exclude-match https://blog.twitter.com/*
+// @exclude-match https://about.x.com/*
+// @exclude-match https://about.twitter.com/*
+// @exclude-match https://careers.x.com/*
+// @exclude-match https://careers.twitter.com/*
+// @exclude-match https://legal.x.com/*
+// @exclude-match https://legal.twitter.com/*
+// @exclude-match https://privacy.x.com/*
+// @exclude-match https://privacy.twitter.com/*
+// @exclude-match https://transparency.x.com/*
+// @exclude-match https://transparency.twitter.com/*
+// @exclude-match https://cards.x.com/*
+// @exclude-match https://cards.twitter.com/*
+// @exclude-match https://publish.x.com/*
+// @exclude-match https://publish.twitter.com/*
+// @exclude-match https://platform.x.com/*
+// @exclude-match https://platform.twitter.com/*
+// @exclude-match https://api.x.com/*
+// @exclude-match https://api.twitter.com/*
+// @exclude-match https://upload.x.com/*
+// @exclude-match https://upload.twitter.com/*
+// @exclude-match https://ton.x.com/*
+// @exclude-match https://ton.twitter.com/*
+// @exclude-match https://media.x.com/*
+// @exclude-match https://media.twitter.com/*
+// @exclude-match https://brand.x.com/*
+// @exclude-match https://brand.twitter.com/*
+// @exclude-match https://marketing.x.com/*
+// @exclude-match https://marketing.twitter.com/*
+// @exclude-match https://investor.x.com/*
+// @exclude-match https://investor.twitter.com/*
+// @exclude-match https://engineering.x.com/*
+// @exclude-match https://engineering.twitter.com/*
+// @exclude-match https://press.x.com/*
+// @exclude-match https://press.twitter.com/*
+// @exclude-match https://pr.x.com/*
+// @exclude-match https://pr.twitter.com/*
+// @exclude-match https://gdpr.x.com/*
+// @exclude-match https://gdpr.twitter.com/*
+// @exclude       /\.(?:js|mjs|json|css|map|png|jpe?g|gif|svg|webp|avif|ico|woff2?|ttf|otf|eot|mp4|webm|m3u8|wasm|xml|txt|pdf)(?:[?#].*)?$/i
+// @icon          data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMTI4IDEyOCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0wIDk2LjZjMS0xIDMuOC0xMy45IDQuNS0xNi40bDEwLjUtNDEgMy41LTE0cTEtNC45IDIuNC05LjZjMi02IDUuNS00LjYgMTAuMi0zLjRMNDEuNSAxNWwzMCA3LjcgMzQuNiA4LjZxOC43IDIgMTcuMyA0LjVjMiAuNiAzLjQgMi4yIDQuNiAzLjh2Mi45Yy02IDcuMy0xMy4xIDE0LjEtMTkgMjEuNy0yIDIuNy03LjMgNy4yLTcuNyAxMC45LjIgMi42IDEuNyA3LjIgMi4zIDEwbDQgMTcuN2MxIDQuNy42IDQuOSAyLjUgMTBhOSA5IDAgMCAxLTMuMyA0Yy02IDEtMTEtLjktMTYuOC0yLjNMNjkuNiAxMDlhODcyIDg3MiAwIDAgMC00OC43LTExLjdjLjMgMi40LTYuOSAyNi44LTggMzAuN0gweiIvPjxwYXRoIGQ9Ik0wIDk2LjZjMS0xIDMuOC0xMy45IDQuNS0xNi40bDEwLjUtNDEgMy41LTE0cTEtNC45IDIuNC05LjZjMi02IDUuNS00LjYgMTAuMi0zLjRMNDEuNSAxNWwzMCA3LjcgMzQuNiA4LjZxOC43IDIgMTcuMyA0LjVjMiAuNiAzLjQgMi4yIDQuNiAzLjh2Mi45Yy02IDcuMy0xMy4xIDE0LjEtMTkgMjEuNy0yIDIuNy03LjMgNy4yLTcuNyAxMC45LjIgMi42IDEuNyA3LjIgMi4zIDEwbDQgMTcuN2MxIDQuNy42IDQuOSAyLjUgMTBhOSA5IDAgMCAxLTMuMyA0Yy02IDEtMTEtLjktMTYuOC0yLjNMNjkuNiAxMDlhODcyIDg3MiAwIDAgMC00OC43LTExLjdjLjMgMi40LTYuOSAyNi44LTggMzAuN0g4YzEtNC43IDIuNi04LjggMy44LTEzLjRsNi0yMy41YzMgLjkgNyAxLjggMTAgMi42TDQ3IDk4LjVsNTcuMiAxNC41Yy0xLjYtOS41LTQuMy0xOS40LTYuMi0yOC45LS44LTMuNy0yLjItOC43LTIuNi0xMi4zcTEuNy0yLjIgMy43LTQuM2M4LTguNyAxNS41LTE4LjkgMjMuNy0yNy4zLTQuNy0xLjUtMTAuMy0yLjgtMTUtNGwtMjUtNi4zYy0xOC43LTQuNy0zOC40LTEwLTU3LTE0LjMtNS40IDIyLjUtMTEuNiA0NS42LTE3LjMgNjhsLTUuNSAyMmExMDcgMTA3IDAgMCAxLTMgMTEuMnoiLz48cGF0aCBmaWxsPSIjMUJBMUYyIiBkPSJNMzMuNSAyOC42YzIyLjcgNi4zIDQ3IDExLjMgNjkuNyAxNy43TDgzLjYgNjljMiA3LjQgMy43IDE2LjYgNS40IDI0LjJxLjUgMi41IDEuMyA1Yy01LjItMS0xMi44LTMtMTguMi00LjVsLTMzLjktOC41QzM0IDg0IDI0LjUgODEuNCAyMC40IDgwLjljMy44LTE3LjIgOS4yLTM1IDEzLTUyLjMiLz48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTQxLjYgNDNjNy41IDguMiA3LjMgOSAxNy41IDEzIDEtMTAuNSAxMC42LTEzLjMgMTcuNy02LjFxMy41LS41IDYuOC0xLjZjLTIgMi4xLTMuNCAzLjQtNS45IDUgMi40LS4xIDQtLjQgNi40LS44bC02IDQuM2MtMiA4LTMuOCAxMS44LTEwIDE3LjhhMjggMjggMCAwIDEtMjQuOSA0LjJjLTQtMS4yLTcuMi0zLjYtMTAuNi01LjggNiAxLjUgOS41IDEuNiAxNS4zLTEuMi00LjUtMi02LTMuMi04LTcuNmw1LjQuM2MtNS40LTIuMi02LjYtNS03LTEwLjdsNC42IDIuOGMtMy42LTQuNS00LjMtOC42LTEuMy0xMy42Ii8+PC9zdmc+
+// @run-at        document-start
+// @grant         none
 // ==/UserScript==
 
 (function () {
@@ -125,6 +191,13 @@
       font-size: 9.75px; gap: 10.5px
     }
     .row2.dev label {gap: 3.75px}
+    .swbtn {
+      background-color: #242E36; color: #E5EAEC;
+      border: none; cursor: pointer;
+      border-radius: 999px; padding: 2px 7px;
+      font: 600 9.75px "Chirp", system-ui, sans-serif;
+    }
+    .swbtn:hover {background-color: #2f3b45}
     .row2.dev .checkbox {
       width: 15px; height: 15px;
       border-width: 1.5px; border-radius: 3px
@@ -369,7 +442,7 @@
 
   /*//////////////////////////////////////////////////////////////////////*/
 
-window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks the whole site into conference-only mode (redirects to /i/conferences-room)","rweb_conf_dev_enabled":"conference debug overlay: per-feed grid, throttle states, spatial audio panning","rweb_conf_composite_video_enabled":"canvas-composites two media streams into one conference feed","rweb_conf_multi_video_enabled":"multi-video conference with simulcast + presentation tracks","rweb_conf_rnnoise_enabled":"rnnoise ml noise suppression in conferences","rweb_conf_dummy_enabled":"inject a dummy publisher into conferences (testing)","spaces_conference_enabled":"enables the conference product (pair with rweb_conf_only_enabled)","spaces_video_speakers_enabled":"video for space speakers","spaces_video_admins_enabled":"video admin controls in spaces","spaces_video_consumption_enabled":"watch video in spaces","rweb_video_screen_enabled":"video-only 'mixer' timeline (MediaTabVideoMixer) on profiles","responsive_web_tv_cast_enabled":"cast video to a tv (chromecast/airplay)","blue_longer_video_enabled":"allow longer video uploads (premium)","responsive_web_hevc_upload_preview_enabled":"hevc video upload preview","web_video_playback_rate_enabled":"video playback speed control","web_video_transcribed_captions_enabled":"auto-transcribed captions on video","web_video_caption_repositioning_enabled":"drag captions to reposition them","rweb_picture_in_picture_enabled":"picture-in-picture video","rweb_video_pip_enabled":"picture-in-picture video (alt flag)","rweb_save_video_progress_enabled":"remember playback position per video","rweb_live_broadcast_rewind_enabled":"rewind live broadcasts","responsive_web_instream_video_redesign_enabled":"redesigned in-stream video player","dm_video_downloads_enabled":"download videos sent in dms","responsive_web_media_download_video_share_menu_enabled":"'download video' in the share menu","responsive_web_composer_configurable_video_player_enabled":"configurable video player in composer","responsive_web_convert_card_video_to_gif_enabled":"convert card video to gif","media_edge_to_edge_content_enabled":"edge-to-edge media layout","responsive_web_edit_tweet_enabled":"edit posts after sending","responsive_web_edit_tweet_composition_enabled":"show the edit-tweet composer","responsive_web_edit_tweet_api_enabled":"edit-tweet api path","responsive_web_one_hour_edit_window_enabled":"extends the post edit window to one hour","responsive_web_composer_autosave_enabled":"autosave composer drafts","responsive_web_image_poll_composer_enabled":"image polls in the composer","responsive_web_card_image_poll_enabled":"render image polls","responsive_web_tweet_drafts_threads_enabled":"save thread drafts","responsive_web_tweet_drafts_video_enabled":"save drafts that contain video","responsive_web_scheduling_threads_enabled":"schedule whole threads","longform_notetweets_consumption_enabled":"read long-form note tweets","longform_notetweets_rich_text_read_enabled":"render rich text in note tweets","longform_notetweets_inline_media_enabled":"inline media inside note tweets","longform_notetweets_composition_without_claims_enabled":"compose note tweets without monetization claims","disallowed_reply_controls_enabled":"advanced 'who can reply' controls","dont_mention_me_enabled":"let people remove themselves from your replies/mentions","rweb_conversational_replies_downvote_enabled":"downvote button on replies","responsive_web_pinned_replies_enabled":"pin a reply under your post","responsive_web_reply_storm_enabled":"reply-storm (rapid threaded replies) ui","responsive_web_grok_general_availability":"grok available to everyone","responsive_web_grok_voice_mode_enabled":"grok voice mode","responsive_web_grok_image_edit":"edit images with grok","responsive_web_grok_imagine_composer_enabled":"grok imagine image/video composer","responsive_web_grok_imagine_in_composer_enabled":"grok imagine inside the post composer","responsive_web_grok_feed":"a grok-generated feed","responsive_web_grok_personality":"grok personality picker","responsive_web_grok_temporary_chat_enabled":"ephemeral grok chats","responsive_web_grok_debug_enabled":"grok debug ui","responsive_web_grok_show_grok_performance_metrics":"show grok latency/perf metrics","responsive_web_grok_enable_deepersearch":"grok deepersearch mode","responsive_web_grok_model_selector_in_input":"pick the grok model from the input box","responsive_web_grok_420_toggle_enabled":"grok 4.20 beta toggle","responsive_web_grok_05221996":"internal grok codename toggle (dated)","responsive_web_grok_05231996":"internal grok codename toggle (imagine)","responsive_web_grok_fun_mode_disabled":"disables grok fun mode","responsive_web_grok_text_selection_enabled":"ask grok about selected text","responsive_web_grok_analyze_post_followups_enabled":"follow-up questions after analyzing a post","responsive_web_grok_profile_summary_enabled":"grok summary on profiles","xchat_ask_grok_enabled":"ask grok inside chat","payments_cash_deposits_enabled":"twitter money cash deposits","payments_cheques_deposits_enabled":"twitter money cheque deposits","payments_shared_accounts_enabled":"shared twitter money accounts","payments_secondary_accounts_enabled":"secondary twitter money accounts","payments_web_external_app_enabled":"twitter money external app payments","payments_transaction_search_enabled":"search payment transactions","responsive_web_stripe_account_creation_enabled":"create a stripe account in-app","responsive_web_mobile_app_spotlight_v1_config":"profile app/play-store link card (local only unfortunately)","responsive_web_location_spotlight_v1_config":"profile location spotlight card","responsive_web_profile_spotlight_v0_config":"profile spotlight card","responsive_web_profile_about_enabled":"the new structured 'about' profile page","xprofile_editing_enabled":"desktop-only extended bio, which elon removed after it broke (LOL??)","xprofile_work_history_enabled":"work history section on profiles","hidden_profile_subscriptions_enabled":"hide your subscriptions on profile","profile_label_improvements_pcf_edit_profile_enabled":"edit professional category from profile","dm_secret_conversations_enabled":"encrypted dms (xchat secret conversations)","av_chat_encryption_enabled":"encrypted audio/video calls","av_chat_group_e2ee_creator_enabled":"create e2ee group calls","av_chat_group_e2ee_joiner_enabled":"join e2ee group calls","av_chat_xchat_emoji_reactions_enabled":"emoji reactions in calls","dm_bulk_delete_enabled":"bulk delete dms","dm_edit_dms_overflow_menu_enabled":"edit sent dms","dm_voice_rendering_enabled":"voice messages in dms","rweb_xchat_standalone_avcall_enabled":"standalone audio/video calls in xchat","rweb_xchat_delegate_accounts_enabled":"use xchat from delegated accounts","communities_analytics_enabled":"community analytics dashboard","communities_adult_content_setting_enabled":"mark a community as adult-content","communities_non_member_reply_enabled":"non-members can reply in communities","responsive_web_birdwatch_note_writing_enabled":"write community notes","responsive_web_birdwatch_media_notes_enabled":"community notes on media","freedom_of_speech_not_reach_author_label_enabled":"show 'visibility limited' author labels","creator_subscriptions_revamp_enabled":"revamped creator subscriptions","super_follow_exclusive_tweet_creation_api_enabled":"create super-follower-only posts","premium_content_api_read_enabled":"read paywalled premium posts","recruiting_premium_jobs_enabled":"premium job listings","recruiting_global_jobs_search_enabled":"global job search","articles_rest_api_enabled":"long-form articles api","highlights_tweets_tab_ui_enabled":"highlights tab on profile","rweb_debugger_enabled":"in-client network request logger (debugger)","gryphon_underground_enabled":"internal tweetdeck / pro \"underground\" mode","responsive_web_jetfuel_frame":"internal ads (jetfuel) frame","responsive_web_send_jetfuel_preview_image_enabled":"send jetfuel ad preview image","responsive_web_user_spectral_key_enabled":"spectral key (internal user keying)","march_madness_brackets_enabled":"seasonal march madness brackets","responsive_web_grok_user_seconds_debug":"debug grok active-seconds tracking","responsive_web_api_transition_enabled":"routes api calls through the transition layer","responsive_web_temporary_ocf_x_migration":"ocf-to-x onboarding migration","responsive_web_redux_use_fragment_enabled":"switches the redux data layer to fragments","responsive_web_graphql_timeline_navigation_enabled":"core graphql timeline navigation","rweb_session_binding_enabled":"binds the session to the device","rweb_client_transaction_id_enabled":"adds client transaction ids to requests","network_layer_503_backoff_mode":"network retry / backoff behavior on 503","responsive_web_timeline_cover_killswitch_enabled":"timeline cover killswitch","responsive_web_extension_compatibility_hide":"hides content flagged by extension-compat checks"},"danger":{"rweb_conf_only_enabled":"replaces the entire web app with conference-only mode","rweb_video_screen_enabled":"swaps the profile media tab for the video mixer layout","responsive_web_api_transition_enabled":"reroutes all api traffic, so can break loading completely","responsive_web_temporary_ocf_x_migration":"changes onboarding/auth flows","responsive_web_redux_use_fragment_enabled":"swaps the data layer, can break rendering","responsive_web_graphql_timeline_navigation_enabled":"core navigation, timelines can break completely","rweb_session_binding_enabled":"can invalidate your session / log you out","responsive_web_extension_compatibility_hide":"can hide page content","is_maintenance_mode_enabled":"puts the client in maintenance mode"}},"switches":{"dev":[{"key":"jfDev","label":"jetfuel dev mode","title":"sets sessionStorage jfDev, unlocking the internal jetfuel ads dev menu (needs reload)"},{"key":"inspect","label":"inspector","title":"hover any element to see its data-testid, click to copy (esc to exit)"},{"key":"exposeDebug","label":"expose audio","title":"adds ?exposeDebug=1 so the media stream audio player is reachable"},{"key":"forceDevEnv","label":"force dev env","title":"experimental: revives prod-gated dev code, may break the client (needs reload)"}],"filters":[{"key":"true","label":"enabled","title":"only flags currently on"},{"key":"safe","label":"safe","title":"hide flags that match a risky pattern"},{"key":"danger","label":"dangerous","title":"only flags that match a risky pattern"},{"key":"mod","label":"modified","title":"only flags you have overridden"}]}};
+window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks the whole site into conference-only mode (redirects to /i/conferences-room)","rweb_conf_dev_enabled":"conference debug overlay: per-feed grid, throttle states, spatial audio panning","rweb_conf_composite_video_enabled":"canvas-composites two media streams into one conference feed","rweb_conf_multi_video_enabled":"multi-video conference with simulcast + presentation tracks","rweb_conf_rnnoise_enabled":"rnnoise ml noise suppression in conferences","rweb_conf_dummy_enabled":"inject a dummy publisher into conferences (testing)","spaces_conference_enabled":"enables the conference product (pair with rweb_conf_only_enabled)","spaces_video_speakers_enabled":"video for space speakers","spaces_video_admins_enabled":"video admin controls in spaces","spaces_video_consumption_enabled":"watch video in spaces","rweb_video_screen_enabled":"video-only 'mixer' timeline (MediaTabVideoMixer) on profiles","responsive_web_tv_cast_enabled":"cast video to a tv (chromecast/airplay)","blue_longer_video_enabled":"allow longer video uploads (premium)","responsive_web_hevc_upload_preview_enabled":"hevc video upload preview","web_video_playback_rate_enabled":"video playback speed control","web_video_transcribed_captions_enabled":"auto-transcribed captions on video","web_video_caption_repositioning_enabled":"drag captions to reposition them","rweb_picture_in_picture_enabled":"picture-in-picture video","rweb_video_pip_enabled":"picture-in-picture video (alt flag)","rweb_save_video_progress_enabled":"remember playback position per video","rweb_live_broadcast_rewind_enabled":"rewind live broadcasts","responsive_web_instream_video_redesign_enabled":"redesigned in-stream video player","dm_video_downloads_enabled":"download videos sent in dms","responsive_web_media_download_video_share_menu_enabled":"'download video' in the share menu","responsive_web_composer_configurable_video_player_enabled":"configurable video player in composer","responsive_web_convert_card_video_to_gif_enabled":"convert card video to gif","media_edge_to_edge_content_enabled":"edge-to-edge media layout","responsive_web_edit_tweet_enabled":"edit posts after sending","responsive_web_edit_tweet_composition_enabled":"show the edit-tweet composer","responsive_web_edit_tweet_api_enabled":"edit-tweet api path","responsive_web_one_hour_edit_window_enabled":"extends the post edit window to one hour","responsive_web_composer_autosave_enabled":"autosave composer drafts","responsive_web_image_poll_composer_enabled":"image polls in the composer","responsive_web_card_image_poll_enabled":"render image polls","responsive_web_tweet_drafts_threads_enabled":"save thread drafts","responsive_web_tweet_drafts_video_enabled":"save drafts that contain video","responsive_web_scheduling_threads_enabled":"schedule whole threads","longform_notetweets_consumption_enabled":"read long-form note tweets","longform_notetweets_rich_text_read_enabled":"render rich text in note tweets","longform_notetweets_inline_media_enabled":"inline media inside note tweets","longform_notetweets_composition_without_claims_enabled":"compose note tweets without monetization claims","disallowed_reply_controls_enabled":"advanced 'who can reply' controls","dont_mention_me_enabled":"let people remove themselves from your replies/mentions","rweb_conversational_replies_downvote_enabled":"downvote button on replies","responsive_web_pinned_replies_enabled":"pin a reply under your post","responsive_web_reply_storm_enabled":"reply-storm (rapid threaded replies) ui","responsive_web_grok_general_availability":"grok available to everyone","responsive_web_grok_voice_mode_enabled":"grok voice mode","responsive_web_grok_image_edit":"edit images with grok","responsive_web_grok_imagine_composer_enabled":"grok imagine image/video composer","responsive_web_grok_imagine_in_composer_enabled":"grok imagine inside the post composer","responsive_web_grok_feed":"a grok-generated feed","responsive_web_grok_personality":"grok personality picker","responsive_web_grok_temporary_chat_enabled":"ephemeral grok chats","responsive_web_grok_debug_enabled":"grok debug ui","responsive_web_grok_show_grok_performance_metrics":"show grok latency/perf metrics","responsive_web_grok_enable_deepersearch":"grok deepersearch mode","responsive_web_grok_model_selector_in_input":"pick the grok model from the input box","responsive_web_grok_420_toggle_enabled":"grok 4.20 beta toggle","responsive_web_grok_05221996":"internal grok codename toggle (dated)","responsive_web_grok_05231996":"internal grok codename toggle (imagine)","responsive_web_grok_fun_mode_disabled":"disables grok fun mode","responsive_web_grok_text_selection_enabled":"ask grok about selected text","responsive_web_grok_analyze_post_followups_enabled":"follow-up questions after analyzing a post","responsive_web_grok_profile_summary_enabled":"grok summary on profiles","xchat_ask_grok_enabled":"ask grok inside chat","payments_cash_deposits_enabled":"twitter money cash deposits","payments_cheques_deposits_enabled":"twitter money cheque deposits","payments_shared_accounts_enabled":"shared twitter money accounts","payments_secondary_accounts_enabled":"secondary twitter money accounts","payments_web_external_app_enabled":"twitter money external app payments","payments_transaction_search_enabled":"search payment transactions","responsive_web_stripe_account_creation_enabled":"create a stripe account in-app","responsive_web_mobile_app_spotlight_v1_config":"profile app/play-store link card (local only unfortunately)","responsive_web_location_spotlight_v1_config":"profile location spotlight card","responsive_web_profile_spotlight_v0_config":"profile spotlight card","responsive_web_profile_about_enabled":"the new structured 'about' profile page","xprofile_editing_enabled":"desktop-only extended bio, which elon removed after it broke (LOL??)","xprofile_work_history_enabled":"work history section on profiles","hidden_profile_subscriptions_enabled":"hide your subscriptions on profile","profile_label_improvements_pcf_edit_profile_enabled":"edit professional category from profile","dm_secret_conversations_enabled":"encrypted dms (xchat secret conversations)","av_chat_encryption_enabled":"encrypted audio/video calls","av_chat_group_e2ee_creator_enabled":"create e2ee group calls","av_chat_group_e2ee_joiner_enabled":"join e2ee group calls","av_chat_xchat_emoji_reactions_enabled":"emoji reactions in calls","dm_bulk_delete_enabled":"bulk delete dms","dm_edit_dms_overflow_menu_enabled":"edit sent dms","dm_voice_rendering_enabled":"voice messages in dms","rweb_xchat_standalone_avcall_enabled":"standalone audio/video calls in xchat","rweb_xchat_delegate_accounts_enabled":"use xchat from delegated accounts","communities_analytics_enabled":"community analytics dashboard","communities_adult_content_setting_enabled":"mark a community as adult-content","communities_non_member_reply_enabled":"non-members can reply in communities","responsive_web_birdwatch_note_writing_enabled":"write community notes","responsive_web_birdwatch_media_notes_enabled":"community notes on media","freedom_of_speech_not_reach_author_label_enabled":"show 'visibility limited' author labels","creator_subscriptions_revamp_enabled":"revamped creator subscriptions","super_follow_exclusive_tweet_creation_api_enabled":"create super-follower-only posts","premium_content_api_read_enabled":"read paywalled premium posts","recruiting_premium_jobs_enabled":"premium job listings","recruiting_global_jobs_search_enabled":"global job search","articles_rest_api_enabled":"long-form articles api","highlights_tweets_tab_ui_enabled":"highlights tab on profile","rweb_debugger_enabled":"in-client network request logger (debugger)","gryphon_underground_enabled":"internal tweetdeck / pro \"underground\" mode","responsive_web_jetfuel_frame":"internal ads (jetfuel) frame","responsive_web_send_jetfuel_preview_image_enabled":"send jetfuel ad preview image","responsive_web_user_spectral_key_enabled":"spectral key (internal user keying)","march_madness_brackets_enabled":"seasonal march madness brackets","responsive_web_grok_user_seconds_debug":"debug grok active-seconds tracking","rweb_xchat_debug_enabled":"xchat (encrypted dm) debug ui","rweb_xchat_dogfood_logs_enabled":"xchat dogfood logging","super_follow_web_debug_enabled":"super-follow debug ui","responsive_web_grok_dev_universal_search_id_enabled":"grok dev universal search id","rweb_debugger_bug_report_email":"bug report email attached by the network logger","responsive_web_birdwatch_note_internal_insights_enabled":"community notes internal insights panel","responsive_web_birdwatch_note_request_download_enabled":"download your community-notes data","responsive_web_birdwatch_top_contributor_enabled":"community notes top-contributor surface","responsive_web_birdwatch_translation_enabled":"translate community notes","voice_rooms_employee_only_enabled":"employee-only spaces (voice rooms)","x_jetfuel_enable_test_cluster":"jetfuel ads test cluster (pairs with jfDev)","new_timeline_experiment_enabled":"new timeline experiment","blue_business_admin_sidebar_module_enabled":"verified-org admin sidebar module","communities_moderation_log_enabled":"community moderation log","oauth_trusted_developer_badge_enabled":"trusted-developer badge on apps","responsive_web_api_transition_enabled":"routes api calls through the transition layer","responsive_web_temporary_ocf_x_migration":"ocf-to-x onboarding migration","responsive_web_redux_use_fragment_enabled":"switches the redux data layer to fragments","responsive_web_graphql_timeline_navigation_enabled":"core graphql timeline navigation","rweb_session_binding_enabled":"binds the session to the device","rweb_client_transaction_id_enabled":"adds client transaction ids to requests","network_layer_503_backoff_mode":"network retry / backoff behavior on 503","responsive_web_timeline_cover_killswitch_enabled":"timeline cover killswitch","responsive_web_extension_compatibility_hide":"hides content flagged by extension-compat checks"},"danger":{"rweb_conf_only_enabled":"replaces the entire web app with conference-only mode","rweb_video_screen_enabled":"swaps the profile media tab for the video mixer layout","responsive_web_api_transition_enabled":"reroutes all api traffic, so can break loading completely","responsive_web_temporary_ocf_x_migration":"changes onboarding/auth flows","responsive_web_redux_use_fragment_enabled":"swaps the data layer, can break rendering","responsive_web_graphql_timeline_navigation_enabled":"core navigation, timelines can break completely","rweb_session_binding_enabled":"can invalidate your session / log you out","responsive_web_extension_compatibility_hide":"can hide page content","is_maintenance_mode_enabled":"puts the client in maintenance mode"}},"switches":{"dev":[{"key":"jfDev","label":"jetfuel dev mode","title":"sets sessionStorage jfDev, unlocking the super epic emusk rocket emoji mode"},{"key":"inspect","label":"inspector","title":"hover any element to see its data-testid"},{"key":"exposeDebug","label":"expose audio","title":"adds ?exposeDebug=1 so the media stream audio player is reachable"},{"key":"forceDevEnv","label":"force dev environment","title":"tries to revive prod-gated developer code (needs a reload)"}],"filters":[{"key":"true","label":"enabled"},{"key":"safe","label":"safe"},{"key":"danger","label":"dangerous"},{"key":"mod","label":"modified"}],"actions":[{"action":"unregister","label":"unregister sw.js","title":"unregister the service worker (fresh assets when reloading)"},{"action":"flush","label":"flush cache","title":"delete the cached html app shell"},{"action":"refresh","label":"refresh cache","title":"reprime the html app shell"}]}};
 (function () {
   "use strict";
 
@@ -386,8 +459,6 @@ window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks t
 
   let overrides = {};
   try {overrides = JSON.parse(localStorage.getItem("twitterflags.overrides") || "{}") || {}} catch {overrides = {}}
-  // frozen snapshot of what was actually applied at load; the panel diffs against
-  // this to know if a reload is pending (survives live edits within the session)
   let appliedoverrides = {};
   try {appliedoverrides = JSON.parse(JSON.stringify(overrides))} catch {}
   let dirty = false;
@@ -451,10 +522,6 @@ window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks t
 
   /*//////////////////////////////////////////////////////////////////////*/
 
-  // optional: force the client into a dev environment. env is read once at module
-  // eval from __META_DATA__.env; flipping "prod" -> "devel" revives a pile of
-  // prod-gated dev code (request interceptor, sw-dereg, manifest debug). must be
-  // installed before main.js reads it, hence here. experimental, can break things.
   let forceenv = null;
   try { const dc = JSON.parse(localStorage.getItem("twitterflags.dev") || "{}"); if (dc && dc.forceDevEnv) forceenv = "devel" } catch {}
   if (forceenv) {
@@ -741,14 +808,11 @@ window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks t
   let tip = null, copyT = 0;
   const SUPPRESS = ["mousedown", "mouseup", "pointerdown", "pointerup", "auxclick", "contextmenu"];
 
-  // composedPath sees through shadow retargeting, so this reliably detects any
-  // event that passed through our userscript panel host and leaves it alone
   const onpanel = e => {
     const p = e.composedPath ? e.composedPath() : null;
     if (p) { for (const n of p) if (n && n.id === "tfuserscripthost") return true }
     return !!(e.target && e.target.closest && e.target.closest("#tfuserscripthost"));
   };
-  // only act on real testid targets: blank areas and the panel stay fully clickable
   const testidof = e => {
     if (onpanel(e)) return null;
     const p = e.composedPath ? e.composedPath() : null;
@@ -809,6 +873,17 @@ window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks t
   }
 
   function post() {try {window.postMessage({source: PCHAN, type: "dev", config: cfg}, location.origin)} catch {}}
+  function swaction(action) {
+    try {
+      const sw = navigator.serviceWorker;
+      if (!sw) {log("no serviceWorker api"); return}
+      if (action === "unregister") {sw.getRegistrations().then(rs => {rs.forEach(r => r.unregister()); log("unregistered", rs.length, "service worker(s)")}); return}
+      const type = action === "flush" ? "ACTION_FLUSH" : action === "refresh" ? "ACTION_REFRESH" : null;
+      if (!type) return;
+      if (sw.controller) {sw.controller.postMessage({type}); log("sent", type)}
+      else log("no active service worker controller");
+    } catch (e) {log("sw action failed:", e && e.message)}
+  }
 
   window.addEventListener("message", e => {
     if (e.source !== window) return;
@@ -816,6 +891,7 @@ window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks t
     if (!d || d.source !== UCHAN) return;
     if (d.cmd === "devget") post();
     else if (d.cmd === "devset") { Object.assign(cfg, d.config || {}); save(); apply(); post() }
+    else if (d.cmd === "sw") swaction(d.action);
   });
 
   window.twitterflagsDev = {
@@ -885,7 +961,7 @@ window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks t
     root.appendChild(wrap);
 
     const fab = document.createElement("button");
-    fab.className = "tffab"; fab.title = "twitter flags (drag to move, tap to open)";
+    fab.className = "tffab"; fab.title = "drag me!";
     fab.innerHTML = iconsvg;
     root.appendChild(fab);
 
@@ -896,7 +972,6 @@ window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks t
       if (pos && typeof pos.left === "number") {fab.style.left = pos.left + "px"; fab.style.top = pos.top + "px"; fab.style.right = "auto"; fab.style.bottom = "auto"}
     } catch {}
 
-    // draggable circle; a real drag suppresses the open-tap and its position sticks
     let down = false, moved = false, sx = 0, sy = 0, ox = 0, oy = 0;
     fab.addEventListener("pointerdown", e => {
       down = true; moved = false;
@@ -942,7 +1017,6 @@ window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks t
   const persist = () => {if (EXT) try {chrome.storage.local.set({overrides})} catch {}};
   const canon = o => {try {return JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]]))} catch {return ""}};
   const clone = o => {try {return JSON.parse(JSON.stringify(o))} catch {return {}}};
-  // unsaved = current overrides differ from what the page applied at load
   const markdirty = () => {dirty = canon(overrides) !== canon(applied)};
 
   /*//////////////////////////////////////////////////////////////////////*/
@@ -998,8 +1072,6 @@ window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks t
   function stateapply(p, fromcache) {
     if (!p) return;
     const empty = !p.captured || !p.flags || !Object.keys(p.flags).length;
-    // once we hold real flags, ignore empty snapshots (a second injector or a
-    // reload race) so the panel never flashes back to the "no flags" screen
     if (!fromcache && empty && captured && Object.keys(flags).length) return;
     if (fromcache) cached = true;
     else {cached = false; livestamp = Date.now()}
@@ -1064,7 +1136,7 @@ window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks t
 
   let knowndesc = {}, dangerknowndesc = {}, switchcfg = {};
 
-  // minimal jsonc reader: strips // and /* */ (respecting strings) + trailing commas
+  // minimal jsonc
   function parsejsonc(text) {
     let o = "", str = false, q = "", i = 0;
     while (i < text.length) {
@@ -1078,8 +1150,6 @@ window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks t
     return JSON.parse(o.replace(/,(\s*[}\]])/g, "$1"));
   }
 
-  // configs are jsonc; the userscript build inlines them as a global, the
-  // extension fetches its packaged files at runtime
   async function loadconfigs() {
     if (window.twitterflagsconfigs) return window.twitterflagsconfigs;
     const get = async f => {
@@ -1146,7 +1216,6 @@ window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks t
 
   const filters = {true: false, safe: false, danger: false, mod: false};
 
-  // build the header switches (and their alt text) from switches.jsonc
   function buildswitches() {
     const devrow = query(".row2.dev"), filtrow = query(".row2.filters"), bulk = filtrow.querySelector(".bulk");
     const mk = (s, defgroup) => {
@@ -1161,6 +1230,13 @@ window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks t
     };
     (switchcfg.dev || []).forEach(s => devrow.appendChild(mk(s, "dev")));
     (switchcfg.filters || []).forEach(s => filtrow.insertBefore(mk(s, "filt"), bulk));
+    (switchcfg.actions || []).forEach(a => {
+      const b = document.createElement("button");
+      b.className = "swbtn"; b.textContent = a.label;
+      b.setAttribute("data-sw", a.action);
+      if (a.title) b.setAttribute("title", a.title);
+      devrow.appendChild(b);
+    });
   }
 
   function paintchecks() {
@@ -1189,6 +1265,14 @@ window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks t
     markdirty(); persist(); send("setmany", { set, clear }); render();
   }
   header.addEventListener("click", e => {
+    const sw = e.target.closest(".swbtn");
+    if (sw) {
+      e.preventDefault();
+      send("sw", {action: sw.getAttribute("data-sw")});
+      const orig = sw.textContent; sw.textContent = "sent";
+      setTimeout(() => {sw.textContent = orig}, 900);
+      return;
+    }
     const bb = e.target.closest(".bulkbtn");
     if (bb) { e.preventDefault(); bulksafe(bb.getAttribute("data-bulk")); return }
     const lbl = e.target.closest(".checklabel");

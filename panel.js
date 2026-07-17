@@ -13,7 +13,6 @@
   const persist = () => {if (EXT) try {chrome.storage.local.set({overrides})} catch {}};
   const canon = o => {try {return JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]]))} catch {return ""}};
   const clone = o => {try {return JSON.parse(JSON.stringify(o))} catch {return {}}};
-  // unsaved = current overrides differ from what the page applied at load
   const markdirty = () => {dirty = canon(overrides) !== canon(applied)};
 
   /*//////////////////////////////////////////////////////////////////////*/
@@ -69,8 +68,6 @@
   function stateapply(p, fromcache) {
     if (!p) return;
     const empty = !p.captured || !p.flags || !Object.keys(p.flags).length;
-    // once we hold real flags, ignore empty snapshots (a second injector or a
-    // reload race) so the panel never flashes back to the "no flags" screen
     if (!fromcache && empty && captured && Object.keys(flags).length) return;
     if (fromcache) cached = true;
     else {cached = false; livestamp = Date.now()}
@@ -135,7 +132,7 @@
 
   let knowndesc = {}, dangerknowndesc = {}, switchcfg = {};
 
-  // minimal jsonc reader: strips // and /* */ (respecting strings) + trailing commas
+  // minimal jsonc
   function parsejsonc(text) {
     let o = "", str = false, q = "", i = 0;
     while (i < text.length) {
@@ -149,8 +146,6 @@
     return JSON.parse(o.replace(/,(\s*[}\]])/g, "$1"));
   }
 
-  // configs are jsonc; the userscript build inlines them as a global, the
-  // extension fetches its packaged files at runtime
   async function loadconfigs() {
     if (window.twitterflagsconfigs) return window.twitterflagsconfigs;
     const get = async f => {
@@ -217,7 +212,6 @@
 
   const filters = {true: false, safe: false, danger: false, mod: false};
 
-  // build the header switches (and their alt text) from switches.jsonc
   function buildswitches() {
     const devrow = query(".row2.dev"), filtrow = query(".row2.filters"), bulk = filtrow.querySelector(".bulk");
     const mk = (s, defgroup) => {
@@ -232,6 +226,13 @@
     };
     (switchcfg.dev || []).forEach(s => devrow.appendChild(mk(s, "dev")));
     (switchcfg.filters || []).forEach(s => filtrow.insertBefore(mk(s, "filt"), bulk));
+    (switchcfg.actions || []).forEach(a => {
+      const b = document.createElement("button");
+      b.className = "swbtn"; b.textContent = a.label;
+      b.setAttribute("data-sw", a.action);
+      if (a.title) b.setAttribute("title", a.title);
+      devrow.appendChild(b);
+    });
   }
 
   function paintchecks() {
@@ -260,6 +261,14 @@
     markdirty(); persist(); send("setmany", { set, clear }); render();
   }
   header.addEventListener("click", e => {
+    const sw = e.target.closest(".swbtn");
+    if (sw) {
+      e.preventDefault();
+      send("sw", {action: sw.getAttribute("data-sw")});
+      const orig = sw.textContent; sw.textContent = "sent";
+      setTimeout(() => {sw.textContent = orig}, 900);
+      return;
+    }
     const bb = e.target.closest(".bulkbtn");
     if (bb) { e.preventDefault(); bulksafe(bb.getAttribute("data-bulk")); return }
     const lbl = e.target.closest(".checklabel");

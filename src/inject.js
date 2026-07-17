@@ -14,8 +14,6 @@
 
   let overrides = {};
   try {overrides = JSON.parse(localStorage.getItem("twitterflags.overrides") || "{}") || {}} catch {overrides = {}}
-  // frozen snapshot of what was actually applied at load; the panel diffs against
-  // this to know if a reload is pending (survives live edits within the session)
   let appliedoverrides = {};
   try {appliedoverrides = JSON.parse(JSON.stringify(overrides))} catch {}
   let dirty = false;
@@ -79,10 +77,6 @@
 
   /*//////////////////////////////////////////////////////////////////////*/
 
-  // optional: force the client into a dev environment. env is read once at module
-  // eval from __META_DATA__.env; flipping "prod" -> "devel" revives a pile of
-  // prod-gated dev code (request interceptor, sw-dereg, manifest debug). must be
-  // installed before main.js reads it, hence here. experimental, can break things.
   let forceenv = null;
   try { const dc = JSON.parse(localStorage.getItem("twitterflags.dev") || "{}"); if (dc && dc.forceDevEnv) forceenv = "devel" } catch {}
   if (forceenv) {

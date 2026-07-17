@@ -35,7 +35,6 @@ const panelhtml = rawhtml.slice(rawhtml.indexOf("<body>") + 6, rawhtml.indexOf("
 const injectsrc = rd("src/inject.js");
 const devsrc = rd("src/dev.js");
 
-// configs are jsonc; inline them as a global so the userscript needs no fetch
 function parsejsonc(text) {
   let o = "", str = false, q = "", i = 0;
   while (i < text.length) {
@@ -103,19 +102,48 @@ const closesvg = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.59 12
 
 /*//////////////////////////////////////////////////////////////////////*/
 
-const meta = `// ==UserScript==
-// @name         twitter flags & more
-// @namespace    coolsite.cv
-// @version      ${version}
-// @description  browse hidden stuff inside the twitter client with an in-page panel!
-// @author       cv
-// @match        https://x.com/*
-// @match        https://twitter.com/*
-// @icon         ${iconmeta}
-// @run-at       document-start
-// @grant        none
-// ==/UserScript==
-`;
+const appmatches = [
+  "https://x.com/*",
+  "https://*.x.com/*",
+  "https://mobile.x.com/*",
+  "https://twitter.com/*",
+  "https://*.twitter.com/*",
+  "https://mobile.twitter.com/*",
+  "https://twitter.app.link/*",
+  "https://twitter.test-app.link/*",
+  "https://twitter-alternate.test-app.link/*",
+  "https://x.app.link/*",
+  "https://x-alternate.app.link/*",
+  "https://x.test-app.link/*",
+  "https://x-alternate.test-app.link/*"
+];
+const notapp = [
+  "ads", "ads-api", "analytics", "business", "developer", "help", "support",
+  "blog", "about", "careers", "legal", "privacy", "transparency", "cards",
+  "publish", "platform", "api", "upload", "ton", "media", "brand", "marketing",
+  "investor", "engineering", "press", "pr", "gdpr"
+];
+
+const excludematches = [];
+for (const s of notapp) excludematches.push("https://" + s + ".x.com/*", "https://" + s + ".twitter.com/*");
+const excludes = ["/\\.(?:js|mjs|json|css|map|png|jpe?g|gif|svg|webp|avif|ico|woff2?|ttf|otf|eot|mp4|webm|m3u8|wasm|xml|txt|pdf)(?:[?#].*)?$/i"];
+
+const meta = [
+  "// ==UserScript==",
+  "// @name         twitter flags & more",
+  "// @namespace    coolsite.cv",
+  "// @version      " + version,
+  "// @description  browse hidden stuff inside the twitter client with a side panel!",
+  "// @author       cv",
+  ...appmatches.map(m => "// @match         " + m),
+  ...excludematches.map(m => "// @exclude-match " + m),
+  ...excludes.map(m => "// @exclude       " + m),
+  "// @icon          " + iconmeta,
+  "// @run-at        document-start",
+  "// @grant         none",
+  "// ==/UserScript==",
+  ""
+].join("\n");
 
 const head = `(function () {
   "use strict";
@@ -185,7 +213,7 @@ const mountopen = `
     root.appendChild(wrap);
 
     const fab = document.createElement("button");
-    fab.className = "tffab"; fab.title = "twitter flags (drag to move, tap to open)";
+    fab.className = "tffab"; fab.title = "drag me!";
     fab.innerHTML = iconsvg;
     root.appendChild(fab);
 
@@ -196,7 +224,6 @@ const mountopen = `
       if (pos && typeof pos.left === "number") {fab.style.left = pos.left + "px"; fab.style.top = pos.top + "px"; fab.style.right = "auto"; fab.style.bottom = "auto"}
     } catch {}
 
-    // draggable circle; a real drag suppresses the open-tap and its position sticks
     let down = false, moved = false, sx = 0, sy = 0, ox = 0, oy = 0;
     fab.addEventListener("pointerdown", e => {
       down = true; moved = false;

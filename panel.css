@@ -108,6 +108,13 @@
       font-size: 9.75px; gap: 10.5px
     }
     .row2.dev label {gap: 3.75px}
+    .swbtn {
+      background-color: #242E36; color: #E5EAEC;
+      border: none; cursor: pointer;
+      border-radius: 999px; padding: 2px 7px;
+      font: 600 9.75px "Chirp", system-ui, sans-serif;
+    }
+    .swbtn:hover {background-color: #2f3b45}
     .row2.dev .checkbox {
       width: 15px; height: 15px;
       border-width: 1.5px; border-radius: 3px

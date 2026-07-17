@@ -55,14 +55,11 @@
   let tip = null, copyT = 0;
   const SUPPRESS = ["mousedown", "mouseup", "pointerdown", "pointerup", "auxclick", "contextmenu"];
 
-  // composedPath sees through shadow retargeting, so this reliably detects any
-  // event that passed through our userscript panel host and leaves it alone
   const onpanel = e => {
     const p = e.composedPath ? e.composedPath() : null;
     if (p) { for (const n of p) if (n && n.id === "tfuserscripthost") return true }
     return !!(e.target && e.target.closest && e.target.closest("#tfuserscripthost"));
   };
-  // only act on real testid targets: blank areas and the panel stay fully clickable
   const testidof = e => {
     if (onpanel(e)) return null;
     const p = e.composedPath ? e.composedPath() : null;
@@ -123,6 +120,17 @@
   }
 
   function post() {try {window.postMessage({source: PCHAN, type: "dev", config: cfg}, location.origin)} catch {}}
+  function swaction(action) {
+    try {
+      const sw = navigator.serviceWorker;
+      if (!sw) {log("no serviceWorker api"); return}
+      if (action === "unregister") {sw.getRegistrations().then(rs => {rs.forEach(r => r.unregister()); log("unregistered", rs.length, "service worker(s)")}); return}
+      const type = action === "flush" ? "ACTION_FLUSH" : action === "refresh" ? "ACTION_REFRESH" : null;
+      if (!type) return;
+      if (sw.controller) {sw.controller.postMessage({type}); log("sent", type)}
+      else log("no active service worker controller");
+    } catch (e) {log("sw action failed:", e && e.message)}
+  }
 
   window.addEventListener("message", e => {
     if (e.source !== window) return;
@@ -130,6 +138,7 @@
     if (!d || d.source !== UCHAN) return;
     if (d.cmd === "devget") post();
     else if (d.cmd === "devset") { Object.assign(cfg, d.config || {}); save(); apply(); post() }
+    else if (d.cmd === "sw") swaction(d.action);
   });
 
   window.twitterflagsDev = {

@@ -133,6 +133,23 @@
   "march_madness_brackets_enabled": "seasonal march madness brackets",
   "responsive_web_grok_user_seconds_debug": "debug grok active-seconds tracking",
 
+  // extra debug / dev deciders
+  "rweb_xchat_debug_enabled": "xchat (encrypted dm) debug ui",
+  "rweb_xchat_dogfood_logs_enabled": "xchat dogfood logging",
+  "super_follow_web_debug_enabled": "super-follow debug ui",
+  "responsive_web_grok_dev_universal_search_id_enabled": "grok dev universal search id",
+  "rweb_debugger_bug_report_email": "bug report email attached by the network logger",
+  "responsive_web_birdwatch_note_internal_insights_enabled": "community notes internal insights panel",
+  "responsive_web_birdwatch_note_request_download_enabled": "download your community-notes data",
+  "responsive_web_birdwatch_top_contributor_enabled": "community notes top-contributor surface",
+  "responsive_web_birdwatch_translation_enabled": "translate community notes",
+  "voice_rooms_employee_only_enabled": "employee-only spaces (voice rooms)",
+  "x_jetfuel_enable_test_cluster": "jetfuel ads test cluster (pairs with jfDev)",
+  "new_timeline_experiment_enabled": "new timeline experiment",
+  "blue_business_admin_sidebar_module_enabled": "verified-org admin sidebar module",
+  "communities_moderation_log_enabled": "community moderation log",
+  "oauth_trusted_developer_badge_enabled": "trusted-developer badge on apps",
+
   // scary stuff
   "responsive_web_api_transition_enabled": "routes api calls through the transition layer",
   "responsive_web_temporary_ocf_x_migration": "ocf-to-x onboarding migration",

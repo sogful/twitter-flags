@@ -63,6 +63,11 @@
   }
 
   function stateapply(p, fromcache) {
+    if (!p) return;
+    const empty = !p.captured || !p.flags || !Object.keys(p.flags).length;
+    // once we hold real flags, ignore empty snapshots (a second injector or a
+    // reload race) so the panel never flashes back to the "no flags" screen
+    if (!fromcache && empty && captured && Object.keys(flags).length) return;
     if (fromcache) cached = true;
     else {cached = false; livestamp = Date.now()}
     captured = !!p.captured; source = p.source || "none"; dirty = !!p.dirty;

@@ -133,8 +133,35 @@
 
   /*//////////////////////////////////////////////////////////////////////*/
 
-  const knowndesc = window.twitterflagsknowndesc || {};
-  const dangerknowndesc = window.twitterflagsdangerdesc || {};
+  let knowndesc = {}, dangerknowndesc = {}, switchcfg = {};
+
+  // minimal jsonc reader: strips // and /* */ (respecting strings) + trailing commas
+  function parsejsonc(text) {
+    let o = "", str = false, q = "", i = 0;
+    while (i < text.length) {
+      const c = text[i], n = text[i + 1];
+      if (str) { o += c; if (c === "\\") { o += text[i + 1]; i += 2; continue } if (c === q) str = false; i++ }
+      else if (c === '"' || c === "'") { str = true; q = c; o += c; i++ }
+      else if (c === "/" && n === "/") { while (i < text.length && text[i] !== "\n") i++ }
+      else if (c === "/" && n === "*") { i += 2; while (i < text.length && !(text[i] === "*" && text[i + 1] === "/")) i++; i += 2 }
+      else { o += c; i++ }
+    }
+    return JSON.parse(o.replace(/,(\s*[}\]])/g, "$1"));
+  }
+
+  // configs are jsonc; the userscript build inlines them as a global, the
+  // extension fetches its packaged files at runtime
+  async function loadconfigs() {
+    if (window.twitterflagsconfigs) return window.twitterflagsconfigs;
+    const get = async f => {
+      try {
+        const url = (EXT && chrome.runtime.getURL) ? chrome.runtime.getURL("configs/" + f) : "configs/" + f;
+        return parsejsonc(await (await fetch(url)).text());
+      } catch { return {} }
+    };
+    const [desc, switches] = await Promise.all([get("descriptions.jsonc"), get("switches.jsonc")]);
+    return { desc, switches };
+  }
 
   const prefixes = ["responsive_web_", "rweb_", "c9s_"];
 
@@ -190,11 +217,23 @@
 
   const filters = {true: false, safe: false, danger: false, mod: false};
 
-  header.querySelectorAll(".checklabel").forEach(lbl => {
-    const box = document.createElement("span");
-    box.className = "checkbox"; box.innerHTML = TICK;
-    lbl.insertBefore(box, lbl.firstChild);
-  });
+  // build the header switches (and their alt text) from switches.jsonc
+  function buildswitches() {
+    const devrow = query(".row2.dev"), filtrow = query(".row2.filters"), bulk = filtrow.querySelector(".bulk");
+    const mk = (s, defgroup) => {
+      const lbl = document.createElement("label");
+      lbl.className = "checklabel";
+      lbl.setAttribute("data-group", s.flag ? "flag" : defgroup);
+      if (s.flag) lbl.setAttribute("data-flag", s.flag); else lbl.setAttribute("data-key", s.key);
+      if (s.title) lbl.setAttribute("title", s.title);
+      const box = document.createElement("span"); box.className = "checkbox"; box.innerHTML = TICK;
+      lbl.appendChild(box); lbl.appendChild(document.createTextNode(s.label));
+      return lbl;
+    };
+    (switchcfg.dev || []).forEach(s => devrow.appendChild(mk(s, "dev")));
+    (switchcfg.filters || []).forEach(s => filtrow.insertBefore(mk(s, "filt"), bulk));
+  }
+
   function paintchecks() {
     header.querySelectorAll(".checklabel").forEach(lbl => {
       const grp = lbl.getAttribute("data-group"), k = lbl.getAttribute("data-key");
@@ -359,6 +398,14 @@
     else try {chrome.tabs.create({url: "https://x.com/"})} catch {}
   };
   undo.onclick = () => {overrides = clone(applied); markdirty(); persist(); send("syncoverrides", {overrides}); render()};
-  refresh();
+
+  loadconfigs().then(cfg => {
+    knowndesc = (cfg.desc && cfg.desc.known) || {};
+    dangerknowndesc = (cfg.desc && cfg.desc.danger) || {};
+    switchcfg = cfg.switches || {};
+    buildswitches();
+    paintchecks();
+    refresh();
+  });
 
 })();

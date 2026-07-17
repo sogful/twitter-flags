@@ -1,0 +1,18 @@
+{
+  // top row: our own dev tools (not real twitter features). "key" = dev config
+  // key, "flag" = a real feature flag surfaced as a shortcut. "title" = hover alt.
+  "dev": [
+    {"key": "jfDev", "label": "jetfuel dev mode", "title": "sets sessionStorage jfDev, unlocking the internal jetfuel ads dev menu (needs reload)"},
+    {"key": "inspect", "label": "inspector", "title": "hover any element to see its data-testid, click to copy (esc to exit)"},
+    {"key": "exposeDebug", "label": "expose audio", "title": "adds ?exposeDebug=1 so the media stream audio player is reachable"},
+    {"key": "forceDevEnv", "label": "force dev env", "title": "experimental: revives prod-gated dev code, may break the client (needs reload)"}
+  ],
+
+  // filter row: narrows the flag list. "key" matches the filter state in panel.js
+  "filters": [
+    {"key": "true", "label": "enabled", "title": "only flags currently on"},
+    {"key": "safe", "label": "safe", "title": "hide flags that match a risky pattern"},
+    {"key": "danger", "label": "dangerous", "title": "only flags that match a risky pattern"},
+    {"key": "mod", "label": "modified", "title": "only flags you have overridden"}
+  ]
+}

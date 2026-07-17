@@ -55,9 +55,20 @@
   let tip = null, copyT = 0;
   const SUPPRESS = ["mousedown", "mouseup", "pointerdown", "pointerup", "auxclick", "contextmenu"];
 
-  // only act on real testid targets: everything else (blank areas, our own
-  // shadow panel which has no testids) stays fully clickable while inspecting
-  const testidof = e => (e.target && e.target.closest) ? e.target.closest("[data-testid]") : null;
+  // composedPath sees through shadow retargeting, so this reliably detects any
+  // event that passed through our userscript panel host and leaves it alone
+  const onpanel = e => {
+    const p = e.composedPath ? e.composedPath() : null;
+    if (p) { for (const n of p) if (n && n.id === "tfuserscripthost") return true }
+    return !!(e.target && e.target.closest && e.target.closest("#tfuserscripthost"));
+  };
+  // only act on real testid targets: blank areas and the panel stay fully clickable
+  const testidof = e => {
+    if (onpanel(e)) return null;
+    const p = e.composedPath ? e.composedPath() : null;
+    if (p) { for (const n of p) if (n && n.nodeType === 1 && n.hasAttribute && n.hasAttribute("data-testid")) return n }
+    return (e.target && e.target.closest) ? e.target.closest("[data-testid]") : null;
+  };
 
   function onmove(e) {
     const t = testidof(e);

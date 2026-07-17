@@ -343,13 +343,7 @@
     .tfclose:hover svg {fill: #E5EAEC}
 `;
   const panelhtml = `<div class="header">
-    <div class="row2 dev">
-      <label class="checklabel" data-group="dev" data-key="jfDev">jetfuel dev mode</label>
-      <label class="checklabel" data-group="dev" data-key="inspect">inspector</label>
-      <label class="checklabel" data-group="dev" data-key="exposeDebug">expose audio</label>
-      <label class="checklabel" data-group="dev" data-key="forceDevEnv" title="experimental: revives prod-gated dev code, may break the client (needs reload)">force dev env</label>
-      <label class="checklabel" data-group="flag" data-flag="rweb_debugger_enabled">network logger</label>
-    </div>
+    <div class="row2 dev"></div>
     <div class="row1">
       <div class="searchbox">
         <svg class="searchicon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.25 4.25c-3.314 0-6 2.686-6 6s2.686 6 6 6c1.657 0 3.155-.67 4.243-1.757 1.087-1.088 1.757-2.586 1.757-4.243 0-3.314-2.686-6-6-6zm-9 6c0-4.971 4.029-9 9-9s9 4.029 9 9c0 1.943-.617 3.744-1.664 5.215l4.475 4.474-2.122 2.122-4.474-4.475c-1.471 1.047-3.272 1.664-5.215 1.664-4.971 0-9-4.029-9-9z"/></svg>
@@ -358,10 +352,6 @@
       <select class="prefixselect"></select>
     </div>
     <div class="row2 filters">
-      <label class="checklabel" data-group="filt" data-key="true">enabled</label>
-      <label class="checklabel" data-group="filt" data-key="safe">safe</label>
-      <label class="checklabel" data-group="filt" data-key="danger">dangerous</label>
-      <label class="checklabel" data-group="filt" data-key="mod">modified</label>
       <div class="bulk">
         <button class="bulkbtn" data-bulk="on">all on</button>
         <button class="bulkbtn" data-bulk="off">all off</button>
@@ -379,6 +369,7 @@
 
   /*//////////////////////////////////////////////////////////////////////*/
 
+window.twitterflagsconfigs = {"desc":{"known":{"rweb_conf_only_enabled":"locks the whole site into conference-only mode (redirects to /i/conferences-room)","rweb_conf_dev_enabled":"conference debug overlay: per-feed grid, throttle states, spatial audio panning","rweb_conf_composite_video_enabled":"canvas-composites two media streams into one conference feed","rweb_conf_multi_video_enabled":"multi-video conference with simulcast + presentation tracks","rweb_conf_rnnoise_enabled":"rnnoise ml noise suppression in conferences","rweb_conf_dummy_enabled":"inject a dummy publisher into conferences (testing)","spaces_conference_enabled":"enables the conference product (pair with rweb_conf_only_enabled)","spaces_video_speakers_enabled":"video for space speakers","spaces_video_admins_enabled":"video admin controls in spaces","spaces_video_consumption_enabled":"watch video in spaces","rweb_video_screen_enabled":"video-only 'mixer' timeline (MediaTabVideoMixer) on profiles","responsive_web_tv_cast_enabled":"cast video to a tv (chromecast/airplay)","blue_longer_video_enabled":"allow longer video uploads (premium)","responsive_web_hevc_upload_preview_enabled":"hevc video upload preview","web_video_playback_rate_enabled":"video playback speed control","web_video_transcribed_captions_enabled":"auto-transcribed captions on video","web_video_caption_repositioning_enabled":"drag captions to reposition them","rweb_picture_in_picture_enabled":"picture-in-picture video","rweb_video_pip_enabled":"picture-in-picture video (alt flag)","rweb_save_video_progress_enabled":"remember playback position per video","rweb_live_broadcast_rewind_enabled":"rewind live broadcasts","responsive_web_instream_video_redesign_enabled":"redesigned in-stream video player","dm_video_downloads_enabled":"download videos sent in dms","responsive_web_media_download_video_share_menu_enabled":"'download video' in the share menu","responsive_web_composer_configurable_video_player_enabled":"configurable video player in composer","responsive_web_convert_card_video_to_gif_enabled":"convert card video to gif","media_edge_to_edge_content_enabled":"edge-to-edge media layout","responsive_web_edit_tweet_enabled":"edit posts after sending","responsive_web_edit_tweet_composition_enabled":"show the edit-tweet composer","responsive_web_edit_tweet_api_enabled":"edit-tweet api path","responsive_web_one_hour_edit_window_enabled":"extends the post edit window to one hour","responsive_web_composer_autosave_enabled":"autosave composer drafts","responsive_web_image_poll_composer_enabled":"image polls in the composer","responsive_web_card_image_poll_enabled":"render image polls","responsive_web_tweet_drafts_threads_enabled":"save thread drafts","responsive_web_tweet_drafts_video_enabled":"save drafts that contain video","responsive_web_scheduling_threads_enabled":"schedule whole threads","longform_notetweets_consumption_enabled":"read long-form note tweets","longform_notetweets_rich_text_read_enabled":"render rich text in note tweets","longform_notetweets_inline_media_enabled":"inline media inside note tweets","longform_notetweets_composition_without_claims_enabled":"compose note tweets without monetization claims","disallowed_reply_controls_enabled":"advanced 'who can reply' controls","dont_mention_me_enabled":"let people remove themselves from your replies/mentions","rweb_conversational_replies_downvote_enabled":"downvote button on replies","responsive_web_pinned_replies_enabled":"pin a reply under your post","responsive_web_reply_storm_enabled":"reply-storm (rapid threaded replies) ui","responsive_web_grok_general_availability":"grok available to everyone","responsive_web_grok_voice_mode_enabled":"grok voice mode","responsive_web_grok_image_edit":"edit images with grok","responsive_web_grok_imagine_composer_enabled":"grok imagine image/video composer","responsive_web_grok_imagine_in_composer_enabled":"grok imagine inside the post composer","responsive_web_grok_feed":"a grok-generated feed","responsive_web_grok_personality":"grok personality picker","responsive_web_grok_temporary_chat_enabled":"ephemeral grok chats","responsive_web_grok_debug_enabled":"grok debug ui","responsive_web_grok_show_grok_performance_metrics":"show grok latency/perf metrics","responsive_web_grok_enable_deepersearch":"grok deepersearch mode","responsive_web_grok_model_selector_in_input":"pick the grok model from the input box","responsive_web_grok_420_toggle_enabled":"grok 4.20 beta toggle","responsive_web_grok_05221996":"internal grok codename toggle (dated)","responsive_web_grok_05231996":"internal grok codename toggle (imagine)","responsive_web_grok_fun_mode_disabled":"disables grok fun mode","responsive_web_grok_text_selection_enabled":"ask grok about selected text","responsive_web_grok_analyze_post_followups_enabled":"follow-up questions after analyzing a post","responsive_web_grok_profile_summary_enabled":"grok summary on profiles","xchat_ask_grok_enabled":"ask grok inside chat","payments_cash_deposits_enabled":"twitter money cash deposits","payments_cheques_deposits_enabled":"twitter money cheque deposits","payments_shared_accounts_enabled":"shared twitter money accounts","payments_secondary_accounts_enabled":"secondary twitter money accounts","payments_web_external_app_enabled":"twitter money external app payments","payments_transaction_search_enabled":"search payment transactions","responsive_web_stripe_account_creation_enabled":"create a stripe account in-app","responsive_web_mobile_app_spotlight_v1_config":"profile app/play-store link card (local only unfortunately)","responsive_web_location_spotlight_v1_config":"profile location spotlight card","responsive_web_profile_spotlight_v0_config":"profile spotlight card","responsive_web_profile_about_enabled":"the new structured 'about' profile page","xprofile_editing_enabled":"desktop-only extended bio, which elon removed after it broke (LOL??)","xprofile_work_history_enabled":"work history section on profiles","hidden_profile_subscriptions_enabled":"hide your subscriptions on profile","profile_label_improvements_pcf_edit_profile_enabled":"edit professional category from profile","dm_secret_conversations_enabled":"encrypted dms (xchat secret conversations)","av_chat_encryption_enabled":"encrypted audio/video calls","av_chat_group_e2ee_creator_enabled":"create e2ee group calls","av_chat_group_e2ee_joiner_enabled":"join e2ee group calls","av_chat_xchat_emoji_reactions_enabled":"emoji reactions in calls","dm_bulk_delete_enabled":"bulk delete dms","dm_edit_dms_overflow_menu_enabled":"edit sent dms","dm_voice_rendering_enabled":"voice messages in dms","rweb_xchat_standalone_avcall_enabled":"standalone audio/video calls in xchat","rweb_xchat_delegate_accounts_enabled":"use xchat from delegated accounts","communities_analytics_enabled":"community analytics dashboard","communities_adult_content_setting_enabled":"mark a community as adult-content","communities_non_member_reply_enabled":"non-members can reply in communities","responsive_web_birdwatch_note_writing_enabled":"write community notes","responsive_web_birdwatch_media_notes_enabled":"community notes on media","freedom_of_speech_not_reach_author_label_enabled":"show 'visibility limited' author labels","creator_subscriptions_revamp_enabled":"revamped creator subscriptions","super_follow_exclusive_tweet_creation_api_enabled":"create super-follower-only posts","premium_content_api_read_enabled":"read paywalled premium posts","recruiting_premium_jobs_enabled":"premium job listings","recruiting_global_jobs_search_enabled":"global job search","articles_rest_api_enabled":"long-form articles api","highlights_tweets_tab_ui_enabled":"highlights tab on profile","rweb_debugger_enabled":"in-client network request logger (debugger)","gryphon_underground_enabled":"internal tweetdeck / pro \"underground\" mode","responsive_web_jetfuel_frame":"internal ads (jetfuel) frame","responsive_web_send_jetfuel_preview_image_enabled":"send jetfuel ad preview image","responsive_web_user_spectral_key_enabled":"spectral key (internal user keying)","march_madness_brackets_enabled":"seasonal march madness brackets","responsive_web_grok_user_seconds_debug":"debug grok active-seconds tracking","responsive_web_api_transition_enabled":"routes api calls through the transition layer","responsive_web_temporary_ocf_x_migration":"ocf-to-x onboarding migration","responsive_web_redux_use_fragment_enabled":"switches the redux data layer to fragments","responsive_web_graphql_timeline_navigation_enabled":"core graphql timeline navigation","rweb_session_binding_enabled":"binds the session to the device","rweb_client_transaction_id_enabled":"adds client transaction ids to requests","network_layer_503_backoff_mode":"network retry / backoff behavior on 503","responsive_web_timeline_cover_killswitch_enabled":"timeline cover killswitch","responsive_web_extension_compatibility_hide":"hides content flagged by extension-compat checks"},"danger":{"rweb_conf_only_enabled":"replaces the entire web app with conference-only mode","rweb_video_screen_enabled":"swaps the profile media tab for the video mixer layout","responsive_web_api_transition_enabled":"reroutes all api traffic, so can break loading completely","responsive_web_temporary_ocf_x_migration":"changes onboarding/auth flows","responsive_web_redux_use_fragment_enabled":"swaps the data layer, can break rendering","responsive_web_graphql_timeline_navigation_enabled":"core navigation, timelines can break completely","rweb_session_binding_enabled":"can invalidate your session / log you out","responsive_web_extension_compatibility_hide":"can hide page content","is_maintenance_mode_enabled":"puts the client in maintenance mode"}},"switches":{"dev":[{"key":"jfDev","label":"jetfuel dev mode","title":"sets sessionStorage jfDev, unlocking the internal jetfuel ads dev menu (needs reload)"},{"key":"inspect","label":"inspector","title":"hover any element to see its data-testid, click to copy (esc to exit)"},{"key":"exposeDebug","label":"expose audio","title":"adds ?exposeDebug=1 so the media stream audio player is reachable"},{"key":"forceDevEnv","label":"force dev env","title":"experimental: revives prod-gated dev code, may break the client (needs reload)"}],"filters":[{"key":"true","label":"enabled","title":"only flags currently on"},{"key":"safe","label":"safe","title":"hide flags that match a risky pattern"},{"key":"danger","label":"dangerous","title":"only flags that match a risky pattern"},{"key":"mod","label":"modified","title":"only flags you have overridden"}]}};
 (function () {
   "use strict";
 
@@ -750,9 +741,20 @@
   let tip = null, copyT = 0;
   const SUPPRESS = ["mousedown", "mouseup", "pointerdown", "pointerup", "auxclick", "contextmenu"];
 
-  // only act on real testid targets: everything else (blank areas, our own
-  // shadow panel which has no testids) stays fully clickable while inspecting
-  const testidof = e => (e.target && e.target.closest) ? e.target.closest("[data-testid]") : null;
+  // composedPath sees through shadow retargeting, so this reliably detects any
+  // event that passed through our userscript panel host and leaves it alone
+  const onpanel = e => {
+    const p = e.composedPath ? e.composedPath() : null;
+    if (p) { for (const n of p) if (n && n.id === "tfuserscripthost") return true }
+    return !!(e.target && e.target.closest && e.target.closest("#tfuserscripthost"));
+  };
+  // only act on real testid targets: blank areas and the panel stay fully clickable
+  const testidof = e => {
+    if (onpanel(e)) return null;
+    const p = e.composedPath ? e.composedPath() : null;
+    if (p) { for (const n of p) if (n && n.nodeType === 1 && n.hasAttribute && n.hasAttribute("data-testid")) return n }
+    return (e.target && e.target.closest) ? e.target.closest("[data-testid]") : null;
+  };
 
   function onmove(e) {
     const t = testidof(e);
@@ -826,163 +828,6 @@
   else document.addEventListener("DOMContentLoaded", init);
 
 })();
-
-window.twitterflagsknowndesc = {
-
-  // conference / spaces
-  rweb_conf_only_enabled: "locks the whole site into conference-only mode (redirects to /i/conferences-room)",
-  rweb_conf_dev_enabled: "conference debug overlay: per-feed grid, throttle states, spatial audio panning",
-  rweb_conf_composite_video_enabled: "canvas-composites two media streams into one conference feed",
-  rweb_conf_multi_video_enabled: "multi-video conference with simulcast + presentation tracks",
-  rweb_conf_rnnoise_enabled: "rnnoise ml noise suppression in conferences",
-  rweb_conf_dummy_enabled: "inject a dummy publisher into conferences (testing)",
-  spaces_conference_enabled: "enables the conference product (pair with rweb_conf_only_enabled)",
-  spaces_video_speakers_enabled: "video for space speakers",
-  spaces_video_admins_enabled: "video admin controls in spaces",
-  spaces_video_consumption_enabled: "watch video in spaces",
-
-  // video / media / tv
-  rweb_video_screen_enabled: "video-only 'mixer' timeline (MediaTabVideoMixer) on profiles",
-  responsive_web_tv_cast_enabled: "cast video to a tv (chromecast/airplay)",
-  blue_longer_video_enabled: "allow longer video uploads (premium)",
-  responsive_web_hevc_upload_preview_enabled: "hevc video upload preview",
-  web_video_playback_rate_enabled: "video playback speed control",
-  web_video_transcribed_captions_enabled: "auto-transcribed captions on video",
-  web_video_caption_repositioning_enabled: "drag captions to reposition them",
-  rweb_picture_in_picture_enabled: "picture-in-picture video",
-  rweb_video_pip_enabled: "picture-in-picture video (alt flag)",
-  rweb_save_video_progress_enabled: "remember playback position per video",
-  rweb_live_broadcast_rewind_enabled: "rewind live broadcasts",
-  responsive_web_instream_video_redesign_enabled: "redesigned in-stream video player",
-  dm_video_downloads_enabled: "download videos sent in dms",
-  responsive_web_media_download_video_share_menu_enabled: "'download video' in the share menu",
-  responsive_web_composer_configurable_video_player_enabled: "configurable video player in composer",
-  responsive_web_convert_card_video_to_gif_enabled: "convert card video to gif",
-  media_edge_to_edge_content_enabled: "edge-to-edge media layout",
-
-  // compose / tweet
-  responsive_web_edit_tweet_enabled: "edit posts after sending",
-  responsive_web_edit_tweet_composition_enabled: "show the edit-tweet composer",
-  responsive_web_edit_tweet_api_enabled: "edit-tweet api path",
-  responsive_web_one_hour_edit_window_enabled: "extends the post edit window to one hour",
-  responsive_web_composer_autosave_enabled: "autosave composer drafts",
-  responsive_web_image_poll_composer_enabled: "image polls in the composer",
-  responsive_web_card_image_poll_enabled: "render image polls",
-  responsive_web_tweet_drafts_threads_enabled: "save thread drafts",
-  responsive_web_tweet_drafts_video_enabled: "save drafts that contain video",
-  responsive_web_scheduling_threads_enabled: "schedule whole threads",
-  longform_notetweets_consumption_enabled: "read long-form note tweets",
-  longform_notetweets_rich_text_read_enabled: "render rich text in note tweets",
-  longform_notetweets_inline_media_enabled: "inline media inside note tweets",
-  longform_notetweets_composition_without_claims_enabled: "compose note tweets without monetization claims",
-  disallowed_reply_controls_enabled: "advanced 'who can reply' controls",
-  dont_mention_me_enabled: "let people remove themselves from your replies/mentions",
-  rweb_conversational_replies_downvote_enabled: "downvote button on replies",
-  responsive_web_pinned_replies_enabled: "pin a reply under your post",
-  responsive_web_reply_storm_enabled: "reply-storm (rapid threaded replies) ui",
-
-  // grok / ai
-  responsive_web_grok_general_availability: "grok available to everyone",
-  responsive_web_grok_voice_mode_enabled: "grok voice mode",
-  responsive_web_grok_image_edit: "edit images with grok",
-  responsive_web_grok_imagine_composer_enabled: "grok imagine image/video composer",
-  responsive_web_grok_imagine_in_composer_enabled: "grok imagine inside the post composer",
-  responsive_web_grok_feed: "a grok-generated feed",
-  responsive_web_grok_personality: "grok personality picker",
-  responsive_web_grok_temporary_chat_enabled: "ephemeral grok chats",
-  responsive_web_grok_debug_enabled: "grok debug ui",
-  responsive_web_grok_show_grok_performance_metrics: "show grok latency/perf metrics",
-  responsive_web_grok_enable_deepersearch: "grok deepersearch mode",
-  responsive_web_grok_model_selector_in_input: "pick the grok model from the input box",
-  responsive_web_grok_420_toggle_enabled: "grok 4.20 beta toggle",
-  responsive_web_grok_05221996: "internal grok codename toggle (dated)",
-  responsive_web_grok_05231996: "internal grok codename toggle (imagine)",
-  responsive_web_grok_fun_mode_disabled: "disables grok fun mode",
-  responsive_web_grok_text_selection_enabled: "ask grok about selected text",
-  responsive_web_grok_analyze_post_followups_enabled: "follow-up questions after analyzing a post",
-  responsive_web_grok_profile_summary_enabled: "grok summary on profiles",
-  xchat_ask_grok_enabled: "ask grok inside chat",
-
-  // payments / money
-  payments_cash_deposits_enabled: "twitter money cash deposits",
-  payments_cheques_deposits_enabled: "twitter money cheque deposits",
-  payments_shared_accounts_enabled: "shared twitter money accounts",
-  payments_secondary_accounts_enabled: "secondary twitter money accounts",
-  payments_web_external_app_enabled: "twitter money external app payments",
-  payments_transaction_search_enabled: "search payment transactions",
-  responsive_web_stripe_account_creation_enabled: "create a stripe account in-app",
-
-  // profile
-  responsive_web_mobile_app_spotlight_v1_config: "profile app/play-store link card (local only unfortunately)",
-  responsive_web_location_spotlight_v1_config: "profile location spotlight card",
-  responsive_web_profile_spotlight_v0_config: "profile spotlight card",
-  responsive_web_profile_about_enabled: "the new structured 'about' profile page",
-  xprofile_editing_enabled: "desktop-only extended bio, which elon removed after it broke (LOL??)",
-  xprofile_work_history_enabled: "work history section on profiles",
-  hidden_profile_subscriptions_enabled: "hide your subscriptions on profile",
-  profile_label_improvements_pcf_edit_profile_enabled: "edit professional category from profile",
-
-  // dm / chat / encryption
-  dm_secret_conversations_enabled: "encrypted dms (xchat secret conversations)",
-  av_chat_encryption_enabled: "encrypted audio/video calls",
-  av_chat_group_e2ee_creator_enabled: "create e2ee group calls",
-  av_chat_group_e2ee_joiner_enabled: "join e2ee group calls",
-  av_chat_xchat_emoji_reactions_enabled: "emoji reactions in calls",
-  dm_bulk_delete_enabled: "bulk delete dms",
-  dm_edit_dms_overflow_menu_enabled: "edit sent dms",
-  dm_voice_rendering_enabled: "voice messages in dms",
-  rweb_xchat_standalone_avcall_enabled: "standalone audio/video calls in xchat",
-  rweb_xchat_delegate_accounts_enabled: "use xchat from delegated accounts",
-
-  // communities / birdwatch
-  communities_analytics_enabled: "community analytics dashboard",
-  communities_adult_content_setting_enabled: "mark a community as adult-content",
-  communities_non_member_reply_enabled: "non-members can reply in communities",
-  responsive_web_birdwatch_note_writing_enabled: "write community notes",
-  responsive_web_birdwatch_media_notes_enabled: "community notes on media",
-  freedom_of_speech_not_reach_author_label_enabled: "show 'visibility limited' author labels",
-
-  // creator / premium / jobs
-  creator_subscriptions_revamp_enabled: "revamped creator subscriptions",
-  super_follow_exclusive_tweet_creation_api_enabled: "create super-follower-only posts",
-  premium_content_api_read_enabled: "read paywalled premium posts",
-  recruiting_premium_jobs_enabled: "premium job listings",
-  recruiting_global_jobs_search_enabled: "global job search",
-  articles_rest_api_enabled: "long-form articles api",
-  highlights_tweets_tab_ui_enabled: "highlights tab on profile",
-
-  // internal / dev / ads
-  rweb_debugger_enabled: "in-client network request logger (debugger)",
-  gryphon_underground_enabled: "internal tweetdeck / pro \"underground\" mode",
-  responsive_web_jetfuel_frame: "internal ads (jetfuel) frame",
-  responsive_web_send_jetfuel_preview_image_enabled: "send jetfuel ad preview image",
-  responsive_web_user_spectral_key_enabled: "spectral key (internal user keying)",
-  march_madness_brackets_enabled: "seasonal march madness brackets",
-  responsive_web_grok_user_seconds_debug: "debug grok active-seconds tracking",
-
-  // scary stuff
-  responsive_web_api_transition_enabled: "routes api calls through the transition layer",
-  responsive_web_temporary_ocf_x_migration: "ocf-to-x onboarding migration",
-  responsive_web_redux_use_fragment_enabled: "switches the redux data layer to fragments",
-  responsive_web_graphql_timeline_navigation_enabled: "core graphql timeline navigation",
-  rweb_session_binding_enabled: "binds the session to the device",
-  rweb_client_transaction_id_enabled: "adds client transaction ids to requests",
-  network_layer_503_backoff_mode: "network retry / backoff behavior on 503",
-  responsive_web_timeline_cover_killswitch_enabled: "timeline cover killswitch",
-  responsive_web_extension_compatibility_hide: "hides content flagged by extension-compat checks"
-};
-
-window.twitterflagsdangerdesc = {
-  rweb_conf_only_enabled: "replaces the entire web app with conference-only mode",
-  rweb_video_screen_enabled: "swaps the profile media tab for the video mixer layout",
-  responsive_web_api_transition_enabled: "reroutes all api traffic, so can break loading completely",
-  responsive_web_temporary_ocf_x_migration: "changes onboarding/auth flows",
-  responsive_web_redux_use_fragment_enabled: "swaps the data layer, can break rendering",
-  responsive_web_graphql_timeline_navigation_enabled: "core navigation, timelines can break completely",
-  rweb_session_binding_enabled: "can invalidate your session / log you out",
-  responsive_web_extension_compatibility_hide: "can hide page content",
-  is_maintenance_mode_enabled: "puts the client in maintenance mode"
-};
 
 
   /*//////////////////////////////////////////////////////////////////////*/
@@ -1217,8 +1062,35 @@ window.twitterflagsdangerdesc = {
 
   /*//////////////////////////////////////////////////////////////////////*/
 
-  const knowndesc = window.twitterflagsknowndesc || {};
-  const dangerknowndesc = window.twitterflagsdangerdesc || {};
+  let knowndesc = {}, dangerknowndesc = {}, switchcfg = {};
+
+  // minimal jsonc reader: strips // and /* */ (respecting strings) + trailing commas
+  function parsejsonc(text) {
+    let o = "", str = false, q = "", i = 0;
+    while (i < text.length) {
+      const c = text[i], n = text[i + 1];
+      if (str) { o += c; if (c === "\\") { o += text[i + 1]; i += 2; continue } if (c === q) str = false; i++ }
+      else if (c === '"' || c === "'") { str = true; q = c; o += c; i++ }
+      else if (c === "/" && n === "/") { while (i < text.length && text[i] !== "\n") i++ }
+      else if (c === "/" && n === "*") { i += 2; while (i < text.length && !(text[i] === "*" && text[i + 1] === "/")) i++; i += 2 }
+      else { o += c; i++ }
+    }
+    return JSON.parse(o.replace(/,(\s*[}\]])/g, "$1"));
+  }
+
+  // configs are jsonc; the userscript build inlines them as a global, the
+  // extension fetches its packaged files at runtime
+  async function loadconfigs() {
+    if (window.twitterflagsconfigs) return window.twitterflagsconfigs;
+    const get = async f => {
+      try {
+        const url = (EXT && chrome.runtime.getURL) ? chrome.runtime.getURL("configs/" + f) : "configs/" + f;
+        return parsejsonc(await (await fetch(url)).text());
+      } catch { return {} }
+    };
+    const [desc, switches] = await Promise.all([get("descriptions.jsonc"), get("switches.jsonc")]);
+    return { desc, switches };
+  }
 
   const prefixes = ["responsive_web_", "rweb_", "c9s_"];
 
@@ -1274,11 +1146,23 @@ window.twitterflagsdangerdesc = {
 
   const filters = {true: false, safe: false, danger: false, mod: false};
 
-  header.querySelectorAll(".checklabel").forEach(lbl => {
-    const box = document.createElement("span");
-    box.className = "checkbox"; box.innerHTML = TICK;
-    lbl.insertBefore(box, lbl.firstChild);
-  });
+  // build the header switches (and their alt text) from switches.jsonc
+  function buildswitches() {
+    const devrow = query(".row2.dev"), filtrow = query(".row2.filters"), bulk = filtrow.querySelector(".bulk");
+    const mk = (s, defgroup) => {
+      const lbl = document.createElement("label");
+      lbl.className = "checklabel";
+      lbl.setAttribute("data-group", s.flag ? "flag" : defgroup);
+      if (s.flag) lbl.setAttribute("data-flag", s.flag); else lbl.setAttribute("data-key", s.key);
+      if (s.title) lbl.setAttribute("title", s.title);
+      const box = document.createElement("span"); box.className = "checkbox"; box.innerHTML = TICK;
+      lbl.appendChild(box); lbl.appendChild(document.createTextNode(s.label));
+      return lbl;
+    };
+    (switchcfg.dev || []).forEach(s => devrow.appendChild(mk(s, "dev")));
+    (switchcfg.filters || []).forEach(s => filtrow.insertBefore(mk(s, "filt"), bulk));
+  }
+
   function paintchecks() {
     header.querySelectorAll(".checklabel").forEach(lbl => {
       const grp = lbl.getAttribute("data-group"), k = lbl.getAttribute("data-key");
@@ -1443,7 +1327,15 @@ window.twitterflagsdangerdesc = {
     else try {chrome.tabs.create({url: "https://x.com/"})} catch {}
   };
   undo.onclick = () => {overrides = clone(applied); markdirty(); persist(); send("syncoverrides", {overrides}); render()};
-  refresh();
+
+  loadconfigs().then(cfg => {
+    knowndesc = (cfg.desc && cfg.desc.known) || {};
+    dangerknowndesc = (cfg.desc && cfg.desc.danger) || {};
+    switchcfg = cfg.switches || {};
+    buildswitches();
+    paintchecks();
+    refresh();
+  });
 
 })(__tfshim, __tfroot);
 

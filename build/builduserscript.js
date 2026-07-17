@@ -34,7 +34,24 @@ const panelhtml = rawhtml.slice(rawhtml.indexOf("<body>") + 6, rawhtml.indexOf("
 
 const injectsrc = rd("src/inject.js");
 const devsrc = rd("src/dev.js");
-const descsrc = rd("configs/descriptions.js");
+
+// configs are jsonc; inline them as a global so the userscript needs no fetch
+function parsejsonc(text) {
+  let o = "", str = false, q = "", i = 0;
+  while (i < text.length) {
+    const c = text[i], n = text[i + 1];
+    if (str) { o += c; if (c === "\\") { o += text[i + 1]; i += 2; continue } if (c === q) str = false; i++ }
+    else if (c === '"' || c === "'") { str = true; q = c; o += c; i++ }
+    else if (c === "/" && n === "/") { while (i < text.length && text[i] !== "\n") i++ }
+    else if (c === "/" && n === "*") { i += 2; while (i < text.length && !(text[i] === "*" && text[i + 1] === "/")) i++; i += 2 }
+    else { o += c; i++ }
+  }
+  return JSON.parse(o.replace(/,(\s*[}\]])/g, "$1"));
+}
+const configsrc = "window.twitterflagsconfigs = " + JSON.stringify({
+  desc: parsejsonc(rd("configs/descriptions.jsonc")),
+  switches: parsejsonc(rd("configs/switches.jsonc"))
+}) + ";";
 
 let panelsrc = rd("panel.js");
 panelsrc = must(panelsrc, panelsrc.replace("(function () {", "(function (chrome, root) {"), "panel iife open");
@@ -222,12 +239,10 @@ const mountclose = `
 
 /*//////////////////////////////////////////////////////////////////////*/
 
-const parts = [meta, head, injectsrc, devsrc, descsrc, mountopen, panelsrc, mountclose];
+const parts = [meta, head, configsrc, injectsrc, devsrc, mountopen, panelsrc, mountclose];
 const output = parts.join("\n");
 
-const distdir = path.join(here, "dist");
-fs.mkdirSync(distdir, {recursive: true});
-const outpath = path.join(distdir, "twitterflags.user.js");
+const outpath = path.join(here, "twitterflags.user.js");
 fs.writeFileSync(outpath, output);
 console.log("built! ^^", outpath);
 console.log("size:", (output.length / 1024).toFixed(1) + " kb");

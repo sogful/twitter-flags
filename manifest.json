@@ -1,13 +1,16 @@
 {
   "manifest_version": 3,
   "name": "twitter flags & more",
-  "version": "2.0",
+  "version": "2.1",
   "description": "browse hidden stuff inside the twitter client with a side panel!",
   "author": "cv",
   "homepage_url": "https://coolsite.cv",
   "browser_specific_settings": {
     "gecko": {
-      "id": "twitterflags@coolsite.cv",
+      "id": "cv@soggy.cat",
+      "strict_min_version": "128.0"
+    },
+    "gecko_android": {
       "strict_min_version": "128.0"
     }
   },

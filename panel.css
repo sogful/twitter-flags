@@ -264,3 +264,22 @@
       margin-left: 8px;
       font-size: 12px
     }
+
+    /*//////////////////////////////////////////////////////////////////////*/
+
+    .cachednote {
+      background-color: rgba(29,155,240,.1); color: #8ecdf8;
+      border-bottom: 1px solid #242E36;
+      padding: 8px 14px; font-size: 12px
+    }
+
+    @media (pointer: coarse) {
+      body {min-height: 480px}
+      .checkbox {width: 24px; height: 24px}
+      .checkbox .tick {width: 22px; height: 22px}
+      .row2.dev .checkbox {width: 18px; height: 18px}
+      .row2.dev .checkbox .tick {width: 18px; height: 18px}
+      .reset {width: 24px; height: 24px}
+      .reset svg {width: 21px; height: 21px}
+      .item {padding: 14px}
+    }

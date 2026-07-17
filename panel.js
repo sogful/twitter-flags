@@ -5,11 +5,12 @@
   const HOST = /^https:\/\/(x|twitter)\.com\//;
   const EXT = typeof chrome !== "undefined" && !!(chrome.runtime && chrome.runtime.onMessage && chrome.tabs);
 
-  let captured = false, source = "none", dirty = false;
+  let captured = false, source = "none", dirty = false, cached = false;
   let flags = {}, overrides = {}, status = {};
   let devconfig = { jfDev: false, inspect: false };
   const hasoverride = k => Object.prototype.hasOwnProperty.call(overrides, k);
   const effective = k => (hasoverride(k) ? overrides[k] : flags[k]);
+  const persist = () => {if (EXT) try {chrome.storage.local.set({overrides})} catch {}};
 
   /*//////////////////////////////////////////////////////////////////////*/
 
@@ -21,6 +22,11 @@
     if (!t || !HOST.test(t.url || "")) {
       let all = [];
       try { all = await chrome.tabs.query({ lastFocusedWindow: true }) } catch {}
+      t = all.find(x => HOST.test(x.url || "")) || t;
+    }
+    if (!t || !HOST.test(t.url || "")) {
+      let all = [];
+      try { all = await chrome.tabs.query({}) } catch {}
       t = all.find(x => HOST.test(x.url || "")) || t;
     }
     tabId = t && HOST.test(t.url || "") ? t.id : null;
@@ -42,19 +48,40 @@
     } catch {}
   }
 
+  let livestamp = 0, cachetimer = 0;
+
   async function refresh() {
     if (!EXT) {loadplaceholder(); return}
     await resolveTab();
-    if (tabId == null) {captured = false; render(true); return}
+    if (tabId == null) {loadcached(() => {captured = false; render(true)}); return}
+    const before = livestamp;
     ping();
     send("getstate");
     send("devget");
+    clearTimeout(cachetimer);
+    cachetimer = setTimeout(() => {if (livestamp === before) loadcached()}, 800);
   }
 
-  function stateapply(p) {
+  function stateapply(p, fromcache) {
+    if (fromcache) cached = true;
+    else {cached = false; livestamp = Date.now()}
     captured = !!p.captured; source = p.source || "none"; dirty = !!p.dirty;
     flags = p.flags || {}; overrides = p.overrides || {}; status = p.status || {};
     render();
+  }
+
+  function loadcached(fallback) {
+    const before = livestamp;
+    try {
+      chrome.storage.local.get(["laststate", "overrides"], r => {
+        void chrome.runtime.lastError;
+        if (livestamp !== before) return;
+        const p = r && r.laststate;
+        if (!p) {if (fallback) fallback(); return}
+        if (r.overrides) p.overrides = r.overrides;
+        stateapply(p, true);
+      });
+    } catch {if (fallback) fallback()}
   }
 
   function loadplaceholder() {
@@ -90,6 +117,8 @@
     chrome.tabs.onActivated.addListener(refresh);
     chrome.tabs.onUpdated.addListener((id, info) => { if (id === tabId && info.status === "complete") refresh() });
     window.addEventListener("focus", refresh);
+    window.addEventListener("pageshow", refresh);
+    document.addEventListener("visibilitychange", () => {if (!document.hidden) refresh()});
   }
 
   /*//////////////////////////////////////////////////////////////////////*/
@@ -175,7 +204,7 @@
       else { const val = mode === "on"; overrides[name] = val; set[name] = val }
     }
     if (!Object.keys(set).length && !clear.length) return;
-    dirty = true; send("setmany", { set, clear }); render();
+    dirty = true; persist(); send("setmany", { set, clear }); render();
   }
   header.addEventListener("click", e => {
     const bb = e.target.closest(".bulkbtn");
@@ -189,13 +218,13 @@
       const f = lbl.getAttribute("data-flag");
       if (effective(f) === true) { delete overrides[f]; send("clear", { name: f }) }
       else { overrides[f] = true; send("set", { name: f, value: true }) }
-      dirty = true; render();
+      dirty = true; persist(); render();
     }
     else {filters[k] = !filters[k]; paintchecks(); render()}
   });
 
   function syncdev() {paintchecks()}
-  const devpush = () => send("devset", {config: devconfig});
+  const devpush = () => {send("devset", {config: devconfig}); if (EXT) try {chrome.storage.local.set({devconfig})} catch {}};
   paintchecks();
 
   const prefof = n => n.startsWith("responsive_web_") ? "responsive_web" : n.split("_")[0];
@@ -266,7 +295,8 @@
       <div class="controls"><button class="reset${mod ? "" : " off"}" data-name="${escapehtml(name)}" title="reset to default" aria-hidden="${!mod}">${UNDO}</button>${control(name)}</div>
     </div>`;
     }
-    list.innerHTML = html || `<div class="empty center"><div class="face">:(</div><div>no matches</div></div>`;
+    const note = cached ? `<div class="cachednote">page is asleep or closed, showing last captured flags. changes still save and apply on next page load</div>` : "";
+    list.innerHTML = note + (html || `<div class="empty center"><div class="face">:(</div><div>no matches</div></div>`);
   }
 
   /*//////////////////////////////////////////////////////////////////////*/
@@ -274,7 +304,7 @@
   function commit(input) {
     const name = input.getAttribute("data-name"), t = input.getAttribute("data-type");
     const val = parseInput(t, input.value);
-    overrides[name] = val; dirty = true; send("set", { name, value: val }); render();
+    overrides[name] = val; dirty = true; persist(); send("set", { name, value: val }); render();
   }
   list.addEventListener("change", e => {const el = e.target.closest(".editfield"); if (el) commit(el)});
   list.addEventListener("keydown", e => {if (e.key === "Enter") {const el = e.target.closest(".editfield"); 
@@ -283,14 +313,14 @@
   list.addEventListener("click", e => {
     const cb = e.target.closest(".checkbox");
     
-    if (cb) { const n = cb.getAttribute("data-name"); 
-    const val = !(effective(n) === true); overrides[n] = val; dirty = true; 
+    if (cb) { const n = cb.getAttribute("data-name");
+    const val = !(effective(n) === true); overrides[n] = val; dirty = true; persist();
     send("set", {name: n, value: val}); render(); return }
     const resetbtn = e.target.closest(".reset");
 
     if (resetbtn) {
-      const n = resetbtn.getAttribute("data-name"); 
-      delete overrides[n]; dirty = true; send("clear", {name: n}); render(); return
+      const n = resetbtn.getAttribute("data-name");
+      delete overrides[n]; dirty = true; persist(); send("clear", {name: n}); render(); return
     }
     const id = e.target.closest(".ident");
 
@@ -304,8 +334,12 @@
   });
 
   search.oninput = () => render(); prefixselect.onchange = () => render();
-  reload.onclick = () => send("reload");
-  undo.onclick = () => {overrides = {}; dirty = true; send("clearall"); render()};
+  reload.onclick = () => {
+    if (!EXT) {send("reload"); return}
+    if (tabId != null) try {chrome.tabs.reload(tabId)} catch {send("reload")}
+    else try {chrome.tabs.create({url: "https://x.com/"})} catch {}
+  };
+  undo.onclick = () => {overrides = {}; dirty = true; persist(); send("clearall"); render()};
   refresh();
 
 })();

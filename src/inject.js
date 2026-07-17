@@ -18,6 +18,7 @@
   const saveoverrides = () => { try {localStorage.setItem("twitterflags.overrides", JSON.stringify(overrides))} catch {}};
   const hasoverride = k => Object.prototype.hasOwnProperty.call(overrides, k);
   const effective = k => (hasoverride(k) ? overrides[k] : flags[k]);
+  const canon = o => {try {return JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]]))} catch {return ""}};
 
   function applyoverrides(s) {
     try {
@@ -267,6 +268,17 @@
         saveoverrides(); dirty = true; prostate(); break;
       case "clear": delete overrides[d.name]; saveoverrides(); dirty = true; prostate(); break;
       case "clearall": for (const k in overrides) delete overrides[k]; saveoverrides(); dirty = true; prostate(); break;
+      case "syncoverrides": {
+        const inc = (d.overrides && typeof d.overrides === "object" && !Array.isArray(d.overrides)) ? d.overrides : {};
+        if (canon(inc) === canon(overrides)) break;
+        for (const k in overrides) delete overrides[k];
+        Object.assign(overrides, inc);
+        saveoverrides();
+        if (captured) dirty = true;
+        applyoverrides(window[IS]);
+        log("synced", Object.keys(inc).length, "override(s) from extension storage");
+        prostate(); break;
+      }
       case "reload": location.reload(); break;
     }
   });

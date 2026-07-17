@@ -14,6 +14,10 @@
 
   let overrides = {};
   try {overrides = JSON.parse(localStorage.getItem("twitterflags.overrides") || "{}") || {}} catch {overrides = {}}
+  // frozen snapshot of what was actually applied at load; the panel diffs against
+  // this to know if a reload is pending (survives live edits within the session)
+  let appliedoverrides = {};
+  try {appliedoverrides = JSON.parse(JSON.stringify(overrides))} catch {}
   let dirty = false;
   const saveoverrides = () => { try {localStorage.setItem("twitterflags.overrides", JSON.stringify(overrides))} catch {}};
   const hasoverride = k => Object.prototype.hasOwnProperty.call(overrides, k);
@@ -71,6 +75,27 @@
       if (local >= 10) total += configingest(pool, from || "fetch");
     }
     return total;
+  }
+
+  /*//////////////////////////////////////////////////////////////////////*/
+
+  // optional: force the client into a dev environment. env is read once at module
+  // eval from __META_DATA__.env; flipping "prod" -> "devel" revives a pile of
+  // prod-gated dev code (request interceptor, sw-dereg, manifest debug). must be
+  // installed before main.js reads it, hence here. experimental, can break things.
+  let forceenv = null;
+  try { const dc = JSON.parse(localStorage.getItem("twitterflags.dev") || "{}"); if (dc && dc.forceDevEnv) forceenv = "devel" } catch {}
+  if (forceenv) {
+    try {
+      let md = window.__META_DATA__;
+      const patch = v => { try { if (v && typeof v === "object" && v.env !== forceenv) v.env = forceenv } catch {} return v };
+      if (md !== undefined) patch(md);
+      Object.defineProperty(window, "__META_DATA__", {
+        configurable: true,
+        get() { return md },
+        set(v) { md = patch(v); log("forced __META_DATA__.env =", forceenv) }
+      });
+    } catch (e) { log("could not force env:", e && e.message) }
   }
 
   /*//////////////////////////////////////////////////////////////////////*/
@@ -248,6 +273,7 @@
   function snapshot() {
     return {
       captured, source, dirty, flags, overrides,
+      applied: appliedoverrides,
       status: {count: Object.keys(flags).length, isInstalled, manInstalled, fetchhooked, xhrhooked}
     };
   }

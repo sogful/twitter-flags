@@ -118,10 +118,13 @@
 
     .footer {
       display: flex; gap: 10px;
-      align-items: center; padding: 10px 14px;
-      background-color: #1d9bf0; flex-shrink: 0
+      align-items: center;
+      padding: 0 14px; max-height: 0;
+      overflow: hidden; flex-shrink: 0;
+      background-color: #1d9bf0;
+      transition: max-height 0.22s ease, padding 0.22s ease
     }
-    .footer[hidden] {display: none}
+    .footer.show {max-height: 80px; padding: 10px 14px}
     .footer .button {background-color: white; color: black}
     .footer .button.undo {background-color: red; color: white}
     .footer .button.undo:hover {background-color: #f4212e}

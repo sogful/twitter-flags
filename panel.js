@@ -6,11 +6,15 @@
   const EXT = typeof chrome !== "undefined" && !!(chrome.runtime && chrome.runtime.onMessage && chrome.tabs);
 
   let captured = false, source = "none", dirty = false, cached = false;
-  let flags = {}, overrides = {}, status = {};
+  let flags = {}, overrides = {}, status = {}, applied = {};
   let devconfig = { jfDev: false, inspect: false };
   const hasoverride = k => Object.prototype.hasOwnProperty.call(overrides, k);
   const effective = k => (hasoverride(k) ? overrides[k] : flags[k]);
   const persist = () => {if (EXT) try {chrome.storage.local.set({overrides})} catch {}};
+  const canon = o => {try {return JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]]))} catch {return ""}};
+  const clone = o => {try {return JSON.parse(JSON.stringify(o))} catch {return {}}};
+  // unsaved = current overrides differ from what the page applied at load
+  const markdirty = () => {dirty = canon(overrides) !== canon(applied)};
 
   /*//////////////////////////////////////////////////////////////////////*/
 
@@ -70,8 +74,9 @@
     if (!fromcache && empty && captured && Object.keys(flags).length) return;
     if (fromcache) cached = true;
     else {cached = false; livestamp = Date.now()}
-    captured = !!p.captured; source = p.source || "none"; dirty = !!p.dirty;
+    captured = !!p.captured; source = p.source || "none";
     flags = p.flags || {}; overrides = p.overrides || {}; status = p.status || {};
+    applied = p.applied || {}; markdirty();
     render();
   }
 
@@ -90,7 +95,7 @@
   }
 
   function loadplaceholder() {
-    captured = true; source = "placeholder"; dirty = true;
+    captured = true; source = "placeholder";
     flags = {
       responsive_web_grok_voice_mode_enabled: false,
       responsive_web_edit_tweet_enabled: true,
@@ -110,7 +115,7 @@
     };
     devconfig = {jfDev: false, inspect: false, exposeDebug: false};
     status = {count: Object.keys(flags).length, isInstalled: true, manInstalled: true, fetchHooked: true, xhrHooked: true};
-    render(); syncdev();
+    applied = {}; markdirty(); render(); syncdev();
   }
 
   if (EXT) {
@@ -206,10 +211,14 @@
     for (const name of Object.keys(flags)) {
       if (typeOf(flags[name]) !== "boolean" || dangerFor(name)) continue;
       if (mode === "reset") { if (hasoverride(name)) { delete overrides[name]; clear.push(name) } }
-      else { const val = mode === "on"; overrides[name] = val; set[name] = val }
+      else {
+        const val = mode === "on";
+        if (eq(val, flags[name])) { if (hasoverride(name)) { delete overrides[name]; clear.push(name) } }
+        else { overrides[name] = val; set[name] = val }
+      }
     }
     if (!Object.keys(set).length && !clear.length) return;
-    dirty = true; persist(); send("setmany", { set, clear }); render();
+    markdirty(); persist(); send("setmany", { set, clear }); render();
   }
   header.addEventListener("click", e => {
     const bb = e.target.closest(".bulkbtn");
@@ -221,9 +230,10 @@
     if (grp === "dev") {devconfig[k] = !devconfig[k]; paintchecks(); devpush()}
     else if (grp === "flag") {
       const f = lbl.getAttribute("data-flag");
-      if (effective(f) === true) { delete overrides[f]; send("clear", { name: f }) }
-      else { overrides[f] = true; send("set", { name: f, value: true }) }
-      dirty = true; persist(); render();
+      const base = flags[f], val = !(effective(f) === true);
+      if (eq(val, base)) { delete overrides[f]; send("clear", { name: f }) }
+      else { overrides[f] = val; send("set", { name: f, value: val }) }
+      markdirty(); persist(); render();
     }
     else {filters[k] = !filters[k]; paintchecks(); render()}
   });
@@ -257,7 +267,7 @@
   }
   const isMod = name => hasoverride(name) && !eq(overrides[name], flags[name]);
 
-  function updateFoot() { footer.hidden = !dirty }
+  function updateFoot() { footer.classList.toggle("show", dirty) }
 
   function render(noTab) {
     updateFoot();
@@ -309,7 +319,9 @@
   function commit(input) {
     const name = input.getAttribute("data-name"), t = input.getAttribute("data-type");
     const val = parseInput(t, input.value);
-    overrides[name] = val; dirty = true; persist(); send("set", { name, value: val }); render();
+    if (eq(val, flags[name])) { delete overrides[name]; send("clear", { name }) }
+    else { overrides[name] = val; send("set", { name, value: val }) }
+    markdirty(); persist(); render();
   }
   list.addEventListener("change", e => {const el = e.target.closest(".editfield"); if (el) commit(el)});
   list.addEventListener("keydown", e => {if (e.key === "Enter") {const el = e.target.closest(".editfield"); 
@@ -319,13 +331,15 @@
     const cb = e.target.closest(".checkbox");
     
     if (cb) { const n = cb.getAttribute("data-name");
-    const val = !(effective(n) === true); overrides[n] = val; dirty = true; persist();
-    send("set", {name: n, value: val}); render(); return }
+    const base = flags[n], val = !(effective(n) === true);
+    if (eq(val, base)) { delete overrides[n]; send("clear", {name: n}) }
+    else { overrides[n] = val; send("set", {name: n, value: val}) }
+    markdirty(); persist(); render(); return }
     const resetbtn = e.target.closest(".reset");
 
     if (resetbtn) {
       const n = resetbtn.getAttribute("data-name");
-      delete overrides[n]; dirty = true; persist(); send("clear", {name: n}); render(); return
+      delete overrides[n]; markdirty(); persist(); send("clear", {name: n}); render(); return
     }
     const id = e.target.closest(".ident");
 
@@ -344,7 +358,7 @@
     if (tabId != null) try {chrome.tabs.reload(tabId)} catch {send("reload")}
     else try {chrome.tabs.create({url: "https://x.com/"})} catch {}
   };
-  undo.onclick = () => {overrides = {}; dirty = true; persist(); send("clearall"); render()};
+  undo.onclick = () => {overrides = clone(applied); markdirty(); persist(); send("syncoverrides", {overrides}); render()};
   refresh();
 
 })();

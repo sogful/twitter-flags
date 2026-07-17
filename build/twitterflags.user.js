@@ -135,10 +135,13 @@
 
     .footer {
       display: flex; gap: 10px;
-      align-items: center; padding: 10px 14px;
-      background-color: #1d9bf0; flex-shrink: 0
+      align-items: center;
+      padding: 0 14px; max-height: 0;
+      overflow: hidden; flex-shrink: 0;
+      background-color: #1d9bf0;
+      transition: max-height 0.22s ease, padding 0.22s ease
     }
-    .footer[hidden] {display: none}
+    .footer.show {max-height: 80px; padding: 10px 14px}
     .footer .button {background-color: white; color: black}
     .footer .button.undo {background-color: red; color: white}
     .footer .button.undo:hover {background-color: #f4212e}
@@ -304,15 +307,16 @@
   const hostcss = `
     :host {all: initial}
     .tffab {
-      position: fixed; z-index: 2147483647;
+      position: fixed; z-index: 2147483646;
       right: 16px; bottom: 16px;
       width: 40px; height: 40px; border-radius: 999px;
-      background-color: #1d9bf0; border: none; cursor: pointer;
-      pointer-events: auto;
+      background-color: #1d9bf0; border: none; cursor: grab;
+      pointer-events: auto; touch-action: none;
       display: flex; align-items: center; justify-content: center;
       padding: 0
     }
-    .tffab svg {width: 22px; height: 22px}
+    .tffab:active {cursor: grabbing}
+    .tffab svg {width: 22px; height: 22px; pointer-events: none}
     .tfpanelwrap {
       position: fixed; top: 0; right: 0;
       width: 390px; max-width: 100vw;
@@ -343,8 +347,8 @@
       <label class="checklabel" data-group="dev" data-key="jfDev">jetfuel dev mode</label>
       <label class="checklabel" data-group="dev" data-key="inspect">inspector</label>
       <label class="checklabel" data-group="dev" data-key="exposeDebug">expose audio</label>
+      <label class="checklabel" data-group="dev" data-key="forceDevEnv" title="experimental: revives prod-gated dev code, may break the client (needs reload)">force dev env</label>
       <label class="checklabel" data-group="flag" data-flag="rweb_debugger_enabled">network logger</label>
-      <label class="checklabel" data-group="flag" data-flag="rweb_conf_dev_enabled">conf dev grid</label>
     </div>
     <div class="row1">
       <div class="searchbox">
@@ -366,7 +370,7 @@
     </div>
   </div>
   <div class="list"></div>
-  <div class="footer" hidden>
+  <div class="footer">
     <span class="footermessage">You've got unsaved changes!</span>
     <button class="button undo">Undo</button>
     <button class="button hot reload">Save & reload</button>
@@ -391,6 +395,10 @@
 
   let overrides = {};
   try {overrides = JSON.parse(localStorage.getItem("twitterflags.overrides") || "{}") || {}} catch {overrides = {}}
+  // frozen snapshot of what was actually applied at load; the panel diffs against
+  // this to know if a reload is pending (survives live edits within the session)
+  let appliedoverrides = {};
+  try {appliedoverrides = JSON.parse(JSON.stringify(overrides))} catch {}
   let dirty = false;
   const saveoverrides = () => { try {localStorage.setItem("twitterflags.overrides", JSON.stringify(overrides))} catch {}};
   const hasoverride = k => Object.prototype.hasOwnProperty.call(overrides, k);
@@ -448,6 +456,27 @@
       if (local >= 10) total += configingest(pool, from || "fetch");
     }
     return total;
+  }
+
+  /*//////////////////////////////////////////////////////////////////////*/
+
+  // optional: force the client into a dev environment. env is read once at module
+  // eval from __META_DATA__.env; flipping "prod" -> "devel" revives a pile of
+  // prod-gated dev code (request interceptor, sw-dereg, manifest debug). must be
+  // installed before main.js reads it, hence here. experimental, can break things.
+  let forceenv = null;
+  try { const dc = JSON.parse(localStorage.getItem("twitterflags.dev") || "{}"); if (dc && dc.forceDevEnv) forceenv = "devel" } catch {}
+  if (forceenv) {
+    try {
+      let md = window.__META_DATA__;
+      const patch = v => { try { if (v && typeof v === "object" && v.env !== forceenv) v.env = forceenv } catch {} return v };
+      if (md !== undefined) patch(md);
+      Object.defineProperty(window, "__META_DATA__", {
+        configurable: true,
+        get() { return md },
+        set(v) { md = patch(v); log("forced __META_DATA__.env =", forceenv) }
+      });
+    } catch (e) { log("could not force env:", e && e.message) }
   }
 
   /*//////////////////////////////////////////////////////////////////////*/
@@ -625,6 +654,7 @@
   function snapshot() {
     return {
       captured, source, dirty, flags, overrides,
+      applied: appliedoverrides,
       status: {count: Object.keys(flags).length, isInstalled, manInstalled, fetchhooked, xhrhooked}
     };
   }
@@ -668,7 +698,7 @@
 
   const PCHAN = "twitterflagspage", UCHAN = "twitterflagspanel";
   const KEY = "twitterflags.dev";
-  const DEFAULT = {jfDev: false, inspect: false, exposeDebug: false};
+  const DEFAULT = {jfDev: false, inspect: false, exposeDebug: false, forceDevEnv: false};
   const log = (...a) => {try {console.log("%c[twitterflags:dev]", "color:#00ba7c;font-weight:700", ...a)} catch {}};
 
   let cfg;
@@ -695,9 +725,8 @@
 
     s.textContent = `
 
-    html.tfdev-inspect, html.tfdev-inspect * {cursor: crosshair !important}
+    html.tfdev-inspect [data-testid] {cursor: crosshair !important}
     html.tfdev-inspect [data-testid]:hover {outline: 1px solid #1d9bf0 !important; outline-offset: -1px}
-    html.tfdev-inspect #tfuserscripthost {cursor: auto !important}
 
     .tfdev-tip {
       position: fixed; z-index: 2147483647; 
@@ -721,28 +750,26 @@
   let tip = null, copyT = 0;
   const SUPPRESS = ["mousedown", "mouseup", "pointerdown", "pointerup", "auxclick", "contextmenu"];
 
-  // the userscript build lives in a shadow host on the page; the inspector must
-  // leave it alone so its own controls stay clickable
-  const inpanel = e => !!(e.target && e.target.closest && e.target.closest("#tfuserscripthost"));
+  // only act on real testid targets: everything else (blank areas, our own
+  // shadow panel which has no testids) stays fully clickable while inspecting
+  const testidof = e => (e.target && e.target.closest) ? e.target.closest("[data-testid]") : null;
 
   function onmove(e) {
-    if (inpanel(e)) { if (tip) tip.style.display = "none"; return }
-    const t = e.target.closest && e.target.closest("[data-testid]");
+    const t = testidof(e);
     if (!t || !tip) { if (tip) tip.style.display = "none"; return }
     if (!tip.classList.contains("copied")) tip.textContent = t.getAttribute("data-testid");
     tip.style.left = e.clientX + "px"; tip.style.top = e.clientY + "px"; tip.style.display = "block";
   }
-  function suppress(e) {if (inpanel(e)) return; e.preventDefault(); e.stopPropagation()}
+  function suppress(e) {if (testidof(e)) {e.preventDefault(); e.stopPropagation()}}
   function onkeypress(e) {if (e.key === "Escape") { 
     cfg.inspect = false; 
     save(); apply(); post(); 
     log("inspector off (esc)")
   }}
   function onclick(e) {
-    if (inpanel(e)) return;
-    e.preventDefault(); e.stopPropagation();
-    const t = e.target.closest && e.target.closest("[data-testid]");
+    const t = testidof(e);
     if (!t || !tip) return;
+    e.preventDefault(); e.stopPropagation();
     const name = t.getAttribute("data-testid");
     try { navigator.clipboard.writeText(name) } catch {}
     tip.textContent = "copied: " + name; tip.classList.add("copied");
@@ -1012,15 +1039,41 @@ window.twitterflagsdangerdesc = {
     wrap.innerHTML = '<button class="tfclose" title="close">' + closesvg + "</button>" + panelhtml;
     root.appendChild(wrap);
 
-    // fab last so it wins the z-index tie and stays clickable over the open drawer
     const fab = document.createElement("button");
-    fab.className = "tffab"; fab.title = "twitter flags";
+    fab.className = "tffab"; fab.title = "twitter flags (drag to move, tap to open)";
     fab.innerHTML = iconsvg;
     root.appendChild(fab);
 
     (document.body || document.documentElement).appendChild(host);
 
-    fab.addEventListener("click", () => wrap.classList.toggle("open"));
+    try {
+      const pos = JSON.parse(localStorage.getItem("twitterflags.fabpos") || "null");
+      if (pos && typeof pos.left === "number") {fab.style.left = pos.left + "px"; fab.style.top = pos.top + "px"; fab.style.right = "auto"; fab.style.bottom = "auto"}
+    } catch {}
+
+    // draggable circle; a real drag suppresses the open-tap and its position sticks
+    let down = false, moved = false, sx = 0, sy = 0, ox = 0, oy = 0;
+    fab.addEventListener("pointerdown", e => {
+      down = true; moved = false;
+      const r = fab.getBoundingClientRect();
+      ox = r.left; oy = r.top; sx = e.clientX; sy = e.clientY;
+      try {fab.setPointerCapture(e.pointerId)} catch {}
+    });
+    fab.addEventListener("pointermove", e => {
+      if (!down) return;
+      const dx = e.clientX - sx, dy = e.clientY - sy;
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+      const nx = Math.max(0, Math.min(window.innerWidth - fab.offsetWidth, ox + dx));
+      const ny = Math.max(0, Math.min(window.innerHeight - fab.offsetHeight, oy + dy));
+      fab.style.left = nx + "px"; fab.style.top = ny + "px"; fab.style.right = "auto"; fab.style.bottom = "auto";
+    });
+    fab.addEventListener("pointerup", e => {
+      if (!down) return;
+      down = false;
+      try {fab.releasePointerCapture(e.pointerId)} catch {}
+      if (moved) {try {localStorage.setItem("twitterflags.fabpos", JSON.stringify({left: fab.offsetLeft, top: fab.offsetTop}))} catch {}}
+      else wrap.classList.toggle("open");
+    });
     wrap.querySelector(".tfclose").addEventListener("click", () => wrap.classList.remove("open"));
 
     const __tfshim = makeshim();
@@ -1037,11 +1090,15 @@ window.twitterflagsdangerdesc = {
   const EXT = typeof chrome !== "undefined" && !!(chrome.runtime && chrome.runtime.onMessage && chrome.tabs);
 
   let captured = false, source = "none", dirty = false, cached = false;
-  let flags = {}, overrides = {}, status = {};
+  let flags = {}, overrides = {}, status = {}, applied = {};
   let devconfig = { jfDev: false, inspect: false };
   const hasoverride = k => Object.prototype.hasOwnProperty.call(overrides, k);
   const effective = k => (hasoverride(k) ? overrides[k] : flags[k]);
   const persist = () => {if (EXT) try {chrome.storage.local.set({overrides})} catch {}};
+  const canon = o => {try {return JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]]))} catch {return ""}};
+  const clone = o => {try {return JSON.parse(JSON.stringify(o))} catch {return {}}};
+  // unsaved = current overrides differ from what the page applied at load
+  const markdirty = () => {dirty = canon(overrides) !== canon(applied)};
 
   /*//////////////////////////////////////////////////////////////////////*/
 
@@ -1101,8 +1158,9 @@ window.twitterflagsdangerdesc = {
     if (!fromcache && empty && captured && Object.keys(flags).length) return;
     if (fromcache) cached = true;
     else {cached = false; livestamp = Date.now()}
-    captured = !!p.captured; source = p.source || "none"; dirty = !!p.dirty;
+    captured = !!p.captured; source = p.source || "none";
     flags = p.flags || {}; overrides = p.overrides || {}; status = p.status || {};
+    applied = p.applied || {}; markdirty();
     render();
   }
 
@@ -1121,7 +1179,7 @@ window.twitterflagsdangerdesc = {
   }
 
   function loadplaceholder() {
-    captured = true; source = "placeholder"; dirty = true;
+    captured = true; source = "placeholder";
     flags = {
       responsive_web_grok_voice_mode_enabled: false,
       responsive_web_edit_tweet_enabled: true,
@@ -1141,7 +1199,7 @@ window.twitterflagsdangerdesc = {
     };
     devconfig = {jfDev: false, inspect: false, exposeDebug: false};
     status = {count: Object.keys(flags).length, isInstalled: true, manInstalled: true, fetchHooked: true, xhrHooked: true};
-    render(); syncdev();
+    applied = {}; markdirty(); render(); syncdev();
   }
 
   if (EXT) {
@@ -1237,10 +1295,14 @@ window.twitterflagsdangerdesc = {
     for (const name of Object.keys(flags)) {
       if (typeOf(flags[name]) !== "boolean" || dangerFor(name)) continue;
       if (mode === "reset") { if (hasoverride(name)) { delete overrides[name]; clear.push(name) } }
-      else { const val = mode === "on"; overrides[name] = val; set[name] = val }
+      else {
+        const val = mode === "on";
+        if (eq(val, flags[name])) { if (hasoverride(name)) { delete overrides[name]; clear.push(name) } }
+        else { overrides[name] = val; set[name] = val }
+      }
     }
     if (!Object.keys(set).length && !clear.length) return;
-    dirty = true; persist(); send("setmany", { set, clear }); render();
+    markdirty(); persist(); send("setmany", { set, clear }); render();
   }
   header.addEventListener("click", e => {
     const bb = e.target.closest(".bulkbtn");
@@ -1252,9 +1314,10 @@ window.twitterflagsdangerdesc = {
     if (grp === "dev") {devconfig[k] = !devconfig[k]; paintchecks(); devpush()}
     else if (grp === "flag") {
       const f = lbl.getAttribute("data-flag");
-      if (effective(f) === true) { delete overrides[f]; send("clear", { name: f }) }
-      else { overrides[f] = true; send("set", { name: f, value: true }) }
-      dirty = true; persist(); render();
+      const base = flags[f], val = !(effective(f) === true);
+      if (eq(val, base)) { delete overrides[f]; send("clear", { name: f }) }
+      else { overrides[f] = val; send("set", { name: f, value: val }) }
+      markdirty(); persist(); render();
     }
     else {filters[k] = !filters[k]; paintchecks(); render()}
   });
@@ -1288,7 +1351,7 @@ window.twitterflagsdangerdesc = {
   }
   const isMod = name => hasoverride(name) && !eq(overrides[name], flags[name]);
 
-  function updateFoot() { footer.hidden = !dirty }
+  function updateFoot() { footer.classList.toggle("show", dirty) }
 
   function render(noTab) {
     updateFoot();
@@ -1340,7 +1403,9 @@ window.twitterflagsdangerdesc = {
   function commit(input) {
     const name = input.getAttribute("data-name"), t = input.getAttribute("data-type");
     const val = parseInput(t, input.value);
-    overrides[name] = val; dirty = true; persist(); send("set", { name, value: val }); render();
+    if (eq(val, flags[name])) { delete overrides[name]; send("clear", { name }) }
+    else { overrides[name] = val; send("set", { name, value: val }) }
+    markdirty(); persist(); render();
   }
   list.addEventListener("change", e => {const el = e.target.closest(".editfield"); if (el) commit(el)});
   list.addEventListener("keydown", e => {if (e.key === "Enter") {const el = e.target.closest(".editfield"); 
@@ -1350,13 +1415,15 @@ window.twitterflagsdangerdesc = {
     const cb = e.target.closest(".checkbox");
     
     if (cb) { const n = cb.getAttribute("data-name");
-    const val = !(effective(n) === true); overrides[n] = val; dirty = true; persist();
-    send("set", {name: n, value: val}); render(); return }
+    const base = flags[n], val = !(effective(n) === true);
+    if (eq(val, base)) { delete overrides[n]; send("clear", {name: n}) }
+    else { overrides[n] = val; send("set", {name: n, value: val}) }
+    markdirty(); persist(); render(); return }
     const resetbtn = e.target.closest(".reset");
 
     if (resetbtn) {
       const n = resetbtn.getAttribute("data-name");
-      delete overrides[n]; dirty = true; persist(); send("clear", {name: n}); render(); return
+      delete overrides[n]; markdirty(); persist(); send("clear", {name: n}); render(); return
     }
     const id = e.target.closest(".ident");
 
@@ -1375,7 +1442,7 @@ window.twitterflagsdangerdesc = {
     if (tabId != null) try {chrome.tabs.reload(tabId)} catch {send("reload")}
     else try {chrome.tabs.create({url: "https://x.com/"})} catch {}
   };
-  undo.onclick = () => {overrides = {}; dirty = true; persist(); send("clearall"); render()};
+  undo.onclick = () => {overrides = clone(applied); markdirty(); persist(); send("syncoverrides", {overrides}); render()};
   refresh();
 
 })(__tfshim, __tfroot);

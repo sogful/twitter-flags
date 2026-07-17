@@ -3,7 +3,7 @@
 
   const PCHAN = "twitterflagspage", UCHAN = "twitterflagspanel";
   const KEY = "twitterflags.dev";
-  const DEFAULT = {jfDev: false, inspect: false, exposeDebug: false};
+  const DEFAULT = {jfDev: false, inspect: false, exposeDebug: false, forceDevEnv: false};
   const log = (...a) => {try {console.log("%c[twitterflags:dev]", "color:#00ba7c;font-weight:700", ...a)} catch {}};
 
   let cfg;
@@ -30,9 +30,8 @@
 
     s.textContent = `
 
-    html.tfdev-inspect, html.tfdev-inspect * {cursor: crosshair !important}
+    html.tfdev-inspect [data-testid] {cursor: crosshair !important}
     html.tfdev-inspect [data-testid]:hover {outline: 1px solid #1d9bf0 !important; outline-offset: -1px}
-    html.tfdev-inspect #tfuserscripthost {cursor: auto !important}
 
     .tfdev-tip {
       position: fixed; z-index: 2147483647; 
@@ -56,28 +55,26 @@
   let tip = null, copyT = 0;
   const SUPPRESS = ["mousedown", "mouseup", "pointerdown", "pointerup", "auxclick", "contextmenu"];
 
-  // the userscript build lives in a shadow host on the page; the inspector must
-  // leave it alone so its own controls stay clickable
-  const inpanel = e => !!(e.target && e.target.closest && e.target.closest("#tfuserscripthost"));
+  // only act on real testid targets: everything else (blank areas, our own
+  // shadow panel which has no testids) stays fully clickable while inspecting
+  const testidof = e => (e.target && e.target.closest) ? e.target.closest("[data-testid]") : null;
 
   function onmove(e) {
-    if (inpanel(e)) { if (tip) tip.style.display = "none"; return }
-    const t = e.target.closest && e.target.closest("[data-testid]");
+    const t = testidof(e);
     if (!t || !tip) { if (tip) tip.style.display = "none"; return }
     if (!tip.classList.contains("copied")) tip.textContent = t.getAttribute("data-testid");
     tip.style.left = e.clientX + "px"; tip.style.top = e.clientY + "px"; tip.style.display = "block";
   }
-  function suppress(e) {if (inpanel(e)) return; e.preventDefault(); e.stopPropagation()}
+  function suppress(e) {if (testidof(e)) {e.preventDefault(); e.stopPropagation()}}
   function onkeypress(e) {if (e.key === "Escape") { 
     cfg.inspect = false; 
     save(); apply(); post(); 
     log("inspector off (esc)")
   }}
   function onclick(e) {
-    if (inpanel(e)) return;
-    e.preventDefault(); e.stopPropagation();
-    const t = e.target.closest && e.target.closest("[data-testid]");
+    const t = testidof(e);
     if (!t || !tip) return;
+    e.preventDefault(); e.stopPropagation();
     const name = t.getAttribute("data-testid");
     try { navigator.clipboard.writeText(name) } catch {}
     tip.textContent = "copied: " + name; tip.classList.add("copied");

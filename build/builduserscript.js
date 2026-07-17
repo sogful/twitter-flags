@@ -46,15 +46,16 @@ panelsrc = must(panelsrc, panelsrc.replace(/\}\)\(\);\s*$/, "})(__tfshim, __tfro
 const hostcss = `
     :host {all: initial}
     .tffab {
-      position: fixed; z-index: 2147483647;
+      position: fixed; z-index: 2147483646;
       right: 16px; bottom: 16px;
       width: 40px; height: 40px; border-radius: 999px;
-      background-color: #1d9bf0; border: none; cursor: pointer;
-      pointer-events: auto;
+      background-color: #1d9bf0; border: none; cursor: grab;
+      pointer-events: auto; touch-action: none;
       display: flex; align-items: center; justify-content: center;
       padding: 0
     }
-    .tffab svg {width: 22px; height: 22px}
+    .tffab:active {cursor: grabbing}
+    .tffab svg {width: 22px; height: 22px; pointer-events: none}
     .tfpanelwrap {
       position: fixed; top: 0; right: 0;
       width: 390px; max-width: 100vw;
@@ -166,15 +167,41 @@ const mountopen = `
     wrap.innerHTML = '<button class="tfclose" title="close">' + closesvg + "</button>" + panelhtml;
     root.appendChild(wrap);
 
-    // fab last so it wins the z-index tie and stays clickable over the open drawer
     const fab = document.createElement("button");
-    fab.className = "tffab"; fab.title = "twitter flags";
+    fab.className = "tffab"; fab.title = "twitter flags (drag to move, tap to open)";
     fab.innerHTML = iconsvg;
     root.appendChild(fab);
 
     (document.body || document.documentElement).appendChild(host);
 
-    fab.addEventListener("click", () => wrap.classList.toggle("open"));
+    try {
+      const pos = JSON.parse(localStorage.getItem("twitterflags.fabpos") || "null");
+      if (pos && typeof pos.left === "number") {fab.style.left = pos.left + "px"; fab.style.top = pos.top + "px"; fab.style.right = "auto"; fab.style.bottom = "auto"}
+    } catch {}
+
+    // draggable circle; a real drag suppresses the open-tap and its position sticks
+    let down = false, moved = false, sx = 0, sy = 0, ox = 0, oy = 0;
+    fab.addEventListener("pointerdown", e => {
+      down = true; moved = false;
+      const r = fab.getBoundingClientRect();
+      ox = r.left; oy = r.top; sx = e.clientX; sy = e.clientY;
+      try {fab.setPointerCapture(e.pointerId)} catch {}
+    });
+    fab.addEventListener("pointermove", e => {
+      if (!down) return;
+      const dx = e.clientX - sx, dy = e.clientY - sy;
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+      const nx = Math.max(0, Math.min(window.innerWidth - fab.offsetWidth, ox + dx));
+      const ny = Math.max(0, Math.min(window.innerHeight - fab.offsetHeight, oy + dy));
+      fab.style.left = nx + "px"; fab.style.top = ny + "px"; fab.style.right = "auto"; fab.style.bottom = "auto";
+    });
+    fab.addEventListener("pointerup", e => {
+      if (!down) return;
+      down = false;
+      try {fab.releasePointerCapture(e.pointerId)} catch {}
+      if (moved) {try {localStorage.setItem("twitterflags.fabpos", JSON.stringify({left: fab.offsetLeft, top: fab.offsetTop}))} catch {}}
+      else wrap.classList.toggle("open");
+    });
     wrap.querySelector(".tfclose").addEventListener("click", () => wrap.classList.remove("open"));
 
     const __tfshim = makeshim();
@@ -200,7 +227,7 @@ const output = parts.join("\n");
 
 const distdir = path.join(here, "dist");
 fs.mkdirSync(distdir, {recursive: true});
-const outpath = path.join(distdir, "twitter-flags.user.js");
+const outpath = path.join(distdir, "twitterflags.user.js");
 fs.writeFileSync(outpath, output);
 console.log("built! ^^", outpath);
 console.log("size:", (output.length / 1024).toFixed(1) + " kb");

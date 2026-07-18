@@ -13,6 +13,7 @@
     body {
       background-color: #000; color: #E5EAEC;
       font: 14px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
       display: flex; flex-direction: column;
       overflow: hidden; user-select: none;
     }
@@ -108,9 +109,14 @@
       white-space: nowrap; transition: color .15s ease;
       font-family: inherit
     }
-    .fseg.on {color: #fff; font-weight: 700}
+    .fseg.on {color: #fff}
+    .fseg.on .fseglbl {font-weight: 700}
     .fseg .fico {display: inline-flex; width: 12px; height: 12px}
     .fseg .fico svg {width: 12px; height: 12px}
+    /* reserve the bold width so selecting a segment never shifts the layout */
+    .fseglbl {display: inline-grid}
+    .fseglbl::after {content: attr(data-label); font-weight: 700; height: 0; visibility: hidden}
+    .fseglbl, .fseglbl::after {grid-area: 1 / 1}
 
     .note {
       margin-left: auto;
@@ -120,7 +126,11 @@
 
     .bulk {
       display: flex; gap: 8px;
-      margin-left: auto; align-items: center
+      align-items: center; flex-wrap: wrap
+    }
+    .flagcount {
+      color: #6B7F8E; font-size: 12px;
+      margin-top: -2px
     }
     .bulkbtn {
       background: transparent; color: #E5EAEC;
@@ -146,6 +156,12 @@
       font: 700 10.5px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     .swbtn:hover {background-color: rgba(239,243,244,.1)}
+    .row2.swrow .checklabel {font-size: 11px; gap: 4px}
+    .row2.swrow .checkbox {
+      width: 15px; height: 15px;
+      border-width: 1.5px; border-radius: 3px
+    }
+    .row2.swrow .checkbox .tick {width: 15px; height: 15px}
     .row2.dev .checkbox {
       width: 15px; height: 15px;
       border-width: 1.5px; border-radius: 3px
@@ -292,12 +308,13 @@
       scrollbar-width: thin; scrollbar-color: #536471 transparent
     }
     .optsitem {
-      padding: 7px 10px; border-radius: 6px;
-      cursor: pointer; white-space: nowrap;
-      overflow: hidden; text-overflow: ellipsis
+      padding: 6px 10px; border-radius: 6px; cursor: pointer;
+      display: flex; flex-direction: column; gap: 1px
     }
+    .optsval {white-space: nowrap; overflow: hidden; text-overflow: ellipsis}
+    .optsdesc {font-size: 11px; color: #6B7F8E; line-height: 1.25}
     .optsitem:hover {background-color: #16181c}
-    .optsitem.sel {color: #1d9bf0; font-weight: 700}
+    .optsitem.sel .optsval {color: #fff; font-weight: 800}
     .optsempty {padding: 7px 10px; color: #6B7F8E; font-style: italic}
 
     .empty {

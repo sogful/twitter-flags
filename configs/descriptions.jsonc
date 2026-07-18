@@ -1,5 +1,4 @@
 {
-  // flag id -> human description, shown under each flag in the panel
   "known": {
 
   // conference / spaces
@@ -162,11 +161,10 @@
   "responsive_web_extension_compatibility_hide": "hides content flagged by extension-compat checks"
   },
 
-  // flag id -> why it is risky (adds the danger styling + warning)
   "danger": {
   "rweb_conf_only_enabled": "replaces the entire web app with conference-only mode",
   "rweb_video_screen_enabled": "swaps the profile media tab for the video mixer layout",
-  "responsive_web_api_transition_enabled": "reroutes all api traffic, so can break loading completely",
+  "responsive_web_api_transition_enabled": "reroutes all api traffic",
   "responsive_web_temporary_ocf_x_migration": "changes onboarding/auth flows",
   "responsive_web_redux_use_fragment_enabled": "swaps the data layer, can break rendering",
   "responsive_web_graphql_timeline_navigation_enabled": "core navigation, timelines can break completely",

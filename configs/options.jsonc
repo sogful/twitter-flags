@@ -1,27 +1,125 @@
 {
-  // flag -> the fixed set of values it accepts (enums / experiment variants).
-  // free-form inputs (urls, ids, uncapped numbers, durations) are left out.
-  // shown as "N available options" + a dropdown when the value field is focused.
-  // values verified from the client's variantConfig framework (variant keys =
-  // accepted values) and getStringValue comparisons. variant flags default to ""
-  // (no variant); clear the field to get that.
-
-  "responsive_web_account_access_language_lo_banners": ["control", "treatment_1", "treatment_2", "treatment_3", "treatment_4"],
-  "responsive_web_account_access_language_lo_splash_sidebar": ["control", "treatment_1", "treatment_2", "treatment_3", "treatment_4"],
-  "responsive_web_use_app_button_variations": ["control", "treatment_1", "treatment_2"],
-  "subscriptions_inapp_grok_default_mode": ["regular", "fun"],
-  "rweb_update_fatigue_switch_to_app_link": ["BannerSwitchToApp", "InterstitialSwitchToApp", "NuxAppDownload", "SwitchToAppFooter", "UseApp", "UseAppExtended", "SwitchToAppHigh1", "SwitchToAppHigh2", "SwitchToAppHigh3", "SwitchToAppHigh5", "SwitchToAppHigh7", "SwitchToAppLow1", "SwitchToAppLow3", "SwitchToAppLow5", "SwitchToAppLow7", "SwitchToAppLow9"],
-  "subscriptions_upsells_premium_home_nav": ["default", "try_premium", "discount_40_percent", "discount_50_percent", "premium_upsell_upgrade", "premium_upsell_premium", "premium_upsell_get_premium", "expiring_soon", "last_chance"],
-  "subscriptions_upsells_post_engagements_variant": ["direct_to_paywall", "analytics_popup"],
-  "subscriptions_upsells_vo_nav_decoration_variant": ["30_percent_off", "last_week", "last_day"],
-  "subscriptions_upsells_right_sidebar_variant": ["choice_step", "free_trial_basic_14_days", "free_trial_premium_14_days", "discount_50_percent", "discount_40_percent", "extended_discount_50_percent", "ending_today_discount_50_percent", "ending_today_discount_40_percent", "thanksgiving_generic", "thanksgiving_expiring", "thanksgiving_ending", "anniversary_generic", "anniversary_expiring", "anniversary_ending"],
-  "subscriptions_upsells_bookmarks_screen_variant": ["basic_tier_selected", "premium_tier_selected"],
-  "subscriptions_upsells_explore_sidebar_analytics_upsell_variant": ["variant_a", "variant_b", "variant_c"],
-  "subscriptions_upsells_longform_sidebar_variant": ["variant_a", "variant_b", "variant_c", "variant_d"],
-  "subscriptions_upsells_profile_sidebar_analytics_upsell_variant": ["variant_a", "variant_b", "variant_c"],
-  "subscriptions_upsells_radar_sidebar_variant": ["variant_a", "variant_b", "variant_c", "variant_d", "variant_e", "variant_f", "variant_g", "variant_h"],
-  "subscriptions_upsells_reply_boost_variant": ["variant_a", "variant_b", "variant_c"],
-  "subscriptions_upsells_get_verified_button_variant": ["badge", "eu"],
-  "responsive_web_card_conversion_hoisted": ["off", "legacy"],
-  "subscriptions_upsells_post_composer_variant": ["alternative"]
+  "responsive_web_account_access_language_lo_banners": [
+    {"val": "control", "desc": "default log in / sign up labels"},
+    {"val": "treatment_1", "desc": "sign in + sign up wording"},
+    {"val": "treatment_2", "desc": "sign in + create account wording"},
+    {"val": "treatment_3", "desc": "log in + create account wording"},
+    {"val": "treatment_4", "desc": "default labels (not overridden)"}
+  ],
+  "responsive_web_account_access_language_lo_splash_sidebar": [
+    {"val": "control", "desc": "sign up with phone or email"},
+    {"val": "treatment_1", "desc": "sign up with phone or email"},
+    {"val": "treatment_2", "desc": "create account"},
+    {"val": "treatment_3", "desc": "create account with phone or email"},
+    {"val": "treatment_4", "desc": "create account (shows sign-up form)"}
+  ],
+  "responsive_web_use_app_button_variations": [
+    {"val": "control", "desc": "default button layout"},
+    {"val": "treatment_1", "desc": "adds login + use-app buttons (mobile)"},
+    {"val": "treatment_2", "desc": "shrinks login, extends use-app on scroll"}
+  ],
+  "subscriptions_inapp_grok_default_mode": [
+    {"val": "regular", "desc": "grok opens in regular mode"},
+    {"val": "fun", "desc": "grok opens in fun mode"}
+  ],
+  "rweb_update_fatigue_switch_to_app_link": [
+    {"val": "BannerSwitchToApp", "desc": "banner switch-to-app prompt"},
+    {"val": "InterstitialSwitchToApp", "desc": "full-screen interstitial prompt"},
+    {"val": "NuxAppDownload", "desc": "new-user app download prompt"},
+    {"val": "SwitchToAppFooter", "desc": "footer switch-to-app link"},
+    {"val": "UseApp", "desc": "use-app prompt"},
+    {"val": "UseAppExtended", "desc": "extended use-app prompt"},
+    {"val": "SwitchToAppHigh1", "desc": "high-intensity campaign, bucket 1"},
+    {"val": "SwitchToAppHigh2", "desc": "high-intensity campaign, bucket 2"},
+    {"val": "SwitchToAppHigh3", "desc": "high-intensity campaign, bucket 3"},
+    {"val": "SwitchToAppHigh5", "desc": "high-intensity campaign, bucket 5"},
+    {"val": "SwitchToAppHigh7", "desc": "high-intensity campaign, bucket 7"},
+    {"val": "SwitchToAppLow1", "desc": "low-intensity campaign, bucket 1"},
+    {"val": "SwitchToAppLow3", "desc": "low-intensity campaign, bucket 3"},
+    {"val": "SwitchToAppLow5", "desc": "low-intensity campaign, bucket 5"},
+    {"val": "SwitchToAppLow7", "desc": "low-intensity campaign, bucket 7"},
+    {"val": "SwitchToAppLow9", "desc": "low-intensity campaign, bucket 9"}
+  ],
+  "subscriptions_upsells_premium_home_nav": [
+    {"val": "default", "desc": "standard premium nav button"},
+    {"val": "try_premium", "desc": "try premium button"},
+    {"val": "discount_40_percent", "desc": "40% off button"},
+    {"val": "discount_50_percent", "desc": "50% off button"},
+    {"val": "premium_upsell_upgrade", "desc": "upgrade button"},
+    {"val": "premium_upsell_premium", "desc": "premium styled button"},
+    {"val": "premium_upsell_get_premium", "desc": "get premium button"},
+    {"val": "expiring_soon", "desc": "offer expiring soon button"},
+    {"val": "last_chance", "desc": "last chance button"}
+  ],
+  "subscriptions_upsells_post_engagements_variant": [
+    {"val": "direct_to_paywall", "desc": "opens paywall directly"},
+    {"val": "analytics_popup", "desc": "shows analytics upsell popup"}
+  ],
+  "subscriptions_upsells_vo_nav_decoration_variant": [
+    {"val": "30_percent_off", "desc": "30% off nav badge"},
+    {"val": "last_week", "desc": "last week offer nav badge"},
+    {"val": "last_day", "desc": "last day offer nav badge"}
+  ],
+  "subscriptions_upsells_right_sidebar_variant": [
+    {"val": "choice_step", "desc": "plan-choice sidebar module"},
+    {"val": "free_trial_basic_14_days", "desc": "14-day basic free trial"},
+    {"val": "free_trial_premium_14_days", "desc": "14-day premium free trial"},
+    {"val": "discount_50_percent", "desc": "50% off premium"},
+    {"val": "discount_40_percent", "desc": "40% off premium"},
+    {"val": "extended_discount_50_percent", "desc": "extended 50% off offer"},
+    {"val": "ending_today_discount_50_percent", "desc": "50% off, ending today"},
+    {"val": "ending_today_discount_40_percent", "desc": "40% off, ending today"},
+    {"val": "thanksgiving_generic", "desc": "thanksgiving 40% off offer"},
+    {"val": "thanksgiving_expiring", "desc": "thanksgiving offer expiring"},
+    {"val": "thanksgiving_ending", "desc": "thanksgiving offer ending"},
+    {"val": "anniversary_generic", "desc": "anniversary 40% off offer"},
+    {"val": "anniversary_expiring", "desc": "anniversary offer expiring"},
+    {"val": "anniversary_ending", "desc": "anniversary offer ending"}
+  ],
+  "subscriptions_upsells_bookmarks_screen_variant": [
+    {"val": "basic_tier_selected", "desc": "bookmarks upsell, basic preselected"},
+    {"val": "premium_tier_selected", "desc": "bookmarks upsell, premium preselected"}
+  ],
+  "subscriptions_upsells_explore_sidebar_analytics_upsell_variant": [
+    {"val": "variant_a", "desc": "analytics upsell card, headline a"},
+    {"val": "variant_b", "desc": "analytics upsell card, headline b"},
+    {"val": "variant_c", "desc": "analytics upsell card, headline c"}
+  ],
+  "subscriptions_upsells_longform_sidebar_variant": [
+    {"val": "variant_a", "desc": "longform upsell, copy a"},
+    {"val": "variant_b", "desc": "longform upsell, copy b"},
+    {"val": "variant_c", "desc": "longform upsell, copy c"},
+    {"val": "variant_d", "desc": "longform upsell, copy d (alt image)"}
+  ],
+  "subscriptions_upsells_profile_sidebar_analytics_upsell_variant": [
+    {"val": "variant_a", "desc": "analytics upsell card, headline a"},
+    {"val": "variant_b", "desc": "analytics upsell card, headline b"},
+    {"val": "variant_c", "desc": "analytics upsell card, headline c"}
+  ],
+  "subscriptions_upsells_radar_sidebar_variant": [
+    {"val": "variant_a", "desc": "radar upsell, message, non-dismissible"},
+    {"val": "variant_b", "desc": "radar upsell, header only, non-dismissible"},
+    {"val": "variant_c", "desc": "radar upsell, message, dismissible"},
+    {"val": "variant_d", "desc": "radar upsell, header only, dismissible"},
+    {"val": "variant_e", "desc": "premium+ upsell, message, non-dismissible"},
+    {"val": "variant_f", "desc": "premium+ upsell, header only, non-dismissible"},
+    {"val": "variant_g", "desc": "premium+ upsell, message, dismissible"},
+    {"val": "variant_h", "desc": "premium+ upsell, header only, dismissible"}
+  ],
+  "subscriptions_upsells_reply_boost_variant": [
+    {"val": "variant_a", "desc": "reply boost upsell, short fatigue"},
+    {"val": "variant_b", "desc": "reply boost upsell, longer fatigue"},
+    {"val": "variant_c", "desc": "reply boost upsell, alt message"}
+  ],
+  "subscriptions_upsells_get_verified_button_variant": [
+    {"val": "badge", "desc": "standard get-verified button"},
+    {"val": "eu", "desc": "eu-region label variant"}
+  ],
+  "responsive_web_card_conversion_hoisted": [
+    {"val": "off", "desc": "card hoisting disabled"},
+    {"val": "legacy", "desc": "legacy card conversion enabled"}
+  ],
+  "subscriptions_upsells_post_composer_variant": [
+    {"val": "alternative", "desc": "alternative inline premium callout in composer"}
+  ]
 }

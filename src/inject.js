@@ -176,6 +176,76 @@
 
   /*//////////////////////////////////////////////////////////////////////*/
 
+  const ISASSIGN = /__INITIAL_STATE__\s*=\s*\{/;
+  let sourcegrabbed = false;
+
+  function matchbraces(text, start) {
+    let depth = 0, str = false, q = "";
+    for (let i = start; i < text.length; i++) {
+      const c = text[i];
+      if (str) {if (c === "\\") {i++; continue} if (c === q) str = false; continue}
+      if (c === '"' || c === "'" || c === "`") {str = true; q = c; continue}
+      if (c === "{") depth++;
+      else if (c === "}") {if (--depth === 0) return text.slice(start, i + 1)}
+    }
+    return null;
+  }
+  function extractassign(text, name) {
+    let i = text.indexOf(name);
+    while (i >= 0) {
+      const b = text.indexOf("{", i + name.length);
+      if (b >= 0 && b - (i + name.length) < 8) {
+        const json = matchbraces(text, b);
+        if (json) {try {return JSON.parse(json)} catch {}}
+      }
+      i = text.indexOf(name, i + name.length);
+    }
+    return null;
+  }
+  function scanhtmlsource() {
+    if (sourcegrabbed) return 0;
+    try {
+      const scripts = document.getElementsByTagName("script");
+      for (let i = 0; i < scripts.length; i++) {
+        const sc = scripts[i];
+        if (sc.src) continue;
+        const t = sc.textContent;
+        if (!t || !ISASSIGN.test(t)) continue;
+        const obj = extractassign(t, IS);
+        if (obj && obj.featureSwitch) {
+          const n = grabState(obj, "html-source");
+          if (n) {sourcegrabbed = true; log("read the full flag list straight from the page source:", n, "flags"); return n}
+        }
+      }
+    } catch (e) {log("scanhtmlsource error:", e && e.message)}
+    return 0;
+  }
+
+  function fetchsourcefallback() {
+    if (sourcegrabbed) return;
+    try {
+      const f = ofetch || window.fetch;
+      if (!f) return;
+      f.call(window, location.href, {credentials: "include"}).then(r => r.text()).then(t => {
+        if (sourcegrabbed) return;
+        const obj = extractassign(t, IS);
+        if (obj && obj.featureSwitch) {const n = grabState(obj, "html-source(refetch)"); if (n) {sourcegrabbed = true; log("read the full flag list via document refetch:", n, "flags")}}
+        else log("refetch had no parseable __INITIAL_STATE__");
+      }).catch(e => log("refetch failed:", e && e.message));
+    } catch (e) {log("fetchsourcefallback error:", e && e.message)}
+  }
+  function sourceloop() {
+    if (scanhtmlsource()) return;
+    let tries = 0, obs = null;
+    const stop = () => {if (obs) {obs.disconnect(); obs = null}};
+    try {obs = new MutationObserver(() => {if (scanhtmlsource()) stop()}); obs.observe(document.documentElement, {childList: true, subtree: true})} catch {}
+    const iv = setInterval(() => {if (scanhtmlsource() || ++tries > 40) {clearInterval(iv); stop(); if (!sourcegrabbed) fetchsourcefallback()}}, 150);
+    document.addEventListener("DOMContentLoaded", () => {scanhtmlsource()}, {once: true});
+  }
+  sourceloop();
+
+  /*//////////////////////////////////////////////////////////////////////*/
+
   const switchrecievers = ["isTrue", "getValue", "getInt", "getString", "getList", "getStringList", "getDouble", "getFloat", "getLong", "getBoolean", "getJson"];
 
   function findswitches() {
@@ -202,7 +272,6 @@
     return null;
   }
 
-  // count flag-shaped entries (name -> primitive / array / {value}) in a map
   function poolsize(pool) {
     if (!pool || typeof pool !== "object" || Array.isArray(pool)) return 0;
     let n = 0;
@@ -217,9 +286,6 @@
     return n;
   }
 
-  // the whole decider map lives on the manager (getValue reads it); scan its own +
-  // prototype props for the biggest flag-shaped map instead of hardcoding a name,
-  // since the property gets minified differently across builds
   function harvestswitches(fsw) {
     try {
       let best = null, bestN = 0;
@@ -237,7 +303,7 @@
     } catch (e) {log("harvestswitches error:", e && e.message); return 0}
   }
 
-  // features can populate a beat after the manager appears, so retry for a while
+  // retry for a while
   function harvestloop(fsw) {
     let tries = 0;
     const go = () => {const n = harvestswitches(fsw); if (n) log("harvested", n, "flags from the live manager"); return n > 0};
@@ -245,7 +311,6 @@
     const iv = setInterval(() => {if (go() || ++tries > 25) {clearInterval(iv); if (tries > 25) log("harvest: no flag map found on the manager")}}, 300);
   }
 
-  // debounced re-broadcast for the lazy-capture path below
   let capturetimer = 0;
   function schedcapture() {if (!capturetimer) capturetimer = setTimeout(() => {capturetimer = 0; if (onchange) onchange()}, 250)}
 
@@ -258,9 +323,6 @@
       fsw[name] = function (k) {
         if (typeof k === "string" && hasoverride(k)) {const v = overrides[k]; return name === "isTrue" ? v === true : v}
         const res = orig.apply(this, arguments);
-        // lazily record flags the client reads (getValue is authoritative), but
-        // only re-broadcast when something actually changes - re-reading the same
-        // value must NOT re-render the panel (that was jumping the scroll position)
         if (typeof k === "string" && res !== undefined) {
           const fresh = !(k in flags);
           if (fresh || (name === "getValue" && typeof res !== "object" && flags[k] !== res)) {
@@ -303,7 +365,8 @@
     set: (k, v) => { overrides[k] = v; saveoverrides(); dirty = true; if (onchange) onchange(); return v },
     clear: k => { delete overrides[k]; saveoverrides(); dirty = true; if (onchange) onchange() },
     clearAll: () => { for (const k in overrides) delete overrides[k]; saveoverrides(); dirty = true; if (onchange) onchange() },
-    status: () => ({ captured, source, count: Object.keys(flags).length, overrides: Object.keys(overrides).length, dirty, isInstalled, manInstalled, fetchhooked, xhrhooked }),
+    status: () => ({ captured, source, sourcegrabbed, count: Object.keys(flags).length, overrides: Object.keys(overrides).length, dirty, isInstalled, manInstalled, fetchhooked, xhrhooked }),
+    rescan: () => scanhtmlsource(),
     scan: () => {
       let best = null, bestN = 0;
       const seen = new Set();

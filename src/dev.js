@@ -3,13 +3,13 @@
 
   const PCHAN = "twitterflagspage", UCHAN = "twitterflagspanel";
   const KEY = "twitterflags.dev";
-  const DEFAULT = {jfDev: false, inspect: false, exposeDebug: false, forceDevEnv: false};
+  const DEFAULT = {jfDev: false, inspect: false, exposeDebug: false, forceDevEnv: false, forcechirp: false};
   const log = (...a) => {try {console.log("%c[twitterflags:dev]", "color:#00ba7c;font-weight:700", ...a)} catch {}};
 
   let cfg;
   try {cfg = Object.assign({}, DEFAULT, JSON.parse(localStorage.getItem(KEY) || "{}"))}
   catch {cfg = Object.assign({}, DEFAULT)}
-  // frozen load-time snapshot so the panel can tell if a dev toggle is unsaved
+  // frozen load time snapshot so the panel can tell if a dev toggle is unsaved
   const applieddev = Object.assign({}, cfg);
   const save = () => {try {localStorage.setItem(KEY, JSON.stringify(cfg))} catch {}};
 
@@ -22,6 +22,7 @@
     } catch {}
   }
   exposedebug(!!cfg.exposeDebug);
+  if (cfg.forcechirp) try {reapplychirp()} catch {}
 
   /*//////////////////////////////////////////////////////////////////////*/
 
@@ -115,14 +116,42 @@
 
   function apply() {
     cssensure();
-    try {if (cfg.jfDev) sessionStorage.setItem("jfDev", "true"); 
+    try {if (cfg.jfDev) sessionStorage.setItem("jfDev", "true");
     else if (sessionStorage.getItem("jfDev") === "true") sessionStorage.removeItem("jfDev")} catch {}
     exposedebug(!!cfg.exposeDebug);
     inspectset(!!cfg.inspect);
+    forcechirp(!!cfg.forcechirp);
   }
 
   function post() {try {window.postMessage({source: PCHAN, type: "dev", config: cfg, applied: applieddev}, location.origin)} catch {}}
+
+  function reapplychirp() {
+    try {
+      const stack = '"TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+      if (window.FontFace && document.fonts) {
+        [["chirp-regular-web", "400"], ["chirp-medium-web", "500"], ["chirp-bold-web", "700"], ["chirp-heavy-web", "800"]].forEach(([n, weight]) => {
+          try {
+            const ff = new FontFace("TwitterChirp", 'url("https://abs.twimg.com/fonts/v1/' + n + '.woff2")', {weight: weight, display: "swap"});
+            ff.load().then(f => document.fonts.add(f)).catch(e => log("chirp", weight, "failed:", e && e.message));
+          } catch (e) {log("chirp", weight, "error:", e && e.message)}
+        });
+      }
+      let s = document.getElementById("tf-chirp-force");
+      if (!s) { s = document.createElement("style"); s.id = "tf-chirp-force"; (document.head || document.documentElement).appendChild(s) }
+      s.textContent = "*, ::before, ::after { font-family: " + stack + " !important }";
+      log("reapplied + forced TwitterChirp onto the page");
+    } catch (e) {log("reapplychirp error:", e && e.message)}
+  }
+
+  // when the checkbox is on, keep the force live; off tears the style back out
+  function forcechirp(on) {
+    if (on) {reapplychirp(); return}
+    const s = document.getElementById("tf-chirp-force");
+    if (s) s.remove();
+  }
+
   function swaction(action) {
+    if (action === "chirp") {reapplychirp(); return}
     try {
       const sw = navigator.serviceWorker;
       if (!sw) {log("no serviceWorker api"); return}

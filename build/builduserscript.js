@@ -76,9 +76,9 @@ const hostcss = `
       height: 100vh; height: 100dvh;
       background-color: #000; color: #E5EAEC;
       font: 14px "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
       display: flex; flex-direction: column;
       overflow: hidden; user-select: none;
-      padding-right: 14px;
       z-index: 2147483647;
       pointer-events: auto; visibility: hidden;
       border-left: 1px solid #242E36;
@@ -127,11 +127,9 @@ const excludematches = [];
 for (const s of notapp) excludematches.push("https://" + s + ".x.com/*", "https://" + s + ".twitter.com/*");
 const excludes = ["/\\.(?:js|mjs|json|css|map|png|jpe?g|gif|svg|webp|avif|ico|woff2?|ttf|otf|eot|mp4|webm|m3u8|wasm|xml|txt|pdf)(?:[?#].*)?$/i"];
 
-// grouped [directive, value] blocks, blank line between groups; the directive
-// column is padded so every value lines up
 const metagroups = [
   [["@name", "twitter flags & more"], ["@description", "browse hidden stuff inside the twitter client with a side panel!"], ["@version", version]],
-  [["@namespace", "coolsite.cv"], ["@author", "cv"]],
+  [["@namespace", "https://github.com/sogful/twitter-flags"], ["@author", "cv"]],
   appmatches.map(m => ["@match", m]),
   excludematches.map(m => ["@exclude", m]),
   [...excludes.map(r => ["@exclude", r]), ["@icon", iconmeta], ["@run-at", "document-start"], ["@grant", "none"]]
@@ -214,34 +212,25 @@ const mountopen = `
 
     (document.body || document.documentElement).appendChild(host);
 
-    // keep the drawer off the page scrollbar (which otherwise draws over its edge)
     const setsb = () => {try {const w = window.innerWidth - document.documentElement.clientWidth; host.style.setProperty("--tfsb", (w > 0 ? w : 0) + "px")} catch {}};
     setsb();
     window.addEventListener("resize", setsb);
 
-    // instead of overlaying, squish the twitter app so the drawer sits beside it.
-    // x centers its content, so constrain #react-root AND its app-shell child
     function squish(on) {
       try {
         const rr = document.querySelector("#react-root");
         if (!rr) return;
-        const els = [rr, rr.firstElementChild].filter(Boolean);
-        els.forEach(el => {
-          el.style.transition = "width 0.18s ease, max-width 0.18s ease";
-          if (on && window.innerWidth > 500) {
-            el.style.setProperty("width", "calc(100vw - 390px)", "important");
-            el.style.setProperty("max-width", "calc(100vw - 390px)", "important");
-            el.style.setProperty("min-width", "0", "important");
-            el.style.setProperty("overflow-x", "hidden", "important");
-          } else {
-            el.style.width = ""; el.style.maxWidth = ""; el.style.minWidth = ""; el.style.overflowX = "";
-          }
-        });
+        if (on && window.innerWidth > 500) {
+          rr.style.setProperty("width", "calc(100vw - 390px)", "important");
+          rr.style.setProperty("overflow-x", "hidden", "important");
+        } else {
+          rr.style.width = ""; rr.style.overflowX = "";
+        }
       } catch {}
     }
     const setopen = on => {wrap.classList.toggle("open", on); squish(on)};
 
-    // show/hide the circle: right-click it to hide, alt+shift+f toggles it back
+    // show / hide the circle
     const sethidden = h => {try {localStorage.setItem("twitterflags.fabhidden", h ? "1" : "0")} catch {} fab.style.display = h ? "none" : ""};
     try {if (localStorage.getItem("twitterflags.fabhidden") === "1") fab.style.display = "none"} catch {}
     fab.addEventListener("contextmenu", e => {e.preventDefault(); sethidden(true)});

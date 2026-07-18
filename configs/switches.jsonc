@@ -4,25 +4,25 @@
     {"key": "jfDev", "label": "jetfuel dev mode", "title": "sets sessionStorage jfDev, unlocking the super epic emusk rocket emoji mode"},
     {"key": "inspect", "label": "inspector", "title": "not actually a twitter feature, but hover any element to see its data-testid!"},
     {"key": "exposeDebug", "label": "expose audio", "title": "adds ?exposeDebug=1 so the media stream audio player is reachable"},
-    {"key": "forceDevEnv", "label": "force dev environment", "title": "tries to revive prod-gated developer code (needs a reload)"}
+    {"key": "forceDevEnv", "label": "force dev environment", "title": "tries to revive prod-gated developer code (needs a reload)"},
+    {"key": "forcechirp", "label": "on load", "title": "force-apply twitterchirp at the earliest moment of every page load so it never fails to appear", "row": "sw"}
   ],
-  // filter row: multi-state switches. each option can carry a "color" (green /
-  // yellow / red / blue, else default grey) and an "icon" (warn / tick / ban)
+  
   "filters": [
     {"key": "state", "options": [
-      {"val": "all", "label": "all", "icon": "all"},
+      {"val": "all", "label": "all"},
       {"val": "enabled", "label": "enabled", "color": "green", "icon": "check"},
       {"val": "modified", "label": "modified", "color": "yellow", "icon": "pencil"},
       {"val": "disabled", "label": "disabled", "color": "red", "icon": "close"}
     ]},
     {"key": "type", "options": [
-      {"val": "all", "label": "all", "icon": "all"},
+      {"val": "all", "label": "all"},
       {"val": "bool", "label": "checkboxes", "color": "blue", "icon": "tick"},
       {"val": "input", "label": "inputs", "color": "blue", "icon": "compose"},
       {"val": "opts", "label": "dropdowns", "color": "blue", "icon": "chevron"}
     ]},
     {"key": "danger", "options": [
-      {"val": "all", "label": "all", "icon": "all"},
+      {"val": "all", "label": "all"},
       {"val": "safe", "label": "safe", "color": "green", "icon": "shield"},
       {"val": "danger", "label": "dangerous", "color": "red", "icon": "warn"}
     ]}
@@ -31,6 +31,6 @@
     {"action": "unregister", "label": "unregister sw.js", "title": "unregister the service worker (fresh assets when reloading)"},
     {"action": "flush", "label": "flush cache", "title": "delete the cached html app shell"},
     {"action": "refresh", "label": "refresh cache", "title": "reprime the html app shell"},
-    {"action": "github", "label": "github", "title": "open twitter-flags on github in a new tab"}
+    {"action": "chirp", "label": "reapply font", "title": "fetch + reapply the twitterchirp font (twitter's bundle sometimes quietly fails to load it)"}
   ]
 }

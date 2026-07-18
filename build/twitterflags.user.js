@@ -4,7 +4,7 @@
 // @description  browse hidden stuff inside the twitter client with a side panel!
 // @version      2.1
 
-// @namespace    coolsite.cv
+// @namespace    https://github.com/sogful/twitter-flags
 // @author       cv
 
 // @match        https://x.com/*
@@ -100,6 +100,7 @@
     body {
       background-color: #000; color: #E5EAEC;
       font: 14px "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
       display: flex; flex-direction: column;
       overflow: hidden; user-select: none;
     }
@@ -195,9 +196,14 @@
       white-space: nowrap; transition: color .15s ease;
       font-family: inherit
     }
-    .fseg.on {color: #fff; font-weight: 700}
+    .fseg.on {color: #fff}
+    .fseg.on .fseglbl {font-weight: 700}
     .fseg .fico {display: inline-flex; width: 12px; height: 12px}
     .fseg .fico svg {width: 12px; height: 12px}
+    /* reserve the bold width so selecting a segment never shifts the layout */
+    .fseglbl {display: inline-grid}
+    .fseglbl::after {content: attr(data-label); font-weight: 700; height: 0; visibility: hidden}
+    .fseglbl, .fseglbl::after {grid-area: 1 / 1}
 
     .note {
       margin-left: auto;
@@ -207,7 +213,11 @@
 
     .bulk {
       display: flex; gap: 8px;
-      margin-left: auto; align-items: center
+      align-items: center; flex-wrap: wrap
+    }
+    .flagcount {
+      color: #6B7F8E; font-size: 12px;
+      margin-top: -2px
     }
     .bulkbtn {
       background: transparent; color: #E5EAEC;
@@ -233,6 +243,12 @@
       font: 700 10.5px "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     .swbtn:hover {background-color: rgba(239,243,244,.1)}
+    .row2.swrow .checklabel {font-size: 11px; gap: 4px}
+    .row2.swrow .checkbox {
+      width: 15px; height: 15px;
+      border-width: 1.5px; border-radius: 3px
+    }
+    .row2.swrow .checkbox .tick {width: 15px; height: 15px}
     .row2.dev .checkbox {
       width: 15px; height: 15px;
       border-width: 1.5px; border-radius: 3px
@@ -379,12 +395,13 @@
       scrollbar-width: thin; scrollbar-color: #536471 transparent
     }
     .optsitem {
-      padding: 7px 10px; border-radius: 6px;
-      cursor: pointer; white-space: nowrap;
-      overflow: hidden; text-overflow: ellipsis
+      padding: 6px 10px; border-radius: 6px; cursor: pointer;
+      display: flex; flex-direction: column; gap: 1px
     }
+    .optsval {white-space: nowrap; overflow: hidden; text-overflow: ellipsis}
+    .optsdesc {font-size: 11px; color: #6B7F8E; line-height: 1.25}
     .optsitem:hover {background-color: #16181c}
-    .optsitem.sel {color: #1d9bf0; font-weight: 700}
+    .optsitem.sel .optsval {color: #fff; font-weight: 800}
     .optsempty {padding: 7px 10px; color: #6B7F8E; font-style: italic}
 
     .empty {
@@ -458,9 +475,9 @@
       height: 100vh; height: 100dvh;
       background-color: #000; color: #E5EAEC;
       font: 14px "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
       display: flex; flex-direction: column;
       overflow: hidden; user-select: none;
-      padding-right: 14px;
       z-index: 2147483647;
       pointer-events: auto; visibility: hidden;
       border-left: 1px solid #242E36;
@@ -497,6 +514,7 @@
         <button class="bulkbtn" data-upsell="on">slop on</button>
       </div>
     </div>
+    <div class="flagcount">??? flags</div>
   </div>
   <div class="list"></div>
   <div class="footer">
@@ -650,7 +668,7 @@ window.twitterflagsconfigs = {
     "danger": {
       "rweb_conf_only_enabled": "replaces the entire web app with conference-only mode",
       "rweb_video_screen_enabled": "swaps the profile media tab for the video mixer layout",
-      "responsive_web_api_transition_enabled": "reroutes all api traffic, so can break loading completely",
+      "responsive_web_api_transition_enabled": "reroutes all api traffic",
       "responsive_web_temporary_ocf_x_migration": "changes onboarding/auth flows",
       "responsive_web_redux_use_fragment_enabled": "swaps the data layer, can break rendering",
       "responsive_web_graphql_timeline_navigation_enabled": "core navigation, timelines can break completely",
@@ -680,6 +698,12 @@ window.twitterflagsconfigs = {
         "key": "forceDevEnv",
         "label": "force dev environment",
         "title": "tries to revive prod-gated developer code (needs a reload)"
+      },
+      {
+        "key": "forcechirp",
+        "label": "on load",
+        "title": "force-apply twitterchirp at the earliest moment of every page load so it never fails to appear",
+        "row": "sw"
       }
     ],
     "filters": [
@@ -688,8 +712,7 @@ window.twitterflagsconfigs = {
         "options": [
           {
             "val": "all",
-            "label": "all",
-            "icon": "all"
+            "label": "all"
           },
           {
             "val": "enabled",
@@ -716,8 +739,7 @@ window.twitterflagsconfigs = {
         "options": [
           {
             "val": "all",
-            "label": "all",
-            "icon": "all"
+            "label": "all"
           },
           {
             "val": "bool",
@@ -744,8 +766,7 @@ window.twitterflagsconfigs = {
         "options": [
           {
             "val": "all",
-            "label": "all",
-            "icon": "all"
+            "label": "all"
           },
           {
             "val": "safe",
@@ -779,9 +800,9 @@ window.twitterflagsconfigs = {
         "title": "reprime the html app shell"
       },
       {
-        "action": "github",
-        "label": "github",
-        "title": "open twitter-flags on github in a new tab"
+        "action": "chirp",
+        "label": "reapply font",
+        "title": "fetch + reapply the twitterchirp font (twitter's bundle sometimes quietly fails to load it)"
       }
     ]
   },
@@ -1391,127 +1412,388 @@ window.twitterflagsconfigs = {
   },
   "options": {
     "responsive_web_account_access_language_lo_banners": [
-      "control",
-      "treatment_1",
-      "treatment_2",
-      "treatment_3",
-      "treatment_4"
+      {
+        "val": "control",
+        "desc": "default log in / sign up labels"
+      },
+      {
+        "val": "treatment_1",
+        "desc": "sign in + sign up wording"
+      },
+      {
+        "val": "treatment_2",
+        "desc": "sign in + create account wording"
+      },
+      {
+        "val": "treatment_3",
+        "desc": "log in + create account wording"
+      },
+      {
+        "val": "treatment_4",
+        "desc": "default labels (not overridden)"
+      }
     ],
     "responsive_web_account_access_language_lo_splash_sidebar": [
-      "control",
-      "treatment_1",
-      "treatment_2",
-      "treatment_3",
-      "treatment_4"
+      {
+        "val": "control",
+        "desc": "sign up with phone or email"
+      },
+      {
+        "val": "treatment_1",
+        "desc": "sign up with phone or email"
+      },
+      {
+        "val": "treatment_2",
+        "desc": "create account"
+      },
+      {
+        "val": "treatment_3",
+        "desc": "create account with phone or email"
+      },
+      {
+        "val": "treatment_4",
+        "desc": "create account (shows sign-up form)"
+      }
     ],
     "responsive_web_use_app_button_variations": [
-      "control",
-      "treatment_1",
-      "treatment_2"
+      {
+        "val": "control",
+        "desc": "default button layout"
+      },
+      {
+        "val": "treatment_1",
+        "desc": "adds login + use-app buttons (mobile)"
+      },
+      {
+        "val": "treatment_2",
+        "desc": "shrinks login, extends use-app on scroll"
+      }
     ],
     "subscriptions_inapp_grok_default_mode": [
-      "regular",
-      "fun"
+      {
+        "val": "regular",
+        "desc": "grok opens in regular mode"
+      },
+      {
+        "val": "fun",
+        "desc": "grok opens in fun mode"
+      }
     ],
     "rweb_update_fatigue_switch_to_app_link": [
-      "BannerSwitchToApp",
-      "InterstitialSwitchToApp",
-      "NuxAppDownload",
-      "SwitchToAppFooter",
-      "UseApp",
-      "UseAppExtended",
-      "SwitchToAppHigh1",
-      "SwitchToAppHigh2",
-      "SwitchToAppHigh3",
-      "SwitchToAppHigh5",
-      "SwitchToAppHigh7",
-      "SwitchToAppLow1",
-      "SwitchToAppLow3",
-      "SwitchToAppLow5",
-      "SwitchToAppLow7",
-      "SwitchToAppLow9"
+      {
+        "val": "BannerSwitchToApp",
+        "desc": "banner switch-to-app prompt"
+      },
+      {
+        "val": "InterstitialSwitchToApp",
+        "desc": "full-screen interstitial prompt"
+      },
+      {
+        "val": "NuxAppDownload",
+        "desc": "new-user app download prompt"
+      },
+      {
+        "val": "SwitchToAppFooter",
+        "desc": "footer switch-to-app link"
+      },
+      {
+        "val": "UseApp",
+        "desc": "use-app prompt"
+      },
+      {
+        "val": "UseAppExtended",
+        "desc": "extended use-app prompt"
+      },
+      {
+        "val": "SwitchToAppHigh1",
+        "desc": "high-intensity campaign, bucket 1"
+      },
+      {
+        "val": "SwitchToAppHigh2",
+        "desc": "high-intensity campaign, bucket 2"
+      },
+      {
+        "val": "SwitchToAppHigh3",
+        "desc": "high-intensity campaign, bucket 3"
+      },
+      {
+        "val": "SwitchToAppHigh5",
+        "desc": "high-intensity campaign, bucket 5"
+      },
+      {
+        "val": "SwitchToAppHigh7",
+        "desc": "high-intensity campaign, bucket 7"
+      },
+      {
+        "val": "SwitchToAppLow1",
+        "desc": "low-intensity campaign, bucket 1"
+      },
+      {
+        "val": "SwitchToAppLow3",
+        "desc": "low-intensity campaign, bucket 3"
+      },
+      {
+        "val": "SwitchToAppLow5",
+        "desc": "low-intensity campaign, bucket 5"
+      },
+      {
+        "val": "SwitchToAppLow7",
+        "desc": "low-intensity campaign, bucket 7"
+      },
+      {
+        "val": "SwitchToAppLow9",
+        "desc": "low-intensity campaign, bucket 9"
+      }
     ],
     "subscriptions_upsells_premium_home_nav": [
-      "default",
-      "try_premium",
-      "discount_40_percent",
-      "discount_50_percent",
-      "premium_upsell_upgrade",
-      "premium_upsell_premium",
-      "premium_upsell_get_premium",
-      "expiring_soon",
-      "last_chance"
+      {
+        "val": "default",
+        "desc": "standard premium nav button"
+      },
+      {
+        "val": "try_premium",
+        "desc": "try premium button"
+      },
+      {
+        "val": "discount_40_percent",
+        "desc": "40% off button"
+      },
+      {
+        "val": "discount_50_percent",
+        "desc": "50% off button"
+      },
+      {
+        "val": "premium_upsell_upgrade",
+        "desc": "upgrade button"
+      },
+      {
+        "val": "premium_upsell_premium",
+        "desc": "premium styled button"
+      },
+      {
+        "val": "premium_upsell_get_premium",
+        "desc": "get premium button"
+      },
+      {
+        "val": "expiring_soon",
+        "desc": "offer expiring soon button"
+      },
+      {
+        "val": "last_chance",
+        "desc": "last chance button"
+      }
     ],
     "subscriptions_upsells_post_engagements_variant": [
-      "direct_to_paywall",
-      "analytics_popup"
+      {
+        "val": "direct_to_paywall",
+        "desc": "opens paywall directly"
+      },
+      {
+        "val": "analytics_popup",
+        "desc": "shows analytics upsell popup"
+      }
     ],
     "subscriptions_upsells_vo_nav_decoration_variant": [
-      "30_percent_off",
-      "last_week",
-      "last_day"
+      {
+        "val": "30_percent_off",
+        "desc": "30% off nav badge"
+      },
+      {
+        "val": "last_week",
+        "desc": "last week offer nav badge"
+      },
+      {
+        "val": "last_day",
+        "desc": "last day offer nav badge"
+      }
     ],
     "subscriptions_upsells_right_sidebar_variant": [
-      "choice_step",
-      "free_trial_basic_14_days",
-      "free_trial_premium_14_days",
-      "discount_50_percent",
-      "discount_40_percent",
-      "extended_discount_50_percent",
-      "ending_today_discount_50_percent",
-      "ending_today_discount_40_percent",
-      "thanksgiving_generic",
-      "thanksgiving_expiring",
-      "thanksgiving_ending",
-      "anniversary_generic",
-      "anniversary_expiring",
-      "anniversary_ending"
+      {
+        "val": "choice_step",
+        "desc": "plan-choice sidebar module"
+      },
+      {
+        "val": "free_trial_basic_14_days",
+        "desc": "14-day basic free trial"
+      },
+      {
+        "val": "free_trial_premium_14_days",
+        "desc": "14-day premium free trial"
+      },
+      {
+        "val": "discount_50_percent",
+        "desc": "50% off premium"
+      },
+      {
+        "val": "discount_40_percent",
+        "desc": "40% off premium"
+      },
+      {
+        "val": "extended_discount_50_percent",
+        "desc": "extended 50% off offer"
+      },
+      {
+        "val": "ending_today_discount_50_percent",
+        "desc": "50% off, ending today"
+      },
+      {
+        "val": "ending_today_discount_40_percent",
+        "desc": "40% off, ending today"
+      },
+      {
+        "val": "thanksgiving_generic",
+        "desc": "thanksgiving 40% off offer"
+      },
+      {
+        "val": "thanksgiving_expiring",
+        "desc": "thanksgiving offer expiring"
+      },
+      {
+        "val": "thanksgiving_ending",
+        "desc": "thanksgiving offer ending"
+      },
+      {
+        "val": "anniversary_generic",
+        "desc": "anniversary 40% off offer"
+      },
+      {
+        "val": "anniversary_expiring",
+        "desc": "anniversary offer expiring"
+      },
+      {
+        "val": "anniversary_ending",
+        "desc": "anniversary offer ending"
+      }
     ],
     "subscriptions_upsells_bookmarks_screen_variant": [
-      "basic_tier_selected",
-      "premium_tier_selected"
+      {
+        "val": "basic_tier_selected",
+        "desc": "bookmarks upsell, basic preselected"
+      },
+      {
+        "val": "premium_tier_selected",
+        "desc": "bookmarks upsell, premium preselected"
+      }
     ],
     "subscriptions_upsells_explore_sidebar_analytics_upsell_variant": [
-      "variant_a",
-      "variant_b",
-      "variant_c"
+      {
+        "val": "variant_a",
+        "desc": "analytics upsell card, headline a"
+      },
+      {
+        "val": "variant_b",
+        "desc": "analytics upsell card, headline b"
+      },
+      {
+        "val": "variant_c",
+        "desc": "analytics upsell card, headline c"
+      }
     ],
     "subscriptions_upsells_longform_sidebar_variant": [
-      "variant_a",
-      "variant_b",
-      "variant_c",
-      "variant_d"
+      {
+        "val": "variant_a",
+        "desc": "longform upsell, copy a"
+      },
+      {
+        "val": "variant_b",
+        "desc": "longform upsell, copy b"
+      },
+      {
+        "val": "variant_c",
+        "desc": "longform upsell, copy c"
+      },
+      {
+        "val": "variant_d",
+        "desc": "longform upsell, copy d (alt image)"
+      }
     ],
     "subscriptions_upsells_profile_sidebar_analytics_upsell_variant": [
-      "variant_a",
-      "variant_b",
-      "variant_c"
+      {
+        "val": "variant_a",
+        "desc": "analytics upsell card, headline a"
+      },
+      {
+        "val": "variant_b",
+        "desc": "analytics upsell card, headline b"
+      },
+      {
+        "val": "variant_c",
+        "desc": "analytics upsell card, headline c"
+      }
     ],
     "subscriptions_upsells_radar_sidebar_variant": [
-      "variant_a",
-      "variant_b",
-      "variant_c",
-      "variant_d",
-      "variant_e",
-      "variant_f",
-      "variant_g",
-      "variant_h"
+      {
+        "val": "variant_a",
+        "desc": "radar upsell, message, non-dismissible"
+      },
+      {
+        "val": "variant_b",
+        "desc": "radar upsell, header only, non-dismissible"
+      },
+      {
+        "val": "variant_c",
+        "desc": "radar upsell, message, dismissible"
+      },
+      {
+        "val": "variant_d",
+        "desc": "radar upsell, header only, dismissible"
+      },
+      {
+        "val": "variant_e",
+        "desc": "premium+ upsell, message, non-dismissible"
+      },
+      {
+        "val": "variant_f",
+        "desc": "premium+ upsell, header only, non-dismissible"
+      },
+      {
+        "val": "variant_g",
+        "desc": "premium+ upsell, message, dismissible"
+      },
+      {
+        "val": "variant_h",
+        "desc": "premium+ upsell, header only, dismissible"
+      }
     ],
     "subscriptions_upsells_reply_boost_variant": [
-      "variant_a",
-      "variant_b",
-      "variant_c"
+      {
+        "val": "variant_a",
+        "desc": "reply boost upsell, short fatigue"
+      },
+      {
+        "val": "variant_b",
+        "desc": "reply boost upsell, longer fatigue"
+      },
+      {
+        "val": "variant_c",
+        "desc": "reply boost upsell, alt message"
+      }
     ],
     "subscriptions_upsells_get_verified_button_variant": [
-      "badge",
-      "eu"
+      {
+        "val": "badge",
+        "desc": "standard get-verified button"
+      },
+      {
+        "val": "eu",
+        "desc": "eu-region label variant"
+      }
     ],
     "responsive_web_card_conversion_hoisted": [
-      "off",
-      "legacy"
+      {
+        "val": "off",
+        "desc": "card hoisting disabled"
+      },
+      {
+        "val": "legacy",
+        "desc": "legacy card conversion enabled"
+      }
     ],
     "subscriptions_upsells_post_composer_variant": [
-      "alternative"
+      {
+        "val": "alternative",
+        "desc": "alternative inline premium callout in composer"
+      }
     ]
   }
 };
@@ -1693,6 +1975,76 @@ window.twitterflagsconfigs = {
 
   /*//////////////////////////////////////////////////////////////////////*/
 
+  const ISASSIGN = /__INITIAL_STATE__\s*=\s*\{/;
+  let sourcegrabbed = false;
+
+  function matchbraces(text, start) {
+    let depth = 0, str = false, q = "";
+    for (let i = start; i < text.length; i++) {
+      const c = text[i];
+      if (str) {if (c === "\\") {i++; continue} if (c === q) str = false; continue}
+      if (c === '"' || c === "'" || c === "`") {str = true; q = c; continue}
+      if (c === "{") depth++;
+      else if (c === "}") {if (--depth === 0) return text.slice(start, i + 1)}
+    }
+    return null;
+  }
+  function extractassign(text, name) {
+    let i = text.indexOf(name);
+    while (i >= 0) {
+      const b = text.indexOf("{", i + name.length);
+      if (b >= 0 && b - (i + name.length) < 8) {
+        const json = matchbraces(text, b);
+        if (json) {try {return JSON.parse(json)} catch {}}
+      }
+      i = text.indexOf(name, i + name.length);
+    }
+    return null;
+  }
+  function scanhtmlsource() {
+    if (sourcegrabbed) return 0;
+    try {
+      const scripts = document.getElementsByTagName("script");
+      for (let i = 0; i < scripts.length; i++) {
+        const sc = scripts[i];
+        if (sc.src) continue;
+        const t = sc.textContent;
+        if (!t || !ISASSIGN.test(t)) continue;
+        const obj = extractassign(t, IS);
+        if (obj && obj.featureSwitch) {
+          const n = grabState(obj, "html-source");
+          if (n) {sourcegrabbed = true; log("read the full flag list straight from the page source:", n, "flags"); return n}
+        }
+      }
+    } catch (e) {log("scanhtmlsource error:", e && e.message)}
+    return 0;
+  }
+
+  function fetchsourcefallback() {
+    if (sourcegrabbed) return;
+    try {
+      const f = ofetch || window.fetch;
+      if (!f) return;
+      f.call(window, location.href, {credentials: "include"}).then(r => r.text()).then(t => {
+        if (sourcegrabbed) return;
+        const obj = extractassign(t, IS);
+        if (obj && obj.featureSwitch) {const n = grabState(obj, "html-source(refetch)"); if (n) {sourcegrabbed = true; log("read the full flag list via document refetch:", n, "flags")}}
+        else log("refetch had no parseable __INITIAL_STATE__");
+      }).catch(e => log("refetch failed:", e && e.message));
+    } catch (e) {log("fetchsourcefallback error:", e && e.message)}
+  }
+  function sourceloop() {
+    if (scanhtmlsource()) return;
+    let tries = 0, obs = null;
+    const stop = () => {if (obs) {obs.disconnect(); obs = null}};
+    try {obs = new MutationObserver(() => {if (scanhtmlsource()) stop()}); obs.observe(document.documentElement, {childList: true, subtree: true})} catch {}
+    const iv = setInterval(() => {if (scanhtmlsource() || ++tries > 40) {clearInterval(iv); stop(); if (!sourcegrabbed) fetchsourcefallback()}}, 150);
+    document.addEventListener("DOMContentLoaded", () => {scanhtmlsource()}, {once: true});
+  }
+  sourceloop();
+
+  /*//////////////////////////////////////////////////////////////////////*/
+
   const switchrecievers = ["isTrue", "getValue", "getInt", "getString", "getList", "getStringList", "getDouble", "getFloat", "getLong", "getBoolean", "getJson"];
 
   function findswitches() {
@@ -1719,7 +2071,6 @@ window.twitterflagsconfigs = {
     return null;
   }
 
-  // count flag-shaped entries (name -> primitive / array / {value}) in a map
   function poolsize(pool) {
     if (!pool || typeof pool !== "object" || Array.isArray(pool)) return 0;
     let n = 0;
@@ -1734,9 +2085,6 @@ window.twitterflagsconfigs = {
     return n;
   }
 
-  // the whole decider map lives on the manager (getValue reads it); scan its own +
-  // prototype props for the biggest flag-shaped map instead of hardcoding a name,
-  // since the property gets minified differently across builds
   function harvestswitches(fsw) {
     try {
       let best = null, bestN = 0;
@@ -1754,7 +2102,7 @@ window.twitterflagsconfigs = {
     } catch (e) {log("harvestswitches error:", e && e.message); return 0}
   }
 
-  // features can populate a beat after the manager appears, so retry for a while
+  // retry for a while
   function harvestloop(fsw) {
     let tries = 0;
     const go = () => {const n = harvestswitches(fsw); if (n) log("harvested", n, "flags from the live manager"); return n > 0};
@@ -1762,7 +2110,6 @@ window.twitterflagsconfigs = {
     const iv = setInterval(() => {if (go() || ++tries > 25) {clearInterval(iv); if (tries > 25) log("harvest: no flag map found on the manager")}}, 300);
   }
 
-  // debounced re-broadcast for the lazy-capture path below
   let capturetimer = 0;
   function schedcapture() {if (!capturetimer) capturetimer = setTimeout(() => {capturetimer = 0; if (onchange) onchange()}, 250)}
 
@@ -1775,9 +2122,6 @@ window.twitterflagsconfigs = {
       fsw[name] = function (k) {
         if (typeof k === "string" && hasoverride(k)) {const v = overrides[k]; return name === "isTrue" ? v === true : v}
         const res = orig.apply(this, arguments);
-        // lazily record flags the client reads (getValue is authoritative), but
-        // only re-broadcast when something actually changes - re-reading the same
-        // value must NOT re-render the panel (that was jumping the scroll position)
         if (typeof k === "string" && res !== undefined) {
           const fresh = !(k in flags);
           if (fresh || (name === "getValue" && typeof res !== "object" && flags[k] !== res)) {
@@ -1820,7 +2164,8 @@ window.twitterflagsconfigs = {
     set: (k, v) => { overrides[k] = v; saveoverrides(); dirty = true; if (onchange) onchange(); return v },
     clear: k => { delete overrides[k]; saveoverrides(); dirty = true; if (onchange) onchange() },
     clearAll: () => { for (const k in overrides) delete overrides[k]; saveoverrides(); dirty = true; if (onchange) onchange() },
-    status: () => ({ captured, source, count: Object.keys(flags).length, overrides: Object.keys(overrides).length, dirty, isInstalled, manInstalled, fetchhooked, xhrhooked }),
+    status: () => ({ captured, source, sourcegrabbed, count: Object.keys(flags).length, overrides: Object.keys(overrides).length, dirty, isInstalled, manInstalled, fetchhooked, xhrhooked }),
+    rescan: () => scanhtmlsource(),
     scan: () => {
       let best = null, bestN = 0;
       const seen = new Set();
@@ -1889,13 +2234,13 @@ window.twitterflagsconfigs = {
 
   const PCHAN = "twitterflagspage", UCHAN = "twitterflagspanel";
   const KEY = "twitterflags.dev";
-  const DEFAULT = {jfDev: false, inspect: false, exposeDebug: false, forceDevEnv: false};
+  const DEFAULT = {jfDev: false, inspect: false, exposeDebug: false, forceDevEnv: false, forcechirp: false};
   const log = (...a) => {try {console.log("%c[twitterflags:dev]", "color:#00ba7c;font-weight:700", ...a)} catch {}};
 
   let cfg;
   try {cfg = Object.assign({}, DEFAULT, JSON.parse(localStorage.getItem(KEY) || "{}"))}
   catch {cfg = Object.assign({}, DEFAULT)}
-  // frozen load-time snapshot so the panel can tell if a dev toggle is unsaved
+  // frozen load time snapshot so the panel can tell if a dev toggle is unsaved
   const applieddev = Object.assign({}, cfg);
   const save = () => {try {localStorage.setItem(KEY, JSON.stringify(cfg))} catch {}};
 
@@ -1908,6 +2253,7 @@ window.twitterflagsconfigs = {
     } catch {}
   }
   exposedebug(!!cfg.exposeDebug);
+  if (cfg.forcechirp) try {reapplychirp()} catch {}
 
   /*//////////////////////////////////////////////////////////////////////*/
 
@@ -2001,14 +2347,42 @@ window.twitterflagsconfigs = {
 
   function apply() {
     cssensure();
-    try {if (cfg.jfDev) sessionStorage.setItem("jfDev", "true"); 
+    try {if (cfg.jfDev) sessionStorage.setItem("jfDev", "true");
     else if (sessionStorage.getItem("jfDev") === "true") sessionStorage.removeItem("jfDev")} catch {}
     exposedebug(!!cfg.exposeDebug);
     inspectset(!!cfg.inspect);
+    forcechirp(!!cfg.forcechirp);
   }
 
   function post() {try {window.postMessage({source: PCHAN, type: "dev", config: cfg, applied: applieddev}, location.origin)} catch {}}
+
+  function reapplychirp() {
+    try {
+      const stack = '"TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+      if (window.FontFace && document.fonts) {
+        [["chirp-regular-web", "400"], ["chirp-medium-web", "500"], ["chirp-bold-web", "700"], ["chirp-heavy-web", "800"]].forEach(([n, weight]) => {
+          try {
+            const ff = new FontFace("TwitterChirp", 'url("https://abs.twimg.com/fonts/v1/' + n + '.woff2")', {weight: weight, display: "swap"});
+            ff.load().then(f => document.fonts.add(f)).catch(e => log("chirp", weight, "failed:", e && e.message));
+          } catch (e) {log("chirp", weight, "error:", e && e.message)}
+        });
+      }
+      let s = document.getElementById("tf-chirp-force");
+      if (!s) { s = document.createElement("style"); s.id = "tf-chirp-force"; (document.head || document.documentElement).appendChild(s) }
+      s.textContent = "*, ::before, ::after { font-family: " + stack + " !important }";
+      log("reapplied + forced TwitterChirp onto the page");
+    } catch (e) {log("reapplychirp error:", e && e.message)}
+  }
+
+  // when the checkbox is on, keep the force live; off tears the style back out
+  function forcechirp(on) {
+    if (on) {reapplychirp(); return}
+    const s = document.getElementById("tf-chirp-force");
+    if (s) s.remove();
+  }
+
   function swaction(action) {
+    if (action === "chirp") {reapplychirp(); return}
     try {
       const sw = navigator.serviceWorker;
       if (!sw) {log("no serviceWorker api"); return}
@@ -2102,34 +2476,25 @@ window.twitterflagsconfigs = {
 
     (document.body || document.documentElement).appendChild(host);
 
-    // keep the drawer off the page scrollbar (which otherwise draws over its edge)
     const setsb = () => {try {const w = window.innerWidth - document.documentElement.clientWidth; host.style.setProperty("--tfsb", (w > 0 ? w : 0) + "px")} catch {}};
     setsb();
     window.addEventListener("resize", setsb);
 
-    // instead of overlaying, squish the twitter app so the drawer sits beside it.
-    // x centers its content, so constrain #react-root AND its app-shell child
     function squish(on) {
       try {
         const rr = document.querySelector("#react-root");
         if (!rr) return;
-        const els = [rr, rr.firstElementChild].filter(Boolean);
-        els.forEach(el => {
-          el.style.transition = "width 0.18s ease, max-width 0.18s ease";
-          if (on && window.innerWidth > 500) {
-            el.style.setProperty("width", "calc(100vw - 390px)", "important");
-            el.style.setProperty("max-width", "calc(100vw - 390px)", "important");
-            el.style.setProperty("min-width", "0", "important");
-            el.style.setProperty("overflow-x", "hidden", "important");
-          } else {
-            el.style.width = ""; el.style.maxWidth = ""; el.style.minWidth = ""; el.style.overflowX = "";
-          }
-        });
+        if (on && window.innerWidth > 500) {
+          rr.style.setProperty("width", "calc(100vw - 390px)", "important");
+          rr.style.setProperty("overflow-x", "hidden", "important");
+        } else {
+          rr.style.width = ""; rr.style.overflowX = "";
+        }
       } catch {}
     }
     const setopen = on => {wrap.classList.toggle("open", on); squish(on)};
 
-    // show/hide the circle: right-click it to hide, alt+shift+f toggles it back
+    // show / hide the circle
     const sethidden = h => {try {localStorage.setItem("twitterflags.fabhidden", h ? "1" : "0")} catch {} fab.style.display = h ? "none" : ""};
     try {if (localStorage.getItem("twitterflags.fabhidden") === "1") fab.style.display = "none"} catch {}
     fab.addEventListener("contextmenu", e => {e.preventDefault(); sethidden(true)});
@@ -2187,8 +2552,7 @@ window.twitterflagsconfigs = {
   const persist = () => {if (EXT) try {chrome.storage.local.set({overrides})} catch {}};
   const canon = o => {try {return JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]]))} catch {return ""}};
   const clone = o => {try {return JSON.parse(JSON.stringify(o))} catch {return {}}};
-  // dev toggles that need a reload to apply count toward unsaved (inspector is a
-  // live view tool, like the filters, so it is left out)
+  // dev toggles that need a reload to apply count toward unsaved
   const DEVPERSIST = ["jfDev", "exposeDebug", "forceDevEnv"];
   const devkey = c => JSON.stringify(DEVPERSIST.map(k => [k, !!(c && c[k])]));
   const markdirty = () => {dirty = canon(overrides) !== canon(applied) || devkey(devconfig) !== devkey(applieddev)};
@@ -2245,12 +2609,13 @@ window.twitterflagsconfigs = {
 
   function stateapply(p, fromcache) {
     if (!p) return;
-    const empty = !p.captured || !p.flags || !Object.keys(p.flags).length;
-    if (!fromcache && empty && captured && Object.keys(flags).length) return;
     if (fromcache) cached = true;
     else {cached = false; livestamp = Date.now()}
-    captured = !!p.captured; source = p.source || "none";
-    flags = p.flags || {}; overrides = p.overrides || {}; status = p.status || {};
+    if (p.captured) captured = true; 
+    
+    const incoming = p.flags || {};
+    if (Object.keys(incoming).length) flags = Object.assign(flags, incoming);
+    source = p.source || source; overrides = p.overrides || {}; status = p.status || {};
     applied = p.applied || {}; markdirty();
     rafrender();
   }
@@ -2383,26 +2748,24 @@ window.twitterflagsconfigs = {
   const query = selector => root.querySelector(selector);
   const search = query(".search"), prefixselect = query(".prefixselect"), list = query(".list");
   const header = query(".header"), footer = query(".footer"), reload = query(".reload"), undo = query(".undo");
+  const flagcount = query(".flagcount");
 
   const TICK = '<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9.64 18.952l-5.55-4.861 1.317-1.504 3.951 3.459 8.459-10.948L19.4 6.32 9.64 18.952z"></path></g></svg>';
-  const WARN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22.56 18.25l-8.4-14.51c-.96-1.66-3.36-1.66-4.32 0l-8.4 14.51C.47 19.91 1.68 22 3.6 22h16.8c1.92 0 3.13-2.09 2.16-3.75zM13.25 8.5L13 14.2s-.5-.2-1-.2-1 .2-1 .2l-.25-5.7h2.5zM12 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>';
+  const WARN = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.5 17c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5zm1.5-3c.5 0 1 .2 1 .2l.25-5.7h-2.5l.25 5.7s.5-.2 1-.2zm10.568 6.745c.451-.783.45-1.717-.002-2.496l-8.4-14.511C13.712 2.957 12.903 2.49 12 2.49s-1.711.467-2.165 1.249l-8.4 14.509c-.453.78-.454 1.714-.002 2.497C1.886 21.531 2.696 22 3.6 22h16.8c.905 0 1.715-.469 2.168-1.255zM12.435 4.741l8.4 14.511c.125.214.053.402 0 .495-.044.076-.174.253-.435.253H3.6c-.261 0-.391-.177-.435-.253-.053-.093-.125-.281 0-.495l8.4-14.51c.131-.228.348-.252.435-.252s.304.024.435.251z"/></svg>';
   const UNDO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.29 2.29l1.42 1.42L5.41 6H15c3.87 0 7 3.13 7 7s-3.13 7-7 7H8v-2h7c2.76 0 5-2.24 5-5s-2.24-5-5-5H5.41l2.3 2.29-1.42 1.42L1.59 7l4.7-4.71z"/></svg>';
 
-  // switch-option icons (from the twitter-icons set); every option shows one
+  // switch option icons!
   const FICONS = {
-    all: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.001 3.01V3m0 18v.01m3.442-17.315l.004-.01M8.56 20.315l-.004.01m9.806-14.68l.008-.007M5.64 18.366l-.007.007m14.677-9.81l.01-.004M3.69 15.447l-.01.004m-.675-3.446h-.01m18 0h.01M5.641 5.645l-.007-.008m12.728 12.728l.007.007M3.69 8.562l-.01-.003m16.63 6.888l.01.004M8.559 3.695l-.004-.01m6.888 16.63l.004.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    check: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.75C6.34 1.75 1.75 6.34 1.75 12S6.34 22.25 12 22.25 22.25 17.66 22.25 12 17.66 1.75 12 1.75zm-.81 14.68l-4.1-3.27 1.25-1.57 2.47 1.98 3.97-5.47 1.62 1.18-5.21 7.15z"/></svg>',
-    pencil: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.3906 11.8044L10.0459 19.4167C9.37191 20.1152 8.46631 20.5441 7.49902 20.6247L3 20.9997L3.375 16.5007C3.45561 15.5334 3.8855 14.6288 4.58398 13.9548L12.1953 6.60907L17.3906 11.8044Z"/><path d="M15.2061 3.70477C16.6185 2.34219 18.8622 2.36205 20.25 3.74969C21.6379 5.13757 21.6578 7.38218 20.2949 8.79461L18.7793 10.3649L13.6348 5.2204L15.2061 3.70477Z"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.75c-4.56 0-8.25 3.69-8.25 8.25s3.69 8.25 8.25 8.25 8.25-3.69 8.25-8.25S16.56 3.75 12 3.75zM1.75 12C1.75 6.34 6.34 1.75 12 1.75S22.25 6.34 22.25 12 17.66 22.25 12 22.25 1.75 17.66 1.75 12zM16.4 9.28l-5.21 7.15-4.1-3.27 1.25-1.57 2.47 1.98 3.97-5.47 1.62 1.18z"/></svg>',
+    pencil: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.543 4.04275C15.3142 2.27164 18.1858 2.27164 19.957 4.04275C21.7282 5.81396 21.7282 8.68558 19.957 10.4568L11.2314 19.1834C10.4044 20.0104 9.31319 20.5208 8.14844 20.6267L2.89551 21.1043L3.37305 15.8513C3.47901 14.6866 3.99039 13.5953 4.81738 12.7683L13.543 4.04275ZM6.23145 14.1824C5.73525 14.6786 5.42881 15.3341 5.36523 16.033L5.10449 18.8943L7.9668 18.6346C8.66565 18.571 9.32019 18.2645 9.81641 17.7683L16.585 10.9988L13 7.41385L6.23145 14.1824ZM18.543 5.45682C17.5528 4.46675 15.9472 4.46675 14.957 5.45682L14.4141 5.99979L17.999 9.58475L18.543 9.04275C19.5331 8.05257 19.5331 6.44698 18.543 5.45682Z" fill-rule="evenodd" clip-rule="evenodd"/><path d="M21 20.9998H12.207C12.3582 20.8723 12.5047 20.7382 12.6455 20.5974L14.2432 18.9998H21V20.9998Z"/></svg>',
     close: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.75c-4.56 0-8.25 3.69-8.25 8.25s3.69 8.25 8.25 8.25 8.25-3.69 8.25-8.25S16.56 3.75 12 3.75zM1.75 12C1.75 6.34 6.34 1.75 12 1.75S22.25 6.34 22.25 12 17.66 22.25 12 22.25 1.75 17.66 1.75 12zm8.84 0l-2.3-2.29 1.42-1.42 2.29 2.3 2.29-2.3 1.42 1.42-2.3 2.29 2.3 2.29-1.42 1.42-2.29-2.3-2.29 2.3-1.42-1.42 2.3-2.29z"/></svg>',
     tick: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.64 18.952l-5.55-4.861 1.317-1.504 3.951 3.459 8.459-10.948L19.4 6.32 9.64 18.952z"/></svg>',
     compose: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.938 4.5H9.9c-1.136 0-1.929 0-2.546.05-.605.05-.953.143-1.216.277-.564.288-1.023.747-1.31 1.31-.135.264-.228.612-.277 1.218C4.5 7.97 4.5 8.765 4.5 9.9v4.2c0 1.136 0 1.929.05 2.546.05.605.143.953.277 1.216.288.565.747 1.023 1.31 1.31.264.135.612.228 1.217.277.617.05 1.41.051 2.546.051h4.2c1.136 0 1.929 0 2.545-.05.606-.05.954-.143 1.217-.277.565-.288 1.023-.746 1.31-1.31.135-.264.228-.612.277-1.217.05-.617.051-1.41.051-2.546v-1.037h2V14.1c0 1.103.001 1.992-.058 2.709-.06.728-.185 1.368-.487 1.96-.48.941-1.245 1.707-2.185 2.186-.593.302-1.233.428-1.961.488-.718.058-1.606.057-2.71.057H9.9c-1.103 0-1.991.001-2.709-.058-.728-.06-1.368-.185-1.96-.487-.941-.48-1.707-1.245-2.186-2.185-.302-.593-.428-1.233-.487-1.961-.059-.718-.058-1.606-.058-2.71V9.9c0-1.103-.001-1.991.058-2.709.06-.728.185-1.368.487-1.96.48-.941 1.245-1.707 2.185-2.186.593-.302 1.233-.428 1.961-.487.718-.059 1.606-.058 2.71-.058h1.037v2z"/><path d="M16.293 3.293c1.219-1.219 3.195-1.219 4.414 0 1.219 1.219 1.219 3.195 0 4.414l-5.491 5.491c-.533.533-.89.896-1.31 1.179-.356.24-.742.433-1.148.574-.478.167-.983.234-1.729.341l-2.708.387.387-2.708c.107-.746.174-1.25.34-1.729.142-.405.335-.792.575-1.148.283-.42.646-.777 1.179-1.31l5.491-5.491zm3 1.414c-.438-.438-1.148-.438-1.586 0l-5.491 5.491c-.587.587-.784.79-.934 1.013-.144.214-.26.445-.345.688-.088.254-.131.533-.248 1.354l-.01.067.068-.008c.82-.118 1.1-.161 1.354-.25.243-.084.474-.2.688-.344.223-.15.426-.347 1.013-.934l5.491-5.491c.438-.438.438-1.148 0-1.586z" fill-rule="evenodd" clip-rule="evenodd"/></svg>',
     chevron: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.543 8.96l1.414-1.42L12 14.59l7.043-7.05 1.414 1.42L12 17.41 3.543 8.96z"/></svg>',
-    shield: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.325 2.054c-.21-.072-.44-.072-.65 0l-8 2.75C3.27 4.944 3 5.323 3 5.75v6.162c0 2.807 1.149 4.83 2.813 6.405 1.572 1.488 3.632 2.6 5.555 3.636l.157.085c.296.16.653.16.95 0l.157-.085c1.923-1.037 3.983-2.148 5.556-3.636C19.85 16.742 21 14.719 21 11.912V5.75c0-.427-.271-.807-.675-.946l-8-2.75z"/></svg>',
-    warn: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 18.25l-8.4-14.51c-.96-1.66-3.36-1.66-4.32 0l-8.4 14.51C.47 19.91 1.68 22 3.6 22h16.8c1.92 0 3.13-2.09 2.16-3.75zM13.25 8.5L13 14.2s-.5-.2-1-.2-1 .2-1 .2l-.25-5.7h2.5zM12 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>'
+    shield: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.057L5 6.464v5.448c0 2.165.851 3.687 2.188 4.952 1.275 1.208 2.965 2.155 4.812 3.154 1.847-1 3.537-1.946 4.813-3.154C18.148 15.6 19 14.077 19 11.912V6.464zM11 15v-2.21c-.882-.386-1.5-1.265-1.5-2.29C9.5 9.12 10.62 8 12 8s2.5 1.12 2.5 2.5c0 1.025-.618 1.904-1.5 2.29V15c0 .552-.448 1-1 1s-1-.448-1-1zm10-3.088c0 2.807-1.149 4.83-2.813 6.405-1.615 1.53-3.745 2.66-5.712 3.72-.297.16-.653.16-.95 0-1.967-1.06-4.097-2.19-5.713-3.72C4.15 16.742 3 14.72 3 11.912V6.464c0-.854.542-1.614 1.35-1.892l7-2.406.16-.047c.375-.095.772-.08 1.14.047l7 2.406.149.058C20.524 4.945 21 5.663 21 6.464z"/></svg>',
+    warn: WARN
   };
   const FCOLORS = {default: "#536471", green: "#00ba7c", yellow: "#e0b219", red: "#f4212e", blue: "#1d9bf0"};
-
-  // multi-state filter switches, one per axis; each defaults to "all"
   const filters = {state: "all", type: "all", danger: "all"};
 
   function buildswitches() {
@@ -2428,13 +2791,11 @@ window.twitterflagsconfigs = {
         seg.setAttribute("data-val", o.val);
         if (o.color) seg.setAttribute("data-color", o.color);
         const ic = (o.icon && FICONS[o.icon]) ? `<span class="fico">${FICONS[o.icon]}</span>` : "";
-        seg.innerHTML = ic + `<span>${escapehtml(o.label)}</span>`;
+        seg.innerHTML = ic + `<span class="fseglbl" data-label="${escapehtml(o.label)}">${escapehtml(o.label)}</span>`;
         sw.appendChild(seg);
       });
       return sw;
     };
-    (switchcfg.dev || []).forEach(s => devrow.appendChild(mk(s, "dev")));
-    (switchcfg.filters || []).forEach(f => {if (!(f.key in filters)) filters[f.key] = ((f.options || [])[0] || {}).val || "all"; filtrow.insertBefore(mkswitch(f), bulk)});
     (switchcfg.actions || []).forEach(a => {
       const b = document.createElement("button");
       b.className = "swbtn"; b.textContent = a.label;
@@ -2442,6 +2803,8 @@ window.twitterflagsconfigs = {
       if (a.title) b.setAttribute("title", a.title);
       swrow.appendChild(b);
     });
+    (switchcfg.dev || []).forEach(s => (s.row === "sw" ? swrow : devrow).appendChild(mk(s, "dev")));
+    (switchcfg.filters || []).forEach(f => {if (!(f.key in filters)) filters[f.key] = ((f.options || [])[0] || {}).val || "all"; filtrow.insertBefore(mkswitch(f), bulk)});
     paintswitches();
   }
 
@@ -2456,7 +2819,6 @@ window.twitterflagsconfigs = {
     });
   }
 
-  // slide the handle under the active segment and fade it to that option's color
   function paintswitches() {
     query(".row2.filters").querySelectorAll(".fswitch").forEach(sw => {
       const cur = filters[sw.getAttribute("data-filter")], handle = sw.querySelector(".fhandle");
@@ -2485,8 +2847,6 @@ window.twitterflagsconfigs = {
     markdirty(); persist(); send("setmany", { set, clear }); render();
   }
 
-  // bulk-toggle every known premium upsell / ad / slop flag. off -> set each to
-  // its disabling value; on -> clear our overrides so twitter's defaults return
   function applyupsells(mode) {
     const set = {}, clear = [];
     for (const u of upsellflags) {
@@ -2502,9 +2862,7 @@ window.twitterflagsconfigs = {
     const sw = e.target.closest(".swbtn");
     if (sw) {
       e.preventDefault();
-      const action = sw.getAttribute("data-sw");
-      if (action === "github") { try {window.open("https://github.com/sogful/twitter-flags", "_blank", "noopener")} catch {} return }
-      send("sw", {action});
+      send("sw", {action: sw.getAttribute("data-sw")});
       const orig = sw.textContent; sw.textContent = "sent";
       setTimeout(() => {sw.textContent = orig}, 900);
       return;
@@ -2557,10 +2915,10 @@ window.twitterflagsconfigs = {
     try { return JSON.stringify(a) === JSON.stringify(b) } catch { return false }
   }
   const isMod = name => hasoverride(name) && !eq(overrides[name], flags[name]);
-
   function updateFoot() { footer.classList.toggle("show", dirty) }
 
-  // coalesce bursty re-renders (incoming state messages, typing) into one/frame
+  let lasthtml = "";
+  let lastsig = "";
   let renderraf = 0;
   function rafrender() {
     if (renderraf) return;
@@ -2571,11 +2929,14 @@ window.twitterflagsconfigs = {
   function render(noTab) {
     updateFoot();
     paintchecks();
+    if (flagcount) { const n = Object.keys(flags).length; flagcount.textContent = (!noTab && captured && n) ? n + " flags" : "??? flags" }
     if (noTab) {
+      lasthtml = "";
       list.innerHTML = `<div class="empty">open x.com/twitter.com first!</div>`;
       return;
     }
     if (!captured) {
+      lasthtml = "";
       const s = status || {};
       list.innerHTML = `<div class="empty">no flags captured yet, try reloading the page!</div>`;
       const sb = list.querySelector(".scan");
@@ -2590,6 +2951,7 @@ window.twitterflagsconfigs = {
     const term = search.value.toLowerCase().trim();
     const pref = prefixselect.value;
     let html = "";
+    const shown = [];
     for (const name of names) {
       if (pref) { const pf = prefof(name); if (pref === "__other__" ? !small.has(pf) : pf !== pref) continue }
       const mod = isMod(name);
@@ -2608,21 +2970,43 @@ window.twitterflagsconfigs = {
       if (filters.danger === "danger" && !dangerinfo) continue;
       const d = descFor(name);
       if (term && !(name.toLowerCase().includes(term) || d.text.toLowerCase().includes(term))) continue;
+      shown.push(name);
       const meta = dangerinfo ? `<div class="meta"><span class="dangerzone">${WARN}<span>${escapehtml(dangerinfo)}</span></span></div>` : "";
       const opts = typeOf(flags[name]) !== "boolean" ? optionsmap[name] : null;
       const optsline = (opts && opts.length) ? `<div class="opts" data-name="${escapehtml(name)}">${opts.length} available option${opts.length === 1 ? "" : "s"}</div>` : "";
       const title = d.auto
         ? `<div class="name ident" data-name="${escapehtml(name)}">${escapehtml(name)}</div>`
         : `<div class="name">${escapehtml(d.text)}</div><div class="ident" data-name="${escapehtml(name)}">${escapehtml(name)}</div>`;
-      html += `<div class="item${dangerinfo ? " danger" : ""}${mod ? " mod" : ""}">
+      html += `<div class="item${dangerinfo ? " danger" : ""}${mod ? " mod" : ""}" data-name="${escapehtml(name)}">
       <div class="info">${title}${meta}${optsline}</div>
       <div class="controls"><button class="reset${mod ? "" : " off"}" data-name="${escapehtml(name)}" title="reset to default" aria-hidden="${!mod}">${UNDO}</button>${control(name)}</div>
     </div>`;
     }
-    const note = cached ? `<div class="cachednote">page is asleep or closed, showing last captured flags. changes still save and apply on next page load</div>` : "";
-    const st = list.scrollTop;
-    list.innerHTML = note + (html || `<div class="empty center"><div class="face">:(</div><div>no matches</div></div>`);
-    list.scrollTop = st;
+    const note = cached ? `<div class="cachednote">page is asleep or closed, showing last captured flags.. changes still save and apply on next page load</div>` : "";
+    const out = note + (html || `<div class="empty center"><div class="face">:(</div><div>no matches</div></div>`);
+    if (out === lasthtml) return;
+    lasthtml = out;
+    // same rows in the same order (just a flag's state flipped) -> geometry is
+    // identical, so keep the exact scroll. anchoring via offsetTop drifts here
+    // because content-visibility:auto sizes offscreen items from the estimate
+    const sig = shown.join("");
+    const samerows = sig === lastsig;
+    lastsig = sig;
+    const rawscroll = list.scrollTop;
+    let anchorName = "", anchorTop = 0;
+    if (!samerows) try {
+      for (const it of list.querySelectorAll(".item")) {
+        const top = it.offsetTop - list.scrollTop;
+        if (top >= -1) { anchorName = it.getAttribute("data-name") || ""; anchorTop = top; break }
+      }
+    } catch {}
+    list.innerHTML = out;
+    if (samerows) { list.scrollTop = rawscroll; return }
+    try {
+      const sel = anchorName && (window.CSS && CSS.escape ? CSS.escape(anchorName) : anchorName);
+      const el = sel && list.querySelector('.item[data-name="' + sel + '"]');
+      if (el) list.scrollTop = el.offsetTop - anchorTop;
+    } catch {}
   }
 
   /*//////////////////////////////////////////////////////////////////////*/
@@ -2641,8 +3025,6 @@ window.twitterflagsconfigs = {
 
   /*//////////////////////////////////////////////////////////////////////*/
 
-  // custom twitter-styled options dropdown for flags with a known value set.
-  // lives at the panel root (not in the scrolling list) so it isn't clipped
   let drop = null, dropfield = null;
   function dropparent() { const r = list.getRootNode(); return r.host ? r : document.body }
   function ensuredrop() {
@@ -2666,17 +3048,20 @@ window.twitterflagsconfigs = {
     const cur = field.value.trim(), curl = cur.toLowerCase();
     let html = "";
     for (const o of opts) {
-      const s = String(o);
-      if (dofilter && curl && s.toLowerCase().indexOf(curl) < 0) continue;
-      html += `<div class="optsitem${s === cur ? " sel" : ""}" data-val="${escapehtml(s)}">${escapehtml(s)}</div>`;
+      const s = String(o && typeof o === "object" ? o.val : o);
+      const desc = (o && typeof o === "object" && o.desc) ? o.desc : "";
+      if (dofilter && curl && s.toLowerCase().indexOf(curl) < 0 && desc.toLowerCase().indexOf(curl) < 0) continue;
+      html += `<div class="optsitem${s === cur ? " sel" : ""}" data-val="${escapehtml(s)}"><span class="optsval">${escapehtml(s)}</span>${desc ? `<span class="optsdesc">${escapehtml(desc)}</span>` : ""}</div>`;
     }
     ensuredrop().innerHTML = html || `<div class="optsempty">no match</div>`;
     return true;
   }
   function positiondrop(field) {
     const d = ensuredrop(), r = field.getBoundingClientRect();
-    d.style.left = r.left + "px";
     d.style.minWidth = r.width + "px";
+    let left = r.left;
+    if (left + d.offsetWidth > window.innerWidth - 8) left = Math.max(8, window.innerWidth - 8 - d.offsetWidth);
+    d.style.left = left + "px";
     d.style.top = ""; d.style.bottom = "";
     const room = window.innerHeight - r.bottom;
     if (d.offsetHeight > room - 8 && r.top > room) d.style.bottom = (window.innerHeight - r.top + 4) + "px";
@@ -2746,8 +3131,6 @@ window.twitterflagsconfigs = {
     buildswitches();
     paintchecks();
     refresh();
-    // the switch handle is positioned from segment geometry, so re-place it once
-    // the chirp font has loaded (widths shift) and on any resize
     setTimeout(paintswitches, 400);
     try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(paintswitches) } catch {}
     window.addEventListener("resize", paintswitches);

@@ -10,26 +10,27 @@
   // yellow / red / blue, else default grey) and an "icon" (warn / tick / ban)
   "filters": [
     {"key": "state", "options": [
-      {"val": "all", "label": "all"},
-      {"val": "enabled", "label": "enabled", "color": "green", "icon": "tick"},
-      {"val": "modified", "label": "modified", "color": "yellow"},
-      {"val": "disabled", "label": "disabled", "color": "red", "icon": "ban"}
+      {"val": "all", "label": "all", "icon": "all"},
+      {"val": "enabled", "label": "enabled", "color": "green", "icon": "check"},
+      {"val": "modified", "label": "modified", "color": "yellow", "icon": "pencil"},
+      {"val": "disabled", "label": "disabled", "color": "red", "icon": "close"}
     ]},
     {"key": "type", "options": [
-      {"val": "all", "label": "all"},
-      {"val": "bool", "label": "checkboxes", "color": "blue"},
-      {"val": "input", "label": "inputs", "color": "blue"},
-      {"val": "opts", "label": "dropdowns", "color": "blue"}
+      {"val": "all", "label": "all", "icon": "all"},
+      {"val": "bool", "label": "checkboxes", "color": "blue", "icon": "tick"},
+      {"val": "input", "label": "inputs", "color": "blue", "icon": "compose"},
+      {"val": "opts", "label": "dropdowns", "color": "blue", "icon": "chevron"}
     ]},
     {"key": "danger", "options": [
-      {"val": "all", "label": "all"},
-      {"val": "safe", "label": "safe", "color": "green"},
+      {"val": "all", "label": "all", "icon": "all"},
+      {"val": "safe", "label": "safe", "color": "green", "icon": "shield"},
       {"val": "danger", "label": "dangerous", "color": "red", "icon": "warn"}
     ]}
   ],
   "actions": [
     {"action": "unregister", "label": "unregister sw.js", "title": "unregister the service worker (fresh assets when reloading)"},
     {"action": "flush", "label": "flush cache", "title": "delete the cached html app shell"},
-    {"action": "refresh", "label": "refresh cache", "title": "reprime the html app shell"}
+    {"action": "refresh", "label": "refresh cache", "title": "reprime the html app shell"},
+    {"action": "github", "label": "github", "title": "open twitter-flags on github in a new tab"}
   ]
 }

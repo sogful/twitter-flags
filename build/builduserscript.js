@@ -82,18 +82,19 @@ const hostcss = `
       z-index: 2147483647;
       pointer-events: auto; visibility: hidden;
       border-left: 1px solid #242E36;
-      box-shadow: -2px 0 24px rgba(0,0,0,0.6);
       transform: translateX(100%);
       transition: transform 0.18s ease
     }
     .tfpanelwrap.open {transform: none; visibility: visible}
     .tfclose {
       position: absolute; top: 6px; right: 10px; z-index: 3;
-      background: none; border: none; cursor: pointer; padding: 4px;
-      display: inline-flex; align-items: center; justify-content: center
+      background-color: rgba(42,43,43,0); border: none; cursor: pointer;
+      padding: 5px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: background-color 0.15s ease
     }
-    .tfclose svg {width: 20px; height: 20px; fill: #6B7F8E}
-    .tfclose:hover svg {fill: #E5EAEC}
+    .tfclose:hover {background-color: #2a2b2b}
+    .tfclose svg {width: 20px; height: 20px; fill: #fff}
 `;
 
 const closesvg = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"/></svg>';
@@ -207,7 +208,7 @@ const mountopen = `
     root.appendChild(wrap);
 
     const fab = document.createElement("button");
-    fab.className = "tffab"; fab.title = "drag me twin";
+    fab.className = "tffab"; fab.title = "drag me twin! (right-click to hide, alt+shift+f to bring back)";
     fab.innerHTML = iconsvg;
     root.appendChild(fab);
 
@@ -217,6 +218,36 @@ const mountopen = `
     const setsb = () => {try {const w = window.innerWidth - document.documentElement.clientWidth; host.style.setProperty("--tfsb", (w > 0 ? w : 0) + "px")} catch {}};
     setsb();
     window.addEventListener("resize", setsb);
+
+    // instead of overlaying, squish the twitter app so the drawer sits beside it.
+    // x centers its content, so constrain #react-root AND its app-shell child
+    function squish(on) {
+      try {
+        const rr = document.querySelector("#react-root");
+        if (!rr) return;
+        const els = [rr, rr.firstElementChild].filter(Boolean);
+        els.forEach(el => {
+          el.style.transition = "width 0.18s ease, max-width 0.18s ease";
+          if (on && window.innerWidth > 500) {
+            el.style.setProperty("width", "calc(100vw - 390px)", "important");
+            el.style.setProperty("max-width", "calc(100vw - 390px)", "important");
+            el.style.setProperty("min-width", "0", "important");
+            el.style.setProperty("overflow-x", "hidden", "important");
+          } else {
+            el.style.width = ""; el.style.maxWidth = ""; el.style.minWidth = ""; el.style.overflowX = "";
+          }
+        });
+      } catch {}
+    }
+    const setopen = on => {wrap.classList.toggle("open", on); squish(on)};
+
+    // show/hide the circle: right-click it to hide, alt+shift+f toggles it back
+    const sethidden = h => {try {localStorage.setItem("twitterflags.fabhidden", h ? "1" : "0")} catch {} fab.style.display = h ? "none" : ""};
+    try {if (localStorage.getItem("twitterflags.fabhidden") === "1") fab.style.display = "none"} catch {}
+    fab.addEventListener("contextmenu", e => {e.preventDefault(); sethidden(true)});
+    window.addEventListener("keydown", e => {
+      if (e.altKey && e.shiftKey && ((e.key || "").toLowerCase() === "f" || e.code === "KeyF")) {e.preventDefault(); sethidden(fab.style.display !== "none")}
+    }, true);
 
     try {
       const pos = JSON.parse(localStorage.getItem("twitterflags.fabpos") || "null");
@@ -243,9 +274,9 @@ const mountopen = `
       down = false;
       try {fab.releasePointerCapture(e.pointerId)} catch {}
       if (moved) {try {localStorage.setItem("twitterflags.fabpos", JSON.stringify({left: fab.offsetLeft, top: fab.offsetTop}))} catch {}}
-      else wrap.classList.toggle("open");
+      else setopen(!wrap.classList.contains("open"));
     });
-    wrap.querySelector(".tfclose").addEventListener("click", () => wrap.classList.remove("open"));
+    wrap.querySelector(".tfclose").addEventListener("click", () => setopen(false));
 
     const __tfshim = makeshim();
     const __tfroot = root;

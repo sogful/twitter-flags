@@ -121,8 +121,8 @@
     .button {
       background-color: #242E36; color: #E5EAEC;
       border: none; cursor: pointer;
-      border-radius: 999px; padding: 7px 14px;
-      font: 600 13px "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      border-radius: 999px; padding: 8px 16px;
+      font: 700 14px "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     .button.hot {
@@ -196,9 +196,8 @@
       font-family: inherit
     }
     .fseg.on {color: #fff; font-weight: 700}
-    .fseg .fico {display: none; width: 12px; height: 12px}
-    .fseg.on .fico {display: inline-flex}
-    .fseg .fico svg {width: 12px; height: 12px; fill: currentColor}
+    .fseg .fico {display: inline-flex; width: 12px; height: 12px}
+    .fseg .fico svg {width: 12px; height: 12px}
 
     .note {
       margin-left: auto;
@@ -211,11 +210,12 @@
       margin-left: auto; align-items: center
     }
     .bulkbtn {
-      background-color: #242E36; color: #E5EAEC;
-      border: none; cursor: pointer;
-      border-radius: 999px; padding: 2px 6px;
-      font: 600 12px "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: transparent; color: #E5EAEC;
+      border: 1px solid #536471; cursor: pointer;
+      border-radius: 999px; padding: 3px 10px;
+      font: 700 12px "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
+    .bulkbtn:hover {background-color: rgba(239,243,244,.1)}
 
     .row2.dev {
       font-size: 9.75px; gap: 10.5px
@@ -227,12 +227,12 @@
       border-bottom: 1px solid #242E36
     }
     .swbtn {
-      background-color: #242E36; color: #E5EAEC;
-      border: none; cursor: pointer;
-      border-radius: 999px; padding: 3px 9px;
-      font: 600 10.5px "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: transparent; color: #E5EAEC;
+      border: 1px solid #536471; cursor: pointer;
+      border-radius: 999px; padding: 3px 10px;
+      font: 700 10.5px "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    .swbtn:hover {background-color: #2f3b45}
+    .swbtn:hover {background-color: rgba(239,243,244,.1)}
     .row2.dev .checkbox {
       width: 15px; height: 15px;
       border-width: 1.5px; border-radius: 3px
@@ -464,18 +464,19 @@
       z-index: 2147483647;
       pointer-events: auto; visibility: hidden;
       border-left: 1px solid #242E36;
-      box-shadow: -2px 0 24px rgba(0,0,0,0.6);
       transform: translateX(100%);
       transition: transform 0.18s ease
     }
     .tfpanelwrap.open {transform: none; visibility: visible}
     .tfclose {
       position: absolute; top: 6px; right: 10px; z-index: 3;
-      background: none; border: none; cursor: pointer; padding: 4px;
-      display: inline-flex; align-items: center; justify-content: center
+      background-color: rgba(42,43,43,0); border: none; cursor: pointer;
+      padding: 5px; border-radius: 999px;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: background-color 0.15s ease
     }
-    .tfclose svg {width: 20px; height: 20px; fill: #6B7F8E}
-    .tfclose:hover svg {fill: #E5EAEC}
+    .tfclose:hover {background-color: #2a2b2b}
+    .tfclose svg {width: 20px; height: 20px; fill: #fff}
 `;
   const panelhtml = `<div class="header">
     <div class="row2 dev"></div>
@@ -687,24 +688,26 @@ window.twitterflagsconfigs = {
         "options": [
           {
             "val": "all",
-            "label": "all"
+            "label": "all",
+            "icon": "all"
           },
           {
             "val": "enabled",
             "label": "enabled",
             "color": "green",
-            "icon": "tick"
+            "icon": "check"
           },
           {
             "val": "modified",
             "label": "modified",
-            "color": "yellow"
+            "color": "yellow",
+            "icon": "pencil"
           },
           {
             "val": "disabled",
             "label": "disabled",
             "color": "red",
-            "icon": "ban"
+            "icon": "close"
           }
         ]
       },
@@ -713,22 +716,26 @@ window.twitterflagsconfigs = {
         "options": [
           {
             "val": "all",
-            "label": "all"
+            "label": "all",
+            "icon": "all"
           },
           {
             "val": "bool",
             "label": "checkboxes",
-            "color": "blue"
+            "color": "blue",
+            "icon": "tick"
           },
           {
             "val": "input",
             "label": "inputs",
-            "color": "blue"
+            "color": "blue",
+            "icon": "compose"
           },
           {
             "val": "opts",
             "label": "dropdowns",
-            "color": "blue"
+            "color": "blue",
+            "icon": "chevron"
           }
         ]
       },
@@ -737,12 +744,14 @@ window.twitterflagsconfigs = {
         "options": [
           {
             "val": "all",
-            "label": "all"
+            "label": "all",
+            "icon": "all"
           },
           {
             "val": "safe",
             "label": "safe",
-            "color": "green"
+            "color": "green",
+            "icon": "shield"
           },
           {
             "val": "danger",
@@ -768,6 +777,11 @@ window.twitterflagsconfigs = {
         "action": "refresh",
         "label": "refresh cache",
         "title": "reprime the html app shell"
+      },
+      {
+        "action": "github",
+        "label": "github",
+        "title": "open twitter-flags on github in a new tab"
       }
     ]
   },
@@ -2082,7 +2096,7 @@ window.twitterflagsconfigs = {
     root.appendChild(wrap);
 
     const fab = document.createElement("button");
-    fab.className = "tffab"; fab.title = "drag me twin";
+    fab.className = "tffab"; fab.title = "drag me twin! (right-click to hide, alt+shift+f to bring back)";
     fab.innerHTML = iconsvg;
     root.appendChild(fab);
 
@@ -2092,6 +2106,36 @@ window.twitterflagsconfigs = {
     const setsb = () => {try {const w = window.innerWidth - document.documentElement.clientWidth; host.style.setProperty("--tfsb", (w > 0 ? w : 0) + "px")} catch {}};
     setsb();
     window.addEventListener("resize", setsb);
+
+    // instead of overlaying, squish the twitter app so the drawer sits beside it.
+    // x centers its content, so constrain #react-root AND its app-shell child
+    function squish(on) {
+      try {
+        const rr = document.querySelector("#react-root");
+        if (!rr) return;
+        const els = [rr, rr.firstElementChild].filter(Boolean);
+        els.forEach(el => {
+          el.style.transition = "width 0.18s ease, max-width 0.18s ease";
+          if (on && window.innerWidth > 500) {
+            el.style.setProperty("width", "calc(100vw - 390px)", "important");
+            el.style.setProperty("max-width", "calc(100vw - 390px)", "important");
+            el.style.setProperty("min-width", "0", "important");
+            el.style.setProperty("overflow-x", "hidden", "important");
+          } else {
+            el.style.width = ""; el.style.maxWidth = ""; el.style.minWidth = ""; el.style.overflowX = "";
+          }
+        });
+      } catch {}
+    }
+    const setopen = on => {wrap.classList.toggle("open", on); squish(on)};
+
+    // show/hide the circle: right-click it to hide, alt+shift+f toggles it back
+    const sethidden = h => {try {localStorage.setItem("twitterflags.fabhidden", h ? "1" : "0")} catch {} fab.style.display = h ? "none" : ""};
+    try {if (localStorage.getItem("twitterflags.fabhidden") === "1") fab.style.display = "none"} catch {}
+    fab.addEventListener("contextmenu", e => {e.preventDefault(); sethidden(true)});
+    window.addEventListener("keydown", e => {
+      if (e.altKey && e.shiftKey && ((e.key || "").toLowerCase() === "f" || e.code === "KeyF")) {e.preventDefault(); sethidden(fab.style.display !== "none")}
+    }, true);
 
     try {
       const pos = JSON.parse(localStorage.getItem("twitterflags.fabpos") || "null");
@@ -2118,9 +2162,9 @@ window.twitterflagsconfigs = {
       down = false;
       try {fab.releasePointerCapture(e.pointerId)} catch {}
       if (moved) {try {localStorage.setItem("twitterflags.fabpos", JSON.stringify({left: fab.offsetLeft, top: fab.offsetTop}))} catch {}}
-      else wrap.classList.toggle("open");
+      else setopen(!wrap.classList.contains("open"));
     });
-    wrap.querySelector(".tfclose").addEventListener("click", () => wrap.classList.remove("open"));
+    wrap.querySelector(".tfclose").addEventListener("click", () => setopen(false));
 
     const __tfshim = makeshim();
     const __tfroot = root;
@@ -2344,8 +2388,18 @@ window.twitterflagsconfigs = {
   const WARN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22.56 18.25l-8.4-14.51c-.96-1.66-3.36-1.66-4.32 0l-8.4 14.51C.47 19.91 1.68 22 3.6 22h16.8c1.92 0 3.13-2.09 2.16-3.75zM13.25 8.5L13 14.2s-.5-.2-1-.2-1 .2-1 .2l-.25-5.7h2.5zM12 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>';
   const UNDO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.29 2.29l1.42 1.42L5.41 6H15c3.87 0 7 3.13 7 7s-3.13 7-7 7H8v-2h7c2.76 0 5-2.24 5-5s-2.24-5-5-5H5.41l2.3 2.29-1.42 1.42L1.59 7l4.7-4.71z"/></svg>';
 
-  const BAN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2zm0 2c1.85 0 3.55.63 4.9 1.69L5.69 16.9A7.9 7.9 0 0 1 4 12c0-4.41 3.59-8 8-8zm0 16a7.9 7.9 0 0 1-4.9-1.69L18.31 7.1A7.9 7.9 0 0 1 20 12c0 4.41-3.59 8-8 8z"/></svg>';
-  const FICONS = {warn: WARN, tick: TICK, ban: BAN};
+  // switch-option icons (from the twitter-icons set); every option shows one
+  const FICONS = {
+    all: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.001 3.01V3m0 18v.01m3.442-17.315l.004-.01M8.56 20.315l-.004.01m9.806-14.68l.008-.007M5.64 18.366l-.007.007m14.677-9.81l.01-.004M3.69 15.447l-.01.004m-.675-3.446h-.01m18 0h.01M5.641 5.645l-.007-.008m12.728 12.728l.007.007M3.69 8.562l-.01-.003m16.63 6.888l.01.004M8.559 3.695l-.004-.01m6.888 16.63l.004.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.75C6.34 1.75 1.75 6.34 1.75 12S6.34 22.25 12 22.25 22.25 17.66 22.25 12 17.66 1.75 12 1.75zm-.81 14.68l-4.1-3.27 1.25-1.57 2.47 1.98 3.97-5.47 1.62 1.18-5.21 7.15z"/></svg>',
+    pencil: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.3906 11.8044L10.0459 19.4167C9.37191 20.1152 8.46631 20.5441 7.49902 20.6247L3 20.9997L3.375 16.5007C3.45561 15.5334 3.8855 14.6288 4.58398 13.9548L12.1953 6.60907L17.3906 11.8044Z"/><path d="M15.2061 3.70477C16.6185 2.34219 18.8622 2.36205 20.25 3.74969C21.6379 5.13757 21.6578 7.38218 20.2949 8.79461L18.7793 10.3649L13.6348 5.2204L15.2061 3.70477Z"/></svg>',
+    close: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.75c-4.56 0-8.25 3.69-8.25 8.25s3.69 8.25 8.25 8.25 8.25-3.69 8.25-8.25S16.56 3.75 12 3.75zM1.75 12C1.75 6.34 6.34 1.75 12 1.75S22.25 6.34 22.25 12 17.66 22.25 12 22.25 1.75 17.66 1.75 12zm8.84 0l-2.3-2.29 1.42-1.42 2.29 2.3 2.29-2.3 1.42 1.42-2.3 2.29 2.3 2.29-1.42 1.42-2.29-2.3-2.29 2.3-1.42-1.42 2.3-2.29z"/></svg>',
+    tick: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.64 18.952l-5.55-4.861 1.317-1.504 3.951 3.459 8.459-10.948L19.4 6.32 9.64 18.952z"/></svg>',
+    compose: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.938 4.5H9.9c-1.136 0-1.929 0-2.546.05-.605.05-.953.143-1.216.277-.564.288-1.023.747-1.31 1.31-.135.264-.228.612-.277 1.218C4.5 7.97 4.5 8.765 4.5 9.9v4.2c0 1.136 0 1.929.05 2.546.05.605.143.953.277 1.216.288.565.747 1.023 1.31 1.31.264.135.612.228 1.217.277.617.05 1.41.051 2.546.051h4.2c1.136 0 1.929 0 2.545-.05.606-.05.954-.143 1.217-.277.565-.288 1.023-.746 1.31-1.31.135-.264.228-.612.277-1.217.05-.617.051-1.41.051-2.546v-1.037h2V14.1c0 1.103.001 1.992-.058 2.709-.06.728-.185 1.368-.487 1.96-.48.941-1.245 1.707-2.185 2.186-.593.302-1.233.428-1.961.488-.718.058-1.606.057-2.71.057H9.9c-1.103 0-1.991.001-2.709-.058-.728-.06-1.368-.185-1.96-.487-.941-.48-1.707-1.245-2.186-2.185-.302-.593-.428-1.233-.487-1.961-.059-.718-.058-1.606-.058-2.71V9.9c0-1.103-.001-1.991.058-2.709.06-.728.185-1.368.487-1.96.48-.941 1.245-1.707 2.185-2.186.593-.302 1.233-.428 1.961-.487.718-.059 1.606-.058 2.71-.058h1.037v2z"/><path d="M16.293 3.293c1.219-1.219 3.195-1.219 4.414 0 1.219 1.219 1.219 3.195 0 4.414l-5.491 5.491c-.533.533-.89.896-1.31 1.179-.356.24-.742.433-1.148.574-.478.167-.983.234-1.729.341l-2.708.387.387-2.708c.107-.746.174-1.25.34-1.729.142-.405.335-.792.575-1.148.283-.42.646-.777 1.179-1.31l5.491-5.491zm3 1.414c-.438-.438-1.148-.438-1.586 0l-5.491 5.491c-.587.587-.784.79-.934 1.013-.144.214-.26.445-.345.688-.088.254-.131.533-.248 1.354l-.01.067.068-.008c.82-.118 1.1-.161 1.354-.25.243-.084.474-.2.688-.344.223-.15.426-.347 1.013-.934l5.491-5.491c.438-.438.438-1.148 0-1.586z" fill-rule="evenodd" clip-rule="evenodd"/></svg>',
+    chevron: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.543 8.96l1.414-1.42L12 14.59l7.043-7.05 1.414 1.42L12 17.41 3.543 8.96z"/></svg>',
+    shield: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.325 2.054c-.21-.072-.44-.072-.65 0l-8 2.75C3.27 4.944 3 5.323 3 5.75v6.162c0 2.807 1.149 4.83 2.813 6.405 1.572 1.488 3.632 2.6 5.555 3.636l.157.085c.296.16.653.16.95 0l.157-.085c1.923-1.037 3.983-2.148 5.556-3.636C19.85 16.742 21 14.719 21 11.912V5.75c0-.427-.271-.807-.675-.946l-8-2.75z"/></svg>',
+    warn: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 18.25l-8.4-14.51c-.96-1.66-3.36-1.66-4.32 0l-8.4 14.51C.47 19.91 1.68 22 3.6 22h16.8c1.92 0 3.13-2.09 2.16-3.75zM13.25 8.5L13 14.2s-.5-.2-1-.2-1 .2-1 .2l-.25-5.7h2.5zM12 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>'
+  };
   const FCOLORS = {default: "#536471", green: "#00ba7c", yellow: "#e0b219", red: "#f4212e", blue: "#1d9bf0"};
 
   // multi-state filter switches, one per axis; each defaults to "all"
@@ -2448,7 +2502,9 @@ window.twitterflagsconfigs = {
     const sw = e.target.closest(".swbtn");
     if (sw) {
       e.preventDefault();
-      send("sw", {action: sw.getAttribute("data-sw")});
+      const action = sw.getAttribute("data-sw");
+      if (action === "github") { try {window.open("https://github.com/sogful/twitter-flags", "_blank", "noopener")} catch {} return }
+      send("sw", {action});
       const orig = sw.textContent; sw.textContent = "sent";
       setTimeout(() => {sw.textContent = orig}, 900);
       return;

@@ -34,8 +34,8 @@
     .button {
       background-color: #242E36; color: #E5EAEC;
       border: none; cursor: pointer;
-      border-radius: 999px; padding: 7px 14px;
-      font: 600 13px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      border-radius: 999px; padding: 8px 16px;
+      font: 700 14px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     .button.hot {
@@ -109,9 +109,8 @@
       font-family: inherit
     }
     .fseg.on {color: #fff; font-weight: 700}
-    .fseg .fico {display: none; width: 12px; height: 12px}
-    .fseg.on .fico {display: inline-flex}
-    .fseg .fico svg {width: 12px; height: 12px; fill: currentColor}
+    .fseg .fico {display: inline-flex; width: 12px; height: 12px}
+    .fseg .fico svg {width: 12px; height: 12px}
 
     .note {
       margin-left: auto;
@@ -124,11 +123,12 @@
       margin-left: auto; align-items: center
     }
     .bulkbtn {
-      background-color: #242E36; color: #E5EAEC;
-      border: none; cursor: pointer;
-      border-radius: 999px; padding: 2px 6px;
-      font: 600 12px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: transparent; color: #E5EAEC;
+      border: 1px solid #536471; cursor: pointer;
+      border-radius: 999px; padding: 3px 10px;
+      font: 700 12px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
+    .bulkbtn:hover {background-color: rgba(239,243,244,.1)}
 
     .row2.dev {
       font-size: 9.75px; gap: 10.5px
@@ -140,12 +140,12 @@
       border-bottom: 1px solid #242E36
     }
     .swbtn {
-      background-color: #242E36; color: #E5EAEC;
-      border: none; cursor: pointer;
-      border-radius: 999px; padding: 3px 9px;
-      font: 600 10.5px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: transparent; color: #E5EAEC;
+      border: 1px solid #536471; cursor: pointer;
+      border-radius: 999px; padding: 3px 10px;
+      font: 700 10.5px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    .swbtn:hover {background-color: #2f3b45}
+    .swbtn:hover {background-color: rgba(239,243,244,.1)}
     .row2.dev .checkbox {
       width: 15px; height: 15px;
       border-width: 1.5px; border-radius: 3px

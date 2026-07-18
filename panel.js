@@ -7,13 +7,17 @@
 
   let captured = false, source = "none", dirty = false, cached = false;
   let flags = {}, overrides = {}, status = {}, applied = {};
-  let devconfig = { jfDev: false, inspect: false };
+  let devconfig = { jfDev: false, inspect: false }, applieddev = {};
   const hasoverride = k => Object.prototype.hasOwnProperty.call(overrides, k);
   const effective = k => (hasoverride(k) ? overrides[k] : flags[k]);
   const persist = () => {if (EXT) try {chrome.storage.local.set({overrides})} catch {}};
   const canon = o => {try {return JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]]))} catch {return ""}};
   const clone = o => {try {return JSON.parse(JSON.stringify(o))} catch {return {}}};
-  const markdirty = () => {dirty = canon(overrides) !== canon(applied)};
+  // dev toggles that need a reload to apply count toward unsaved (inspector is a
+  // live view tool, like the filters, so it is left out)
+  const DEVPERSIST = ["jfDev", "exposeDebug", "forceDevEnv"];
+  const devkey = c => JSON.stringify(DEVPERSIST.map(k => [k, !!(c && c[k])]));
+  const markdirty = () => {dirty = canon(overrides) !== canon(applied) || devkey(devconfig) !== devkey(applieddev)};
 
   /*//////////////////////////////////////////////////////////////////////*/
 
@@ -74,7 +78,7 @@
     captured = !!p.captured; source = p.source || "none";
     flags = p.flags || {}; overrides = p.overrides || {}; status = p.status || {};
     applied = p.applied || {}; markdirty();
-    render();
+    rafrender();
   }
 
   function loadcached(fallback) {
@@ -119,7 +123,7 @@
     chrome.runtime.onMessage.addListener(msg => {
       if (!msg || msg.source !== PCHAN) return;
       if (msg.type === "state") stateapply(msg.payload);
-      else if (msg.type === "dev") { Object.assign(devconfig, msg.config || {}); syncdev() }
+      else if (msg.type === "dev") { Object.assign(devconfig, msg.config || {}); if (msg.applied) applieddev = msg.applied; syncdev() }
     });
     chrome.tabs.onActivated.addListener(refresh);
     chrome.tabs.onUpdated.addListener((id, info) => { if (id === tabId && info.status === "complete") refresh() });
@@ -130,7 +134,7 @@
 
   /*//////////////////////////////////////////////////////////////////////*/
 
-  let knowndesc = {}, dangerknowndesc = {}, switchcfg = {};
+  let knowndesc = {}, dangerknowndesc = {}, switchcfg = {}, upsellflags = [];
 
   // minimal jsonc
   function parsejsonc(text) {
@@ -154,8 +158,8 @@
         return parsejsonc(await (await fetch(url)).text());
       } catch { return {} }
     };
-    const [desc, switches] = await Promise.all([get("descriptions.jsonc"), get("switches.jsonc")]);
-    return { desc, switches };
+    const [desc, switches, upsells] = await Promise.all([get("descriptions.jsonc"), get("switches.jsonc"), get("upsells.jsonc")]);
+    return { desc, switches, upsells };
   }
 
   const prefixes = ["responsive_web_", "rweb_", "c9s_"];
@@ -213,7 +217,7 @@
   const filters = {true: false, safe: false, danger: false, mod: false};
 
   function buildswitches() {
-    const devrow = query(".row2.dev"), filtrow = query(".row2.filters"), bulk = filtrow.querySelector(".bulk");
+    const devrow = query(".row2.dev"), swrow = query(".row2.swrow"), filtrow = query(".row2.filters"), bulk = filtrow.querySelector(".bulk");
     const mk = (s, defgroup) => {
       const lbl = document.createElement("label");
       lbl.className = "checklabel";
@@ -231,7 +235,7 @@
       b.className = "swbtn"; b.textContent = a.label;
       b.setAttribute("data-sw", a.action);
       if (a.title) b.setAttribute("title", a.title);
-      devrow.appendChild(b);
+      swrow.appendChild(b);
     });
   }
 
@@ -260,6 +264,20 @@
     if (!Object.keys(set).length && !clear.length) return;
     markdirty(); persist(); send("setmany", { set, clear }); render();
   }
+
+  // bulk-toggle every known premium upsell / ad / slop flag. off -> set each to
+  // its disabling value; on -> clear our overrides so twitter's defaults return
+  function applyupsells(mode) {
+    const set = {}, clear = [];
+    for (const u of upsellflags) {
+      if (!u || typeof u.flag !== "string") continue;
+      if (mode === "off") { overrides[u.flag] = u.off; set[u.flag] = u.off }
+      else if (hasoverride(u.flag)) { delete overrides[u.flag]; clear.push(u.flag) }
+    }
+    if (!Object.keys(set).length && !clear.length) return;
+    markdirty(); persist(); send("setmany", { set, clear }); render();
+  }
+
   header.addEventListener("click", e => {
     const sw = e.target.closest(".swbtn");
     if (sw) {
@@ -269,13 +287,15 @@
       setTimeout(() => {sw.textContent = orig}, 900);
       return;
     }
+    const up = e.target.closest("[data-upsell]");
+    if (up) { e.preventDefault(); applyupsells(up.getAttribute("data-upsell")); return }
     const bb = e.target.closest(".bulkbtn");
     if (bb) { e.preventDefault(); bulksafe(bb.getAttribute("data-bulk")); return }
     const lbl = e.target.closest(".checklabel");
     if (!lbl) return;
     e.preventDefault();
     const grp = lbl.getAttribute("data-group"), k = lbl.getAttribute("data-key");
-    if (grp === "dev") {devconfig[k] = !devconfig[k]; paintchecks(); devpush()}
+    if (grp === "dev") {devconfig[k] = !devconfig[k]; devpush(); syncdev()}
     else if (grp === "flag") {
       const f = lbl.getAttribute("data-flag");
       const base = flags[f], val = !(effective(f) === true);
@@ -286,7 +306,7 @@
     else {filters[k] = !filters[k]; paintchecks(); render()}
   });
 
-  function syncdev() {paintchecks()}
+  function syncdev() {paintchecks(); markdirty(); updateFoot()}
   const devpush = () => {send("devset", {config: devconfig}); if (EXT) try {chrome.storage.local.set({devconfig})} catch {}};
   paintchecks();
 
@@ -316,6 +336,14 @@
   const isMod = name => hasoverride(name) && !eq(overrides[name], flags[name]);
 
   function updateFoot() { footer.classList.toggle("show", dirty) }
+
+  // coalesce bursty re-renders (incoming state messages, typing) into one/frame
+  let renderraf = 0;
+  function rafrender() {
+    if (renderraf) return;
+    const raf = typeof requestAnimationFrame === "function" ? requestAnimationFrame : (f => setTimeout(f, 16));
+    renderraf = raf(() => {renderraf = 0; render()});
+  }
 
   function render(noTab) {
     updateFoot();
@@ -400,18 +428,26 @@
     }
   });
 
-  search.oninput = () => render(); prefixselect.onchange = () => render();
+  search.oninput = () => rafrender(); prefixselect.onchange = () => render();
   reload.onclick = () => {
     if (!EXT) {send("reload"); return}
     if (tabId != null) try {chrome.tabs.reload(tabId)} catch {send("reload")}
     else try {chrome.tabs.create({url: "https://x.com/"})} catch {}
   };
-  undo.onclick = () => {overrides = clone(applied); markdirty(); persist(); send("syncoverrides", {overrides}); render()};
+  undo.onclick = () => {
+    overrides = clone(applied);
+    let devchanged = false;
+    for (const k of DEVPERSIST) { const base = !!(applieddev && applieddev[k]); if (!!devconfig[k] !== base) {devconfig[k] = base; devchanged = true} }
+    markdirty(); persist(); send("syncoverrides", {overrides});
+    if (devchanged) devpush();
+    render();
+  };
 
   loadconfigs().then(cfg => {
     knowndesc = (cfg.desc && cfg.desc.known) || {};
     dangerknowndesc = (cfg.desc && cfg.desc.danger) || {};
     switchcfg = cfg.switches || {};
+    upsellflags = Object.values(cfg.upsells || {}).filter(Array.isArray).flat();
     buildswitches();
     paintchecks();
     refresh();

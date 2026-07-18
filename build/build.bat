@@ -30,4 +30,4 @@ node "%here%builduserscript.js"
 if errorlevel 1 (echo userscript step failed & exit /b 1)
 
 echo.
-echo done. twitterflags.zip + twitterflags.user.js are in %here%
+echo done! twitterflags.zip/twitterflags.user.js are in %here%

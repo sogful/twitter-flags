@@ -37,7 +37,7 @@
         }
         c++;
       }
-      if (c) log("applied", c, "saved override(s) into customoverrides + defaultConfig for this load");
+      if (c) log("applied", c, "saved overrides into customoverrides + defaultConfig for this load!");
     } catch (e) {log("applyoverrides error:", e && e.message)}
   }
 
@@ -47,6 +47,7 @@
     for (const k in cfg) {
       const v = cfg[k];
       if (v && typeof v === "object" && "value" in v) { flags[k] = v.value; hits++ }
+      else if (Array.isArray(v)) { flags[k] = v; hits++ }
       else if (typeof v === "boolean" || typeof v === "number" || typeof v === "string") { flags[k] = v; hits++ }
     }
     if (hits) {
@@ -201,6 +202,53 @@
     return null;
   }
 
+  // count flag-shaped entries (name -> primitive / array / {value}) in a map
+  function poolsize(pool) {
+    if (!pool || typeof pool !== "object" || Array.isArray(pool)) return 0;
+    let n = 0;
+    try {
+      for (const key in pool) {
+        const dv = pool[key];
+        if (dv && typeof dv === "object" && "value" in dv) n++;
+        else if (Array.isArray(dv) || typeof dv === "boolean" || typeof dv === "number" || typeof dv === "string") n++;
+        if (n >= 10) break;
+      }
+    } catch {}
+    return n;
+  }
+
+  // the whole decider map lives on the manager (getValue reads it); scan its own +
+  // prototype props for the biggest flag-shaped map instead of hardcoding a name,
+  // since the property gets minified differently across builds
+  function harvestswitches(fsw) {
+    try {
+      let best = null, bestN = 0;
+      const seen = new Set();
+      let o = fsw;
+      for (let d = 0; o && d < 3; d++, o = Object.getPrototypeOf(o)) {
+        for (const k of Object.getOwnPropertyNames(o)) {
+          if (seen.has(k)) continue; seen.add(k);
+          let v; try {v = fsw[k]} catch {continue}
+          const n = poolsize(v);
+          if (n > bestN) {bestN = n; best = v}
+        }
+      }
+      return best && bestN >= 10 ? configingest(best, "features(live)") : 0;
+    } catch (e) {log("harvestswitches error:", e && e.message); return 0}
+  }
+
+  // features can populate a beat after the manager appears, so retry for a while
+  function harvestloop(fsw) {
+    let tries = 0;
+    const go = () => {const n = harvestswitches(fsw); if (n) log("harvested", n, "flags from the live manager"); return n > 0};
+    if (go()) return;
+    const iv = setInterval(() => {if (go() || ++tries > 25) {clearInterval(iv); if (tries > 25) log("harvest: no flag map found on the manager")}}, 300);
+  }
+
+  // debounced re-broadcast for the lazy-capture path below
+  let capturetimer = 0;
+  function schedcapture() {if (!capturetimer) capturetimer = setTimeout(() => {capturetimer = 0; if (onchange) onchange()}, 250)}
+
   function hookswitches(fsw) {
     if (!fsw || fsw.tfhooked) return false;
     let wrapped = 0;
@@ -209,12 +257,21 @@
       if (typeof orig !== "function") continue;
       fsw[name] = function (k) {
         if (typeof k === "string" && hasoverride(k)) {const v = overrides[k]; return name === "isTrue" ? v === true : v}
-        return orig.apply(this, arguments);
+        const res = orig.apply(this, arguments);
+        // lazily record every flag the client reads (getValue is authoritative);
+        // guarantees the panel fills even if the bulk harvest never finds the map
+        if (typeof k === "string" && res !== undefined && (name === "getValue" || !(k in flags))) {
+          flags[k] = res;
+          if (!captured) {captured = true; if (source === "none") source = "live-read"}
+          schedcapture();
+        }
+        return res;
       };
       wrapped++;
     }
     fsw.tfhooked = true;
     log("hooked featureSwitches:", wrapped, "getter(s); overrides apply live now");
+    harvestloop(fsw);
     return true;
   }
 
@@ -231,8 +288,8 @@
 
   /*//////////////////////////////////////////////////////////////////////*/
 
-  log("installed! initial-state:", isInstalled, "manifest:", manInstalled, "fetch:", fetchhooked, "xhr:", xhrhooked,
-    "| expect an 'ingested N flags from initial(set):default' line on full reload. if it never appears, the script is sandboxed out of page context.");
+  log("installed!\ninitial-state:", isInstalled, "\nmanifest:", manInstalled, "\nfetch:", fetchhooked, "\nxhr:", xhrhooked,
+    "\nexpect an \"ingested N flags from initial(set):default\" line on full reload.\nif it never appears, the script is unfortunately sandboxed :(");
 
   window.twitterflags = flags;
   window.twitterflagsDebug = {

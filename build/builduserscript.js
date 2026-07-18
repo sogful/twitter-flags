@@ -18,16 +18,12 @@ const tl = s => "`" + s.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\
 const manifest = JSON.parse(rd("manifest.json"));
 const version = manifest.version || "0";
 
-const fontchirp = b64("fonts/chirp.woff2");
-const fontbold = b64("fonts/chirpbold.woff2");
-const fontheavy = b64("fonts/chirpheavy.woff2");
 const iconsvg = rd("images/icon.svg").trim();
 const iconmeta = "data:image/svg+xml;base64," + b64("images/icon.svg");
 
 let panelcss = rd("panel.css");
-panelcss = must(panelcss, panelcss.replace('url("fonts/chirp.woff2")', "url(data:font/woff2;base64," + fontchirp + ")"), "font chirp");
-panelcss = must(panelcss, panelcss.replace('url("fonts/chirpbold.woff2")', "url(data:font/woff2;base64," + fontbold + ")"), "font bold");
-panelcss = must(panelcss, panelcss.replace('url("fonts/chirpheavy.woff2")', "url(data:font/woff2;base64," + fontheavy + ")"), "font heavy");
+panelcss = must(panelcss, panelcss.replace(/\s*@font-face\s*\{[^{}]*Chirp[^{}]*\}/g, ""), "strip @font-face");
+panelcss = must(panelcss, panelcss.replace(/"Chirp"/g, '"TwitterChirp"'), "chirp family -> twitterchirp");
 
 const rawhtml = rd("panel.html");
 const panelhtml = rawhtml.slice(rawhtml.indexOf("<body>") + 6, rawhtml.indexOf("<script")).trim();
@@ -49,8 +45,9 @@ function parsejsonc(text) {
 }
 const configsrc = "window.twitterflagsconfigs = " + JSON.stringify({
   desc: parsejsonc(rd("configs/descriptions.jsonc")),
-  switches: parsejsonc(rd("configs/switches.jsonc"))
-}) + ";";
+  switches: parsejsonc(rd("configs/switches.jsonc")),
+  upsells: parsejsonc(rd("configs/upsells.jsonc"))
+}, null, 2) + ";";
 
 let panelsrc = rd("panel.js");
 panelsrc = must(panelsrc, panelsrc.replace("(function () {", "(function (chrome, root) {"), "panel iife open");
@@ -63,7 +60,7 @@ const hostcss = `
     :host {all: initial}
     .tffab {
       position: fixed; z-index: 2147483646;
-      right: 16px; bottom: 16px;
+      right: calc(16px + var(--tfsb, 0px)); bottom: 16px;
       width: 40px; height: 40px; border-radius: 999px;
       background-color: #1d9bf0; border: none; cursor: grab;
       pointer-events: auto; touch-action: none;
@@ -73,11 +70,11 @@ const hostcss = `
     .tffab:active {cursor: grabbing}
     .tffab svg {width: 22px; height: 22px; pointer-events: none}
     .tfpanelwrap {
-      position: fixed; top: 0; right: 0;
+      position: fixed; top: 0; right: var(--tfsb, 0px);
       width: 390px; max-width: 100vw;
       height: 100vh; height: 100dvh;
       background-color: #000; color: #E5EAEC;
-      font: 14px "Chirp", system-ui, sans-serif;
+      font: 14px "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       display: flex; flex-direction: column;
       overflow: hidden; user-select: none;
       z-index: 2147483647;
@@ -88,7 +85,6 @@ const hostcss = `
       transition: transform 0.18s ease
     }
     .tfpanelwrap.open {transform: none; visibility: visible}
-    .tfpanelwrap .header {padding-top: 34px}
     .tfclose {
       position: absolute; top: 6px; right: 10px; z-index: 3;
       background: none; border: none; cursor: pointer; padding: 4px;
@@ -119,7 +115,7 @@ const appmatches = [
 ];
 const notapp = [
   "ads", "ads-api", "analytics", "business", "developer", "help", "support",
-  "blog", "about", "careers", "legal", "privacy", "transparency", "cards",
+  "blog", "about", "careers", "legal", "privacy", "pro", "transparency", "cards",
   "publish", "platform", "api", "upload", "ton", "media", "brand", "marketing",
   "investor", "engineering", "press", "pr", "gdpr"
 ];
@@ -128,22 +124,18 @@ const excludematches = [];
 for (const s of notapp) excludematches.push("https://" + s + ".x.com/*", "https://" + s + ".twitter.com/*");
 const excludes = ["/\\.(?:js|mjs|json|css|map|png|jpe?g|gif|svg|webp|avif|ico|woff2?|ttf|otf|eot|mp4|webm|m3u8|wasm|xml|txt|pdf)(?:[?#].*)?$/i"];
 
-const meta = [
-  "// ==UserScript==",
-  "// @name         twitter flags & more",
-  "// @namespace    coolsite.cv",
-  "// @version      " + version,
-  "// @description  browse hidden stuff inside the twitter client with a side panel!",
-  "// @author       cv",
-  ...appmatches.map(m => "// @match         " + m),
-  ...excludematches.map(m => "// @exclude-match " + m),
-  ...excludes.map(m => "// @exclude       " + m),
-  "// @icon          " + iconmeta,
-  "// @run-at        document-start",
-  "// @grant         none",
-  "// ==/UserScript==",
-  ""
-].join("\n");
+// grouped [directive, value] blocks, blank line between groups; the directive
+// column is padded so every value lines up
+const metagroups = [
+  [["@name", "twitter flags & more"], ["@description", "browse hidden stuff inside the twitter client with a side panel!"], ["@version", version]],
+  [["@namespace", "coolsite.cv"], ["@author", "cv"]],
+  appmatches.map(m => ["@match", m]),
+  excludematches.map(m => ["@exclude", m]),
+  [...excludes.map(r => ["@exclude", r]), ["@icon", iconmeta], ["@run-at", "document-start"], ["@grant", "none"]]
+];
+const dirw = Math.max(...metagroups.flat().map(p => p[0].length));
+const fmt = ([d, v]) => "// " + d.padEnd(dirw) + "  " + v;
+const meta = "// ==UserScript==\n\n" + metagroups.map(g => g.map(fmt).join("\n")).join("\n\n") + "\n\n// ==/UserScript==\n";
 
 const head = `(function () {
   "use strict";
@@ -213,11 +205,16 @@ const mountopen = `
     root.appendChild(wrap);
 
     const fab = document.createElement("button");
-    fab.className = "tffab"; fab.title = "drag me!";
+    fab.className = "tffab"; fab.title = "drag me twin";
     fab.innerHTML = iconsvg;
     root.appendChild(fab);
 
     (document.body || document.documentElement).appendChild(host);
+
+    // keep the drawer off the page scrollbar (which otherwise draws over its edge)
+    const setsb = () => {try {const w = window.innerWidth - document.documentElement.clientWidth; host.style.setProperty("--tfsb", (w > 0 ? w : 0) + "px")} catch {}};
+    setsb();
+    window.addEventListener("resize", setsb);
 
     try {
       const pos = JSON.parse(localStorage.getItem("twitterflags.fabpos") || "null");

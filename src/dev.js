@@ -7,8 +7,10 @@
   const log = (...a) => {try {console.log("%c[twitterflags:dev]", "color:#00ba7c;font-weight:700", ...a)} catch {}};
 
   let cfg;
-  try {cfg = Object.assign({}, DEFAULT, JSON.parse(localStorage.getItem(KEY) || "{}"))} 
+  try {cfg = Object.assign({}, DEFAULT, JSON.parse(localStorage.getItem(KEY) || "{}"))}
   catch {cfg = Object.assign({}, DEFAULT)}
+  // frozen load-time snapshot so the panel can tell if a dev toggle is unsaved
+  const applieddev = Object.assign({}, cfg);
   const save = () => {try {localStorage.setItem(KEY, JSON.stringify(cfg))} catch {}};
 
   try { if (cfg.jfDev) sessionStorage.setItem("jfDev", "true") } catch {}
@@ -119,7 +121,7 @@
     inspectset(!!cfg.inspect);
   }
 
-  function post() {try {window.postMessage({source: PCHAN, type: "dev", config: cfg}, location.origin)} catch {}}
+  function post() {try {window.postMessage({source: PCHAN, type: "dev", config: cfg, applied: applieddev}, location.origin)} catch {}}
   function swaction(action) {
     try {
       const sw = navigator.serviceWorker;

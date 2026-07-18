@@ -2,7 +2,7 @@
   // top row
   "dev": [
     {"key": "jfDev", "label": "jetfuel dev mode", "title": "sets sessionStorage jfDev, unlocking the super epic emusk rocket emoji mode"},
-    {"key": "inspect", "label": "inspector", "title": "hover any element to see its data-testid"},
+    {"key": "inspect", "label": "inspector", "title": "not actually a twitter feature, but hover any element to see its data-testid!"},
     {"key": "exposeDebug", "label": "expose audio", "title": "adds ?exposeDebug=1 so the media stream audio player is reachable"},
     {"key": "forceDevEnv", "label": "force dev environment", "title": "tries to revive prod-gated developer code (needs a reload)"}
   ],

@@ -41,7 +41,7 @@
 
   function send(cmd, extra) {
     if (!EXT || tabId == null) return;
-    try { chrome.tabs.sendMessage(tabId, Object.assign({ source: UCHAN, cmd }, extra || {})) } catch {}
+    try { const p = chrome.tabs.sendMessage(tabId, Object.assign({ source: UCHAN, cmd }, extra || {})); if (p && p.catch) p.catch(() => {}) } catch {}
   }
 
   function ping() {
@@ -207,11 +207,10 @@
   /*//////////////////////////////////////////////////////////////////////*/
 
   const query = selector => document.querySelector(selector);
-  const search = query(".search"), prefixselect = query(".prefixselect"), list = query(".list");
+  const search = query(".search"), prefixfield = query(".prefixfield"), prefixlabel = query(".prefixlabel"), list = query(".list");
+  let prefixvalue = "", prefbig = [], prefhasother = false;
   const header = query(".header"), footer = query(".footer"), reload = query(".reload"), undo = query(".undo");
   const flagcount = query(".flagcount");
-  // dev toggles + sw buttons live in .devbar (bottom) now, outside .header, so
-  // checkbox painting + click delegation scope to their common ancestor
   const panel = header.parentNode;
 
   const TICK = '<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9.64 18.952l-5.55-4.861 1.317-1.504 3.951 3.459 8.459-10.948L19.4 6.32 9.64 18.952z"></path></g></svg>';
@@ -357,13 +356,14 @@
 
   const prefof = n => n.startsWith("responsive_web_") ? "responsive_web" : n.split("_")[0];
 
+  const preflabel = v => v === "" ? "all prefixes" : v === "__other__" ? "(other...)" : v;
+  function setprefixlabel() { if (prefixlabel) prefixlabel.textContent = preflabel(prefixvalue) }
   function preffill(counts) {
-    const cur = prefixselect.value;
-    const big = Object.keys(counts).filter(p => counts[p] >= 3).sort();
-    const opts = ["", ...big];
-    if (Object.keys(counts).some(p => counts[p] <= 2)) opts.push("__other__");
-    prefixselect.innerHTML = opts.map(o => `<option value="${o}">${o === "" ? "all prefixes" : o === "__other__" ? "(other...)" : o}</option>`).join("");
-    prefixselect.value = opts.includes(cur) ? cur : "";
+    prefbig = Object.keys(counts).filter(p => counts[p] >= 3).sort();
+    prefhasother = Object.keys(counts).some(p => counts[p] <= 2);
+    const valid = ["", ...prefbig, ...(prefhasother ? ["__other__"] : [])];
+    if (!valid.includes(prefixvalue)) prefixvalue = "";
+    setprefixlabel();
   }
 
   function control(name) {
@@ -413,7 +413,7 @@
     const small = new Set(Object.keys(counts).filter(p => counts[p] <= 2));
     preffill(counts);
     const term = search.value.toLowerCase().trim();
-    const pref = prefixselect.value;
+    const pref = prefixvalue;
     let html = "";
     const shown = [];
     for (const name of names) {
@@ -450,9 +450,7 @@
     const out = note + (html || `<div class="empty center"><div class="face">:(</div><div>no matches</div></div>`);
     if (out === lasthtml) return;
     lasthtml = out;
-    // same rows in the same order (just a flag's state flipped) -> geometry is
-    // identical, so keep the exact scroll. anchoring via offsetTop drifts here
-    // because content-visibility:auto sizes offscreen items from the estimate
+    
     const sig = shown.join("");
     const samerows = sig === lastsig;
     lastsig = sig;
@@ -488,8 +486,8 @@
   if (e.key === "Escape") hidedrop()});
 
   /*//////////////////////////////////////////////////////////////////////*/
-
-  let drop = null, dropfield = null;
+  
+  let drop = null, dropfield = null, dropselect = null;
   function dropparent() { const r = list.getRootNode(); return r.host ? r : document.body }
   function ensuredrop() {
     if (drop) return drop;
@@ -497,27 +495,35 @@
     drop.className = "optsdrop";
     drop.addEventListener("mousedown", e => {
       const it = e.target.closest(".optsitem");
-      if (!it || !dropfield) return;
+      if (!it) return;
       e.preventDefault();
-      dropfield.value = it.getAttribute("data-val");
-      commit(dropfield);
+      const v = it.getAttribute("data-val"), fn = dropselect;
       hidedrop();
+      if (fn) fn(v);
     });
     dropparent().appendChild(drop);
     return drop;
+  }
+  function paintdrop(items, current) {
+    let html = "";
+    for (const o of items) {
+      const val = String(o.val), label = o.label != null ? String(o.label) : val, desc = o.desc || "";
+      html += `<div class="optsitem${val === current ? " sel" : ""}" data-val="${escapehtml(val)}"><span class="optsval">${escapehtml(label)}</span>${desc ? `<span class="optsdesc">${escapehtml(desc)}</span>` : ""}</div>`;
+    }
+    ensuredrop().innerHTML = html || `<div class="optsempty">no match</div>`;
   }
   function optsfor(field) { const n = field && field.getAttribute("data-name"); const o = n && optionsmap[n]; return (o && o.length) ? o : null }
   function filldrop(field, dofilter) {
     const opts = optsfor(field); if (!opts) return false;
     const cur = field.value.trim(), curl = cur.toLowerCase();
-    let html = "";
+    const items = [];
     for (const o of opts) {
       const s = String(o && typeof o === "object" ? o.val : o);
       const desc = (o && typeof o === "object" && o.desc) ? o.desc : "";
       if (dofilter && curl && s.toLowerCase().indexOf(curl) < 0 && desc.toLowerCase().indexOf(curl) < 0) continue;
-      html += `<div class="optsitem${s === cur ? " sel" : ""}" data-val="${escapehtml(s)}"><span class="optsval">${escapehtml(s)}</span>${desc ? `<span class="optsdesc">${escapehtml(desc)}</span>` : ""}</div>`;
+      items.push({val: s, desc});
     }
-    ensuredrop().innerHTML = html || `<div class="optsempty">no match</div>`;
+    paintdrop(items, cur);
     return true;
   }
   function positiondrop(field) {
@@ -532,12 +538,29 @@
     else d.style.top = (r.bottom + 4) + "px";
   }
   function showdrop(field) {
-    if (!filldrop(field, false)) { hidedrop(); return }
     dropfield = field;
+    dropselect = v => { field.value = v; commit(field) };
+    if (!filldrop(field, false)) { hidedrop(); return }
     ensuredrop().style.display = "block";
     positiondrop(field);
   }
-  function hidedrop() { if (drop) drop.style.display = "none"; dropfield = null }
+  function hidedrop() { if (drop) drop.style.display = "none"; dropfield = null; dropselect = null }
+
+  const prefixopen = () => !!(drop && drop.style.display === "block" && dropfield === null);
+  function openprefix() {
+    const items = [{val: "", label: "all prefixes"}, ...prefbig.map(p => ({val: p, label: p})), ...(prefhasother ? [{val: "__other__", label: "(other...)"}] : [])];
+    dropfield = null;
+    dropselect = v => { if (v !== prefixvalue) {prefixvalue = v; setprefixlabel(); render()} };
+    paintdrop(items, prefixvalue);
+    ensuredrop().style.display = "block";
+    positiondrop(prefixfield);
+  }
+  prefixfield.addEventListener("mousedown", () => {if (prefixopen()) hidedrop(); else openprefix()});
+  prefixfield.addEventListener("keydown", e => {
+    if (e.key === "Escape") hidedrop();
+    else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (prefixopen()) hidedrop(); else openprefix() }
+  });
+  prefixfield.addEventListener("focusout", () => setTimeout(() => {if (dropfield === null) hidedrop()}, 120));
 
   list.addEventListener("focusin", e => {const el = e.target.closest(".editfield"); if (el) showdrop(el)});
   list.addEventListener("focusout", e => {const el = e.target.closest(".editfield"); if (el) setTimeout(() => {if (list.getRootNode().activeElement !== el) hidedrop()}, 120)});
@@ -571,7 +594,7 @@
     }
   });
 
-  search.oninput = () => rafrender(); prefixselect.onchange = () => render();
+  search.oninput = () => rafrender();
   reload.onclick = () => {
     if (!EXT) {send("reload"); return}
     if (tabId != null) try {chrome.tabs.reload(tabId)} catch {send("reload")}

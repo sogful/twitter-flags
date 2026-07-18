@@ -44,7 +44,7 @@
       color: #fff
     }
 
-    .search, .prefixselect {
+    .search, .prefixfield {
       background: black; color: #E5EAEC;
       border: 1px solid #37434D;
       border-radius: 999px; padding: 9px 14px;
@@ -59,16 +59,18 @@
       left: 13px; width: 18px; height: 18px;
       fill: #6B7F8E; pointer-events: none}
     .search {width: 100%; min-width: 0; padding-left: 38px}
-    .prefixselect {
-      cursor: pointer; appearance: none;
-      padding-right: 38px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M3.543 8.96l1.414-1.42L12 14.59l7.043-7.05 1.414 1.42L12 17.41 3.543 8.96z'/%3E%3C/svg%3E");
+    .prefixfield {
+      cursor: pointer; flex-shrink: 0;
+      max-width: 44%; display: flex; align-items: center;
+      padding-right: 34px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236B7F8E'%3E%3Cpath d='M3.543 8.96l1.414-1.42L12 14.59l7.043-7.05 1.414 1.42L12 17.41 3.543 8.96z'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 12px center;
       background-size: 16px
     }
+    .prefixlabel {overflow: hidden; text-overflow: ellipsis; white-space: nowrap}
     .search::placeholder {color: #6B7F8E}
-    .search:focus, .prefixselect:focus {outline: none; border-color: #1d9bf0}
+    .search:focus, .prefixfield:focus {outline: none; border-color: #1d9bf0}
 
     .row2 {
       display: flex;
@@ -97,7 +99,7 @@
     .fhandle {
       position: absolute; top: 2px; bottom: 2px;
       left: 0; width: 0; z-index: 0;
-      border-radius: 999px; background-color: #536471;
+      border-radius: 999px; background-color: #6B7F8E;
       transition: left .2s ease, width .2s ease, background-color .2s ease
     }
     .fseg {
@@ -120,7 +122,7 @@
 
     .note {
       margin-left: auto;
-      color: #536471;
+      color: #6B7F8E;
       font-size: 12px
     }
 
@@ -134,7 +136,7 @@
     }
     .bulkbtn {
       background: transparent; color: #E5EAEC;
-      border: 1px solid #536471; cursor: pointer;
+      border: 1px solid #6B7F8E; cursor: pointer;
       border-radius: 999px; padding: 3px 10px;
       font: 700 12px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
@@ -153,7 +155,7 @@
     .row2.swrow {gap: 6px}
     .swbtn {
       background: transparent; color: #E5EAEC;
-      border: 1px solid #536471; cursor: pointer;
+      border: 1px solid #6B7F8E; cursor: pointer;
       border-radius: 999px; padding: 3px 10px;
       font: 700 10.5px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
@@ -192,14 +194,14 @@
     .list {
       overflow: auto;
       padding: 4px 0; flex: 1;
-      scrollbar-width: thin; scrollbar-color: #536471 transparent
+      scrollbar-width: thin; scrollbar-color: #6B7F8E transparent
     }
     .list::-webkit-scrollbar {width: 8px}
     .list::-webkit-scrollbar-track {background: transparent}
-    .list::-webkit-scrollbar-thumb {background-color: #536471; border-radius: 999px;
+    .list::-webkit-scrollbar-thumb {background-color: #6B7F8E; border-radius: 999px;
       border: 2px solid transparent; background-clip: padding-box;
       min-height: 20px; max-height: 120px}
-    .list::-webkit-scrollbar-thumb:hover {background-color: #6B7F8E}
+    .list::-webkit-scrollbar-thumb:hover {background-color: #8b98a4}
 
     .item {
       display: flex; align-items: center; gap: 10px;
@@ -294,7 +296,7 @@
     .ident {user-select: all}
 
     .opts {
-      color: #536471; font-size: 12px;
+      color: #6B7F8E; font-size: 12px;
       margin-top: 4px; cursor: pointer; width: fit-content
     }
     .opts:hover {color: #6B7F8E; text-decoration: underline}
@@ -307,7 +309,7 @@
       border: 1px solid #37434D; border-radius: 10px;
       max-height: 240px; max-width: 280px; overflow: auto;
       box-shadow: 0 4px 20px rgba(0,0,0,.7);
-      scrollbar-width: thin; scrollbar-color: #536471 transparent
+      scrollbar-width: thin; scrollbar-color: #6B7F8E transparent
     }
     .optsitem {
       padding: 6px 10px; border-radius: 6px; cursor: pointer;

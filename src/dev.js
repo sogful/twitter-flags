@@ -143,7 +143,6 @@
     } catch (e) {log("reapplychirp error:", e && e.message)}
   }
 
-  // when the checkbox is on, keep the force live; off tears the style back out
   function forcechirp(on) {
     if (on) {reapplychirp(); return}
     const s = document.getElementById("tf-chirp-force");

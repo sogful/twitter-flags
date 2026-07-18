@@ -95,6 +95,8 @@ const hostcss = `
     }
     .tfclose:hover {background-color: #2a2b2b}
     .tfclose svg {width: 20px; height: 20px; fill: #fff}
+    /* keep the top row (search + prefix) from sliding under the close button */
+    .row1 {padding-right: 30px}
 `;
 
 const closesvg = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"/></svg>';
@@ -206,7 +208,7 @@ const mountopen = `
     root.appendChild(wrap);
 
     const fab = document.createElement("button");
-    fab.className = "tffab"; fab.title = "drag me twin! (right-click to hide, alt+shift+f to bring back)";
+    fab.className = "tffab"; fab.title = "drag me twin (right click to hide / alt+shift+f to show)";
     fab.innerHTML = iconsvg;
     root.appendChild(fab);
 

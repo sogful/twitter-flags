@@ -140,15 +140,17 @@
     }
     .bulkbtn:hover {background-color: rgba(239,243,244,.1)}
 
+    .devbar {
+      flex-shrink: 0;
+      padding: 10px 14px;
+      border-top: 1px solid #242E36;
+      display: flex; flex-direction: column; gap: 8px
+    }
     .row2.dev {
       font-size: 9.75px; gap: 10.5px
     }
     .row2.dev label {gap: 3.75px}
-    .row2.swrow {
-      gap: 6px; margin-top: -2px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #242E36
-    }
+    .row2.swrow {gap: 6px}
     .swbtn {
       background: transparent; color: #E5EAEC;
       border: 1px solid #536471; cursor: pointer;

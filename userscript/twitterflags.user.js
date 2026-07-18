@@ -227,15 +227,17 @@
     }
     .bulkbtn:hover {background-color: rgba(239,243,244,.1)}
 
+    .devbar {
+      flex-shrink: 0;
+      padding: 10px 14px;
+      border-top: 1px solid #242E36;
+      display: flex; flex-direction: column; gap: 8px
+    }
     .row2.dev {
       font-size: 9.75px; gap: 10.5px
     }
     .row2.dev label {gap: 3.75px}
-    .row2.swrow {
-      gap: 6px; margin-top: -2px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #242E36
-    }
+    .row2.swrow {gap: 6px}
     .swbtn {
       background: transparent; color: #E5EAEC;
       border: 1px solid #536471; cursor: pointer;
@@ -496,8 +498,6 @@
     .tfclose svg {width: 20px; height: 20px; fill: #fff}
 `;
   const panelhtml = `<div class="header">
-    <div class="row2 dev"></div>
-    <div class="row2 swrow"></div>
     <div class="row1">
       <div class="searchbox">
         <svg class="searchicon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.25 4.25c-3.314 0-6 2.686-6 6s2.686 6 6 6c1.657 0 3.155-.67 4.243-1.757 1.087-1.088 1.757-2.586 1.757-4.243 0-3.314-2.686-6-6-6zm-9 6c0-4.971 4.029-9 9-9s9 4.029 9 9c0 1.943-.617 3.744-1.664 5.215l4.475 4.474-2.122 2.122-4.474-4.475c-1.471 1.047-3.272 1.664-5.215 1.664-4.971 0-9-4.029-9-9z"/></svg>
@@ -517,6 +517,10 @@
     <div class="flagcount">??? flags</div>
   </div>
   <div class="list"></div>
+  <div class="devbar">
+    <div class="row2 swrow"></div>
+    <div class="row2 dev"></div>
+  </div>
   <div class="footer">
     <span class="footermessage">You've got unsaved changes!</span>
     <button class="button undo">Undo</button>
@@ -2749,6 +2753,9 @@ window.twitterflagsconfigs = {
   const search = query(".search"), prefixselect = query(".prefixselect"), list = query(".list");
   const header = query(".header"), footer = query(".footer"), reload = query(".reload"), undo = query(".undo");
   const flagcount = query(".flagcount");
+  // dev toggles + sw buttons live in .devbar (bottom) now, outside .header, so
+  // checkbox painting + click delegation scope to their common ancestor
+  const panel = header.parentNode;
 
   const TICK = '<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9.64 18.952l-5.55-4.861 1.317-1.504 3.951 3.459 8.459-10.948L19.4 6.32 9.64 18.952z"></path></g></svg>';
   const WARN = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.5 17c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5zm1.5-3c.5 0 1 .2 1 .2l.25-5.7h-2.5l.25 5.7s.5-.2 1-.2zm10.568 6.745c.451-.783.45-1.717-.002-2.496l-8.4-14.511C13.712 2.957 12.903 2.49 12 2.49s-1.711.467-2.165 1.249l-8.4 14.509c-.453.78-.454 1.714-.002 2.497C1.886 21.531 2.696 22 3.6 22h16.8c.905 0 1.715-.469 2.168-1.255zM12.435 4.741l8.4 14.511c.125.214.053.402 0 .495-.044.076-.174.253-.435.253H3.6c-.261 0-.391-.177-.435-.253-.053-.093-.125-.281 0-.495l8.4-14.51c.131-.228.348-.252.435-.252s.304.024.435.251z"/></svg>';
@@ -2809,7 +2816,7 @@ window.twitterflagsconfigs = {
   }
 
   function paintchecks() {
-    header.querySelectorAll(".checklabel").forEach(lbl => {
+    panel.querySelectorAll(".checklabel").forEach(lbl => {
       const grp = lbl.getAttribute("data-group");
       let on;
       if (grp === "dev") on = !!devconfig[lbl.getAttribute("data-key")];
@@ -2858,7 +2865,7 @@ window.twitterflagsconfigs = {
     markdirty(); persist(); send("setmany", { set, clear }); render();
   }
 
-  header.addEventListener("click", e => {
+  panel.addEventListener("click", e => {
     const sw = e.target.closest(".swbtn");
     if (sw) {
       e.preventDefault();

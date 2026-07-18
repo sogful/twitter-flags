@@ -6,12 +6,26 @@
     {"key": "exposeDebug", "label": "expose audio", "title": "adds ?exposeDebug=1 so the media stream audio player is reachable"},
     {"key": "forceDevEnv", "label": "force dev environment", "title": "tries to revive prod-gated developer code (needs a reload)"}
   ],
-  // filter row
+  // filter row: multi-state switches. each option can carry a "color" (green /
+  // yellow / red / blue, else default grey) and an "icon" (warn / tick / ban)
   "filters": [
-    {"key": "true", "label": "enabled"},
-    {"key": "safe", "label": "safe"},
-    {"key": "danger", "label": "dangerous"},
-    {"key": "mod", "label": "modified"}
+    {"key": "state", "options": [
+      {"val": "all", "label": "all"},
+      {"val": "enabled", "label": "enabled", "color": "green", "icon": "tick"},
+      {"val": "modified", "label": "modified", "color": "yellow"},
+      {"val": "disabled", "label": "disabled", "color": "red", "icon": "ban"}
+    ]},
+    {"key": "type", "options": [
+      {"val": "all", "label": "all"},
+      {"val": "bool", "label": "checkboxes", "color": "blue"},
+      {"val": "input", "label": "inputs", "color": "blue"},
+      {"val": "opts", "label": "dropdowns", "color": "blue"}
+    ]},
+    {"key": "danger", "options": [
+      {"val": "all", "label": "all"},
+      {"val": "safe", "label": "safe", "color": "green"},
+      {"val": "danger", "label": "dangerous", "color": "red", "icon": "warn"}
+    ]}
   ],
   "actions": [
     {"action": "unregister", "label": "unregister sw.js", "title": "unregister the service worker (fresh assets when reloading)"},

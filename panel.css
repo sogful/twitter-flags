@@ -84,6 +84,34 @@
       align-items: center;
       cursor: pointer
     }
+    .row2.filters {gap: 8px}
+
+    /*//////////////////////////////////////////////////////////////////////*/
+
+    .fswitch {
+      position: relative; display: inline-flex;
+      background: #16181c; border-radius: 999px;
+      padding: 2px; flex-shrink: 0
+    }
+    .fhandle {
+      position: absolute; top: 2px; bottom: 2px;
+      left: 0; width: 0; z-index: 0;
+      border-radius: 999px; background-color: #536471;
+      transition: left .2s ease, width .2s ease, background-color .2s ease
+    }
+    .fseg {
+      position: relative; z-index: 1;
+      border: none; background: none; cursor: pointer;
+      color: #6B7F8E; padding: 4px 9px;
+      border-radius: 999px; font-size: 11px;
+      display: inline-flex; align-items: center; gap: 3px;
+      white-space: nowrap; transition: color .15s ease;
+      font-family: inherit
+    }
+    .fseg.on {color: #fff; font-weight: 700}
+    .fseg .fico {display: none; width: 12px; height: 12px}
+    .fseg.on .fico {display: inline-flex}
+    .fseg .fico svg {width: 12px; height: 12px; fill: currentColor}
 
     .note {
       margin-left: auto;
@@ -151,7 +179,8 @@
     .list::-webkit-scrollbar {width: 8px}
     .list::-webkit-scrollbar-track {background: transparent}
     .list::-webkit-scrollbar-thumb {background-color: #536471; border-radius: 999px;
-      border: 2px solid transparent; background-clip: padding-box}
+      border: 2px solid transparent; background-clip: padding-box;
+      min-height: 20px; max-height: 120px}
     .list::-webkit-scrollbar-thumb:hover {background-color: #6B7F8E}
 
     .item {

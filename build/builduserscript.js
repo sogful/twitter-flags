@@ -78,6 +78,7 @@ const hostcss = `
       font: 14px "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       display: flex; flex-direction: column;
       overflow: hidden; user-select: none;
+      padding-right: 14px;
       z-index: 2147483647;
       pointer-events: auto; visibility: hidden;
       border-left: 1px solid #242E36;

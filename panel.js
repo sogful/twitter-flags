@@ -214,7 +214,12 @@
   const WARN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22.56 18.25l-8.4-14.51c-.96-1.66-3.36-1.66-4.32 0l-8.4 14.51C.47 19.91 1.68 22 3.6 22h16.8c1.92 0 3.13-2.09 2.16-3.75zM13.25 8.5L13 14.2s-.5-.2-1-.2-1 .2-1 .2l-.25-5.7h2.5zM12 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>';
   const UNDO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.29 2.29l1.42 1.42L5.41 6H15c3.87 0 7 3.13 7 7s-3.13 7-7 7H8v-2h7c2.76 0 5-2.24 5-5s-2.24-5-5-5H5.41l2.3 2.29-1.42 1.42L1.59 7l4.7-4.71z"/></svg>';
 
-  const filters = {true: false, safe: false, danger: false, mod: false};
+  const BAN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2zm0 2c1.85 0 3.55.63 4.9 1.69L5.69 16.9A7.9 7.9 0 0 1 4 12c0-4.41 3.59-8 8-8zm0 16a7.9 7.9 0 0 1-4.9-1.69L18.31 7.1A7.9 7.9 0 0 1 20 12c0 4.41-3.59 8-8 8z"/></svg>';
+  const FICONS = {warn: WARN, tick: TICK, ban: BAN};
+  const FCOLORS = {default: "#536471", green: "#00ba7c", yellow: "#e0b219", red: "#f4212e", blue: "#1d9bf0"};
+
+  // multi-state filter switches, one per axis; each defaults to "all"
+  const filters = {state: "all", type: "all", danger: "all"};
 
   function buildswitches() {
     const devrow = query(".row2.dev"), swrow = query(".row2.swrow"), filtrow = query(".row2.filters"), bulk = filtrow.querySelector(".bulk");
@@ -228,8 +233,24 @@
       lbl.appendChild(box); lbl.appendChild(document.createTextNode(s.label));
       return lbl;
     };
+    const mkswitch = f => {
+      const sw = document.createElement("div");
+      sw.className = "fswitch"; sw.setAttribute("data-filter", f.key);
+      const handle = document.createElement("div"); handle.className = "fhandle";
+      sw.appendChild(handle);
+      (f.options || []).forEach(o => {
+        const seg = document.createElement("button");
+        seg.className = "fseg"; seg.type = "button";
+        seg.setAttribute("data-val", o.val);
+        if (o.color) seg.setAttribute("data-color", o.color);
+        const ic = (o.icon && FICONS[o.icon]) ? `<span class="fico">${FICONS[o.icon]}</span>` : "";
+        seg.innerHTML = ic + `<span>${escapehtml(o.label)}</span>`;
+        sw.appendChild(seg);
+      });
+      return sw;
+    };
     (switchcfg.dev || []).forEach(s => devrow.appendChild(mk(s, "dev")));
-    (switchcfg.filters || []).forEach(s => filtrow.insertBefore(mk(s, "filt"), bulk));
+    (switchcfg.filters || []).forEach(f => {if (!(f.key in filters)) filters[f.key] = ((f.options || [])[0] || {}).val || "all"; filtrow.insertBefore(mkswitch(f), bulk)});
     (switchcfg.actions || []).forEach(a => {
       const b = document.createElement("button");
       b.className = "swbtn"; b.textContent = a.label;
@@ -237,16 +258,31 @@
       if (a.title) b.setAttribute("title", a.title);
       swrow.appendChild(b);
     });
+    paintswitches();
   }
 
   function paintchecks() {
     header.querySelectorAll(".checklabel").forEach(lbl => {
-      const grp = lbl.getAttribute("data-group"), k = lbl.getAttribute("data-key");
+      const grp = lbl.getAttribute("data-group");
       let on;
-      if (grp === "dev") on = !!devconfig[k];
+      if (grp === "dev") on = !!devconfig[lbl.getAttribute("data-key")];
       else if (grp === "flag") on = effective(lbl.getAttribute("data-flag")) === true;
-      else on = !!filters[k];
+      else return;
       lbl.querySelector(".checkbox").classList.toggle("on", on);
+    });
+  }
+
+  // slide the handle under the active segment and fade it to that option's color
+  function paintswitches() {
+    query(".row2.filters").querySelectorAll(".fswitch").forEach(sw => {
+      const cur = filters[sw.getAttribute("data-filter")], handle = sw.querySelector(".fhandle");
+      let active = null;
+      sw.querySelectorAll(".fseg").forEach(seg => {const on = seg.getAttribute("data-val") === cur; seg.classList.toggle("on", on); if (on) active = seg});
+      if (active && handle) {
+        handle.style.left = active.offsetLeft + "px";
+        handle.style.width = active.offsetWidth + "px";
+        handle.style.backgroundColor = FCOLORS[active.getAttribute("data-color")] || FCOLORS.default;
+      }
     });
   }
 
@@ -289,6 +325,8 @@
     }
     const up = e.target.closest("[data-upsell]");
     if (up) { e.preventDefault(); applyupsells(up.getAttribute("data-upsell")); return }
+    const seg = e.target.closest(".fseg");
+    if (seg) { e.preventDefault(); filters[seg.closest(".fswitch").getAttribute("data-filter")] = seg.getAttribute("data-val"); paintswitches(); render(); return }
     const bb = e.target.closest(".bulkbtn");
     if (bb) { e.preventDefault(); bulksafe(bb.getAttribute("data-bulk")); return }
     const lbl = e.target.closest(".checklabel");
@@ -303,7 +341,6 @@
       else { overrides[f] = val; send("set", { name: f, value: val }) }
       markdirty(); persist(); render();
     }
-    else {filters[k] = !filters[k]; paintchecks(); render()}
   });
 
   function syncdev() {paintchecks(); markdirty(); updateFoot()}
@@ -369,12 +406,20 @@
     let html = "";
     for (const name of names) {
       if (pref) { const pf = prefof(name); if (pref === "__other__" ? !small.has(pf) : pf !== pref) continue }
-      if (filters.true && effective(name) !== true) continue;
       const mod = isMod(name);
-      if (filters.mod && !mod) continue;
       const dangerinfo = dangerFor(name);
-      if (filters.danger && !dangerinfo) continue;
-      if (filters.safe && dangerinfo) continue;
+      const tp = typeOf(flags[name]);
+      // state axis: all / enabled / modified / disabled
+      if (filters.state === "enabled" && effective(name) !== true) continue;
+      if (filters.state === "disabled" && effective(name) !== false) continue;
+      if (filters.state === "modified" && !mod) continue;
+      // type axis: all / checkboxes / inputs / dropdown inputs
+      if (filters.type === "bool" && tp !== "boolean") continue;
+      if (filters.type === "input" && tp === "boolean") continue;
+      if (filters.type === "opts" && !(optionsmap[name] && optionsmap[name].length)) continue;
+      // danger axis: all / safe / dangerous
+      if (filters.danger === "safe" && dangerinfo) continue;
+      if (filters.danger === "danger" && !dangerinfo) continue;
       const d = descFor(name);
       if (term && !(name.toLowerCase().includes(term) || d.text.toLowerCase().includes(term))) continue;
       const meta = dangerinfo ? `<div class="meta"><span class="dangerzone">${WARN}<span>${escapehtml(dangerinfo)}</span></span></div>` : "";
@@ -515,6 +560,11 @@
     buildswitches();
     paintchecks();
     refresh();
+    // the switch handle is positioned from segment geometry, so re-place it once
+    // the chirp font has loaded (widths shift) and on any resize
+    setTimeout(paintswitches, 400);
+    try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(paintswitches) } catch {}
+    window.addEventListener("resize", paintswitches);
   });
 
 })();

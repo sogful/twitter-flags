@@ -356,7 +356,7 @@
 
   const prefof = n => n.startsWith("responsive_web_") ? "responsive_web" : n.split("_")[0];
 
-  const preflabel = v => v === "" ? "all prefixes" : v === "__other__" ? "(other...)" : v;
+  const preflabel = v => v === "" ? "all prefixes" : v === "__other__" ? "(other..)" : v;
   function setprefixlabel() { if (prefixlabel) prefixlabel.textContent = preflabel(prefixvalue) }
   function preffill(counts) {
     prefbig = Object.keys(counts).filter(p => counts[p] >= 3).sort();
@@ -486,7 +486,7 @@
   if (e.key === "Escape") hidedrop()});
 
   /*//////////////////////////////////////////////////////////////////////*/
-  
+
   let drop = null, dropfield = null, dropselect = null;
   function dropparent() { const r = list.getRootNode(); return r.host ? r : document.body }
   function ensuredrop() {

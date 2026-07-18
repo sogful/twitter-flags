@@ -2477,7 +2477,7 @@ window.twitterflagsconfigs = {
     root.appendChild(wrap);
 
     const fab = document.createElement("button");
-    fab.className = "tffab"; fab.title = "drag me twin (right click to hide / alt+shift+f to show)";
+    fab.className = "tffab"; fab.title = "drag me twin (alt+shift+f to show / hide)";
     fab.innerHTML = iconsvg;
     root.appendChild(fab);
 
@@ -2504,7 +2504,6 @@ window.twitterflagsconfigs = {
     // show / hide the circle
     const sethidden = h => {try {localStorage.setItem("twitterflags.fabhidden", h ? "1" : "0")} catch {} fab.style.display = h ? "none" : ""};
     try {if (localStorage.getItem("twitterflags.fabhidden") === "1") fab.style.display = "none"} catch {}
-    fab.addEventListener("contextmenu", e => {e.preventDefault(); sethidden(true)});
     window.addEventListener("keydown", e => {
       if (e.altKey && e.shiftKey && ((e.key || "").toLowerCase() === "f" || e.code === "KeyF")) {e.preventDefault(); sethidden(fab.style.display !== "none")}
     }, true);

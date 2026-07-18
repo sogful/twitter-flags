@@ -134,7 +134,7 @@
 
   /*//////////////////////////////////////////////////////////////////////*/
 
-  let knowndesc = {}, dangerknowndesc = {}, switchcfg = {}, upsellflags = [];
+  let knowndesc = {}, dangerknowndesc = {}, switchcfg = {}, upsellflags = [], optionsmap = {};
 
   // minimal jsonc
   function parsejsonc(text) {
@@ -158,8 +158,8 @@
         return parsejsonc(await (await fetch(url)).text());
       } catch { return {} }
     };
-    const [desc, switches, upsells] = await Promise.all([get("descriptions.jsonc"), get("switches.jsonc"), get("upsells.jsonc")]);
-    return { desc, switches, upsells };
+    const [desc, switches, upsells, options] = await Promise.all([get("descriptions.jsonc"), get("switches.jsonc"), get("upsells.jsonc"), get("options.jsonc")]);
+    return { desc, switches, upsells, options };
   }
 
   const prefixes = ["responsive_web_", "rweb_", "c9s_"];
@@ -378,16 +378,20 @@
       const d = descFor(name);
       if (term && !(name.toLowerCase().includes(term) || d.text.toLowerCase().includes(term))) continue;
       const meta = dangerinfo ? `<div class="meta"><span class="dangerzone">${WARN}<span>${escapehtml(dangerinfo)}</span></span></div>` : "";
+      const opts = typeOf(flags[name]) !== "boolean" ? optionsmap[name] : null;
+      const optsline = (opts && opts.length) ? `<div class="opts" data-name="${escapehtml(name)}">${opts.length} available option${opts.length === 1 ? "" : "s"}</div>` : "";
       const title = d.auto
         ? `<div class="name ident" data-name="${escapehtml(name)}">${escapehtml(name)}</div>`
         : `<div class="name">${escapehtml(d.text)}</div><div class="ident" data-name="${escapehtml(name)}">${escapehtml(name)}</div>`;
       html += `<div class="item${dangerinfo ? " danger" : ""}${mod ? " mod" : ""}">
-      <div class="info">${title}${meta}</div>
+      <div class="info">${title}${meta}${optsline}</div>
       <div class="controls"><button class="reset${mod ? "" : " off"}" data-name="${escapehtml(name)}" title="reset to default" aria-hidden="${!mod}">${UNDO}</button>${control(name)}</div>
     </div>`;
     }
     const note = cached ? `<div class="cachednote">page is asleep or closed, showing last captured flags. changes still save and apply on next page load</div>` : "";
+    const st = list.scrollTop;
     list.innerHTML = note + (html || `<div class="empty center"><div class="face">:(</div><div>no matches</div></div>`);
+    list.scrollTop = st;
   }
 
   /*//////////////////////////////////////////////////////////////////////*/
@@ -400,8 +404,65 @@
     markdirty(); persist(); render();
   }
   list.addEventListener("change", e => {const el = e.target.closest(".editfield"); if (el) commit(el)});
-  list.addEventListener("keydown", e => {if (e.key === "Enter") {const el = e.target.closest(".editfield"); 
-  if (el && el.tagName !== "TEXTAREA") {commit(el); e.preventDefault()}}});
+  list.addEventListener("keydown", e => {if (e.key === "Enter") {const el = e.target.closest(".editfield");
+  if (el && el.tagName !== "TEXTAREA") {commit(el); e.preventDefault()}}
+  if (e.key === "Escape") hidedrop()});
+
+  /*//////////////////////////////////////////////////////////////////////*/
+
+  // custom twitter-styled options dropdown for flags with a known value set.
+  // lives at the panel root (not in the scrolling list) so it isn't clipped
+  let drop = null, dropfield = null;
+  function dropparent() { const r = list.getRootNode(); return r.host ? r : document.body }
+  function ensuredrop() {
+    if (drop) return drop;
+    drop = document.createElement("div");
+    drop.className = "optsdrop";
+    drop.addEventListener("mousedown", e => {
+      const it = e.target.closest(".optsitem");
+      if (!it || !dropfield) return;
+      e.preventDefault();
+      dropfield.value = it.getAttribute("data-val");
+      commit(dropfield);
+      hidedrop();
+    });
+    dropparent().appendChild(drop);
+    return drop;
+  }
+  function optsfor(field) { const n = field && field.getAttribute("data-name"); const o = n && optionsmap[n]; return (o && o.length) ? o : null }
+  function filldrop(field, dofilter) {
+    const opts = optsfor(field); if (!opts) return false;
+    const cur = field.value.trim(), curl = cur.toLowerCase();
+    let html = "";
+    for (const o of opts) {
+      const s = String(o);
+      if (dofilter && curl && s.toLowerCase().indexOf(curl) < 0) continue;
+      html += `<div class="optsitem${s === cur ? " sel" : ""}" data-val="${escapehtml(s)}">${escapehtml(s)}</div>`;
+    }
+    ensuredrop().innerHTML = html || `<div class="optsempty">no match</div>`;
+    return true;
+  }
+  function positiondrop(field) {
+    const d = ensuredrop(), r = field.getBoundingClientRect();
+    d.style.left = r.left + "px";
+    d.style.minWidth = r.width + "px";
+    d.style.top = ""; d.style.bottom = "";
+    const room = window.innerHeight - r.bottom;
+    if (d.offsetHeight > room - 8 && r.top > room) d.style.bottom = (window.innerHeight - r.top + 4) + "px";
+    else d.style.top = (r.bottom + 4) + "px";
+  }
+  function showdrop(field) {
+    if (!filldrop(field, false)) { hidedrop(); return }
+    dropfield = field;
+    ensuredrop().style.display = "block";
+    positiondrop(field);
+  }
+  function hidedrop() { if (drop) drop.style.display = "none"; dropfield = null }
+
+  list.addEventListener("focusin", e => {const el = e.target.closest(".editfield"); if (el) showdrop(el)});
+  list.addEventListener("focusout", e => {const el = e.target.closest(".editfield"); if (el) setTimeout(() => {if (list.getRootNode().activeElement !== el) hidedrop()}, 120)});
+  list.addEventListener("input", e => {const el = e.target.closest(".editfield"); if (el && dropfield === el) {filldrop(el, true); positiondrop(el)}});
+  list.addEventListener("scroll", () => {if (dropfield) hidedrop()});
 
   list.addEventListener("click", e => {
     const cb = e.target.closest(".checkbox");
@@ -417,6 +478,8 @@
       const n = resetbtn.getAttribute("data-name");
       delete overrides[n]; markdirty(); persist(); send("clear", {name: n}); render(); return
     }
+    const optsel = e.target.closest(".opts");
+    if (optsel) { const it = optsel.closest(".item"); const f = it && it.querySelector(".editfield"); if (f) f.focus(); return }
     const id = e.target.closest(".ident");
 
     if (id) {
@@ -448,6 +511,7 @@
     dangerknowndesc = (cfg.desc && cfg.desc.danger) || {};
     switchcfg = cfg.switches || {};
     upsellflags = Object.values(cfg.upsells || {}).filter(Array.isArray).flat();
+    optionsmap = (cfg.options && typeof cfg.options === "object") ? cfg.options : {};
     buildswitches();
     paintchecks();
     refresh();

@@ -333,6 +333,31 @@
     .meta .dangerzone svg {width: 14px; height: 14px; fill: currentColor}
     .ident {user-select: all}
 
+    .opts {
+      color: #536471; font-size: 12px;
+      margin-top: 4px; cursor: pointer; width: fit-content
+    }
+    .opts:hover {color: #6B7F8E; text-decoration: underline}
+
+    .optsdrop {
+      position: fixed; z-index: 2147483647;
+      display: none; padding: 4px;
+      background: #000; color: #E5EAEC;
+      font: 14px "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      border: 1px solid #37434D; border-radius: 10px;
+      max-height: 240px; max-width: 280px; overflow: auto;
+      box-shadow: 0 4px 20px rgba(0,0,0,.7);
+      scrollbar-width: thin; scrollbar-color: #536471 transparent
+    }
+    .optsitem {
+      padding: 7px 10px; border-radius: 6px;
+      cursor: pointer; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis
+    }
+    .optsitem:hover {background-color: #16181c}
+    .optsitem.sel {color: #1d9bf0; font-weight: 700}
+    .optsempty {padding: 7px 10px; color: #6B7F8E; font-style: italic}
+
     .empty {
       font-style: italic;
       padding: 4px 10px;
@@ -1265,6 +1290,131 @@ window.twitterflagsconfigs = {
         "off": false
       }
     ]
+  },
+  "options": {
+    "responsive_web_account_access_language_lo_banners": [
+      "control",
+      "treatment_1",
+      "treatment_2",
+      "treatment_3",
+      "treatment_4"
+    ],
+    "responsive_web_account_access_language_lo_splash_sidebar": [
+      "control",
+      "treatment_1",
+      "treatment_2",
+      "treatment_3",
+      "treatment_4"
+    ],
+    "responsive_web_use_app_button_variations": [
+      "control",
+      "treatment_1",
+      "treatment_2"
+    ],
+    "subscriptions_inapp_grok_default_mode": [
+      "regular",
+      "fun"
+    ],
+    "rweb_update_fatigue_switch_to_app_link": [
+      "BannerSwitchToApp",
+      "InterstitialSwitchToApp",
+      "NuxAppDownload",
+      "SwitchToAppFooter",
+      "UseApp",
+      "UseAppExtended",
+      "SwitchToAppHigh1",
+      "SwitchToAppHigh2",
+      "SwitchToAppHigh3",
+      "SwitchToAppHigh5",
+      "SwitchToAppHigh7",
+      "SwitchToAppLow1",
+      "SwitchToAppLow3",
+      "SwitchToAppLow5",
+      "SwitchToAppLow7",
+      "SwitchToAppLow9"
+    ],
+    "subscriptions_upsells_premium_home_nav": [
+      "default",
+      "try_premium",
+      "discount_40_percent",
+      "discount_50_percent",
+      "premium_upsell_upgrade",
+      "premium_upsell_premium",
+      "premium_upsell_get_premium",
+      "expiring_soon",
+      "last_chance"
+    ],
+    "subscriptions_upsells_post_engagements_variant": [
+      "direct_to_paywall",
+      "analytics_popup"
+    ],
+    "subscriptions_upsells_vo_nav_decoration_variant": [
+      "30_percent_off",
+      "last_week",
+      "last_day"
+    ],
+    "subscriptions_upsells_right_sidebar_variant": [
+      "choice_step",
+      "free_trial_basic_14_days",
+      "free_trial_premium_14_days",
+      "discount_50_percent",
+      "discount_40_percent",
+      "extended_discount_50_percent",
+      "ending_today_discount_50_percent",
+      "ending_today_discount_40_percent",
+      "thanksgiving_generic",
+      "thanksgiving_expiring",
+      "thanksgiving_ending",
+      "anniversary_generic",
+      "anniversary_expiring",
+      "anniversary_ending"
+    ],
+    "subscriptions_upsells_bookmarks_screen_variant": [
+      "basic_tier_selected",
+      "premium_tier_selected"
+    ],
+    "subscriptions_upsells_explore_sidebar_analytics_upsell_variant": [
+      "variant_a",
+      "variant_b",
+      "variant_c"
+    ],
+    "subscriptions_upsells_longform_sidebar_variant": [
+      "variant_a",
+      "variant_b",
+      "variant_c",
+      "variant_d"
+    ],
+    "subscriptions_upsells_profile_sidebar_analytics_upsell_variant": [
+      "variant_a",
+      "variant_b",
+      "variant_c"
+    ],
+    "subscriptions_upsells_radar_sidebar_variant": [
+      "variant_a",
+      "variant_b",
+      "variant_c",
+      "variant_d",
+      "variant_e",
+      "variant_f",
+      "variant_g",
+      "variant_h"
+    ],
+    "subscriptions_upsells_reply_boost_variant": [
+      "variant_a",
+      "variant_b",
+      "variant_c"
+    ],
+    "subscriptions_upsells_get_verified_button_variant": [
+      "badge",
+      "eu"
+    ],
+    "responsive_web_card_conversion_hoisted": [
+      "off",
+      "legacy"
+    ],
+    "subscriptions_upsells_post_composer_variant": [
+      "alternative"
+    ]
   }
 };
 (function () {
@@ -1527,12 +1677,16 @@ window.twitterflagsconfigs = {
       fsw[name] = function (k) {
         if (typeof k === "string" && hasoverride(k)) {const v = overrides[k]; return name === "isTrue" ? v === true : v}
         const res = orig.apply(this, arguments);
-        // lazily record every flag the client reads (getValue is authoritative);
-        // guarantees the panel fills even if the bulk harvest never finds the map
-        if (typeof k === "string" && res !== undefined && (name === "getValue" || !(k in flags))) {
-          flags[k] = res;
-          if (!captured) {captured = true; if (source === "none") source = "live-read"}
-          schedcapture();
+        // lazily record flags the client reads (getValue is authoritative), but
+        // only re-broadcast when something actually changes - re-reading the same
+        // value must NOT re-render the panel (that was jumping the scroll position)
+        if (typeof k === "string" && res !== undefined) {
+          const fresh = !(k in flags);
+          if (fresh || (name === "getValue" && typeof res !== "object" && flags[k] !== res)) {
+            flags[k] = res;
+            if (!captured) {captured = true; if (source === "none") source = "live-read"}
+            schedcapture();
+          }
         }
         return res;
       };
@@ -2026,7 +2180,7 @@ window.twitterflagsconfigs = {
 
   /*//////////////////////////////////////////////////////////////////////*/
 
-  let knowndesc = {}, dangerknowndesc = {}, switchcfg = {}, upsellflags = [];
+  let knowndesc = {}, dangerknowndesc = {}, switchcfg = {}, upsellflags = [], optionsmap = {};
 
   // minimal jsonc
   function parsejsonc(text) {
@@ -2050,8 +2204,8 @@ window.twitterflagsconfigs = {
         return parsejsonc(await (await fetch(url)).text());
       } catch { return {} }
     };
-    const [desc, switches, upsells] = await Promise.all([get("descriptions.jsonc"), get("switches.jsonc"), get("upsells.jsonc")]);
-    return { desc, switches, upsells };
+    const [desc, switches, upsells, options] = await Promise.all([get("descriptions.jsonc"), get("switches.jsonc"), get("upsells.jsonc"), get("options.jsonc")]);
+    return { desc, switches, upsells, options };
   }
 
   const prefixes = ["responsive_web_", "rweb_", "c9s_"];
@@ -2270,16 +2424,20 @@ window.twitterflagsconfigs = {
       const d = descFor(name);
       if (term && !(name.toLowerCase().includes(term) || d.text.toLowerCase().includes(term))) continue;
       const meta = dangerinfo ? `<div class="meta"><span class="dangerzone">${WARN}<span>${escapehtml(dangerinfo)}</span></span></div>` : "";
+      const opts = typeOf(flags[name]) !== "boolean" ? optionsmap[name] : null;
+      const optsline = (opts && opts.length) ? `<div class="opts" data-name="${escapehtml(name)}">${opts.length} available option${opts.length === 1 ? "" : "s"}</div>` : "";
       const title = d.auto
         ? `<div class="name ident" data-name="${escapehtml(name)}">${escapehtml(name)}</div>`
         : `<div class="name">${escapehtml(d.text)}</div><div class="ident" data-name="${escapehtml(name)}">${escapehtml(name)}</div>`;
       html += `<div class="item${dangerinfo ? " danger" : ""}${mod ? " mod" : ""}">
-      <div class="info">${title}${meta}</div>
+      <div class="info">${title}${meta}${optsline}</div>
       <div class="controls"><button class="reset${mod ? "" : " off"}" data-name="${escapehtml(name)}" title="reset to default" aria-hidden="${!mod}">${UNDO}</button>${control(name)}</div>
     </div>`;
     }
     const note = cached ? `<div class="cachednote">page is asleep or closed, showing last captured flags. changes still save and apply on next page load</div>` : "";
+    const st = list.scrollTop;
     list.innerHTML = note + (html || `<div class="empty center"><div class="face">:(</div><div>no matches</div></div>`);
+    list.scrollTop = st;
   }
 
   /*//////////////////////////////////////////////////////////////////////*/
@@ -2292,8 +2450,65 @@ window.twitterflagsconfigs = {
     markdirty(); persist(); render();
   }
   list.addEventListener("change", e => {const el = e.target.closest(".editfield"); if (el) commit(el)});
-  list.addEventListener("keydown", e => {if (e.key === "Enter") {const el = e.target.closest(".editfield"); 
-  if (el && el.tagName !== "TEXTAREA") {commit(el); e.preventDefault()}}});
+  list.addEventListener("keydown", e => {if (e.key === "Enter") {const el = e.target.closest(".editfield");
+  if (el && el.tagName !== "TEXTAREA") {commit(el); e.preventDefault()}}
+  if (e.key === "Escape") hidedrop()});
+
+  /*//////////////////////////////////////////////////////////////////////*/
+
+  // custom twitter-styled options dropdown for flags with a known value set.
+  // lives at the panel root (not in the scrolling list) so it isn't clipped
+  let drop = null, dropfield = null;
+  function dropparent() { const r = list.getRootNode(); return r.host ? r : document.body }
+  function ensuredrop() {
+    if (drop) return drop;
+    drop = document.createElement("div");
+    drop.className = "optsdrop";
+    drop.addEventListener("mousedown", e => {
+      const it = e.target.closest(".optsitem");
+      if (!it || !dropfield) return;
+      e.preventDefault();
+      dropfield.value = it.getAttribute("data-val");
+      commit(dropfield);
+      hidedrop();
+    });
+    dropparent().appendChild(drop);
+    return drop;
+  }
+  function optsfor(field) { const n = field && field.getAttribute("data-name"); const o = n && optionsmap[n]; return (o && o.length) ? o : null }
+  function filldrop(field, dofilter) {
+    const opts = optsfor(field); if (!opts) return false;
+    const cur = field.value.trim(), curl = cur.toLowerCase();
+    let html = "";
+    for (const o of opts) {
+      const s = String(o);
+      if (dofilter && curl && s.toLowerCase().indexOf(curl) < 0) continue;
+      html += `<div class="optsitem${s === cur ? " sel" : ""}" data-val="${escapehtml(s)}">${escapehtml(s)}</div>`;
+    }
+    ensuredrop().innerHTML = html || `<div class="optsempty">no match</div>`;
+    return true;
+  }
+  function positiondrop(field) {
+    const d = ensuredrop(), r = field.getBoundingClientRect();
+    d.style.left = r.left + "px";
+    d.style.minWidth = r.width + "px";
+    d.style.top = ""; d.style.bottom = "";
+    const room = window.innerHeight - r.bottom;
+    if (d.offsetHeight > room - 8 && r.top > room) d.style.bottom = (window.innerHeight - r.top + 4) + "px";
+    else d.style.top = (r.bottom + 4) + "px";
+  }
+  function showdrop(field) {
+    if (!filldrop(field, false)) { hidedrop(); return }
+    dropfield = field;
+    ensuredrop().style.display = "block";
+    positiondrop(field);
+  }
+  function hidedrop() { if (drop) drop.style.display = "none"; dropfield = null }
+
+  list.addEventListener("focusin", e => {const el = e.target.closest(".editfield"); if (el) showdrop(el)});
+  list.addEventListener("focusout", e => {const el = e.target.closest(".editfield"); if (el) setTimeout(() => {if (list.getRootNode().activeElement !== el) hidedrop()}, 120)});
+  list.addEventListener("input", e => {const el = e.target.closest(".editfield"); if (el && dropfield === el) {filldrop(el, true); positiondrop(el)}});
+  list.addEventListener("scroll", () => {if (dropfield) hidedrop()});
 
   list.addEventListener("click", e => {
     const cb = e.target.closest(".checkbox");
@@ -2309,6 +2524,8 @@ window.twitterflagsconfigs = {
       const n = resetbtn.getAttribute("data-name");
       delete overrides[n]; markdirty(); persist(); send("clear", {name: n}); render(); return
     }
+    const optsel = e.target.closest(".opts");
+    if (optsel) { const it = optsel.closest(".item"); const f = it && it.querySelector(".editfield"); if (f) f.focus(); return }
     const id = e.target.closest(".ident");
 
     if (id) {
@@ -2340,6 +2557,7 @@ window.twitterflagsconfigs = {
     dangerknowndesc = (cfg.desc && cfg.desc.danger) || {};
     switchcfg = cfg.switches || {};
     upsellflags = Object.values(cfg.upsells || {}).filter(Array.isArray).flat();
+    optionsmap = (cfg.options && typeof cfg.options === "object") ? cfg.options : {};
     buildswitches();
     paintchecks();
     refresh();

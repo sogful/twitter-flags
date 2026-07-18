@@ -46,7 +46,8 @@ function parsejsonc(text) {
 const configsrc = "window.twitterflagsconfigs = " + JSON.stringify({
   desc: parsejsonc(rd("configs/descriptions.jsonc")),
   switches: parsejsonc(rd("configs/switches.jsonc")),
-  upsells: parsejsonc(rd("configs/upsells.jsonc"))
+  upsells: parsejsonc(rd("configs/upsells.jsonc")),
+  options: parsejsonc(rd("configs/options.jsonc"))
 }, null, 2) + ";";
 
 let panelsrc = rd("panel.js");

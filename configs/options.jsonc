@@ -1,0 +1,27 @@
+{
+  // flag -> the fixed set of values it accepts (enums / experiment variants).
+  // free-form inputs (urls, ids, uncapped numbers, durations) are left out.
+  // shown as "N available options" + a dropdown when the value field is focused.
+  // values verified from the client's variantConfig framework (variant keys =
+  // accepted values) and getStringValue comparisons. variant flags default to ""
+  // (no variant); clear the field to get that.
+
+  "responsive_web_account_access_language_lo_banners": ["control", "treatment_1", "treatment_2", "treatment_3", "treatment_4"],
+  "responsive_web_account_access_language_lo_splash_sidebar": ["control", "treatment_1", "treatment_2", "treatment_3", "treatment_4"],
+  "responsive_web_use_app_button_variations": ["control", "treatment_1", "treatment_2"],
+  "subscriptions_inapp_grok_default_mode": ["regular", "fun"],
+  "rweb_update_fatigue_switch_to_app_link": ["BannerSwitchToApp", "InterstitialSwitchToApp", "NuxAppDownload", "SwitchToAppFooter", "UseApp", "UseAppExtended", "SwitchToAppHigh1", "SwitchToAppHigh2", "SwitchToAppHigh3", "SwitchToAppHigh5", "SwitchToAppHigh7", "SwitchToAppLow1", "SwitchToAppLow3", "SwitchToAppLow5", "SwitchToAppLow7", "SwitchToAppLow9"],
+  "subscriptions_upsells_premium_home_nav": ["default", "try_premium", "discount_40_percent", "discount_50_percent", "premium_upsell_upgrade", "premium_upsell_premium", "premium_upsell_get_premium", "expiring_soon", "last_chance"],
+  "subscriptions_upsells_post_engagements_variant": ["direct_to_paywall", "analytics_popup"],
+  "subscriptions_upsells_vo_nav_decoration_variant": ["30_percent_off", "last_week", "last_day"],
+  "subscriptions_upsells_right_sidebar_variant": ["choice_step", "free_trial_basic_14_days", "free_trial_premium_14_days", "discount_50_percent", "discount_40_percent", "extended_discount_50_percent", "ending_today_discount_50_percent", "ending_today_discount_40_percent", "thanksgiving_generic", "thanksgiving_expiring", "thanksgiving_ending", "anniversary_generic", "anniversary_expiring", "anniversary_ending"],
+  "subscriptions_upsells_bookmarks_screen_variant": ["basic_tier_selected", "premium_tier_selected"],
+  "subscriptions_upsells_explore_sidebar_analytics_upsell_variant": ["variant_a", "variant_b", "variant_c"],
+  "subscriptions_upsells_longform_sidebar_variant": ["variant_a", "variant_b", "variant_c", "variant_d"],
+  "subscriptions_upsells_profile_sidebar_analytics_upsell_variant": ["variant_a", "variant_b", "variant_c"],
+  "subscriptions_upsells_radar_sidebar_variant": ["variant_a", "variant_b", "variant_c", "variant_d", "variant_e", "variant_f", "variant_g", "variant_h"],
+  "subscriptions_upsells_reply_boost_variant": ["variant_a", "variant_b", "variant_c"],
+  "subscriptions_upsells_get_verified_button_variant": ["badge", "eu"],
+  "responsive_web_card_conversion_hoisted": ["off", "legacy"],
+  "subscriptions_upsells_post_composer_variant": ["alternative"]
+}

@@ -258,12 +258,16 @@
       fsw[name] = function (k) {
         if (typeof k === "string" && hasoverride(k)) {const v = overrides[k]; return name === "isTrue" ? v === true : v}
         const res = orig.apply(this, arguments);
-        // lazily record every flag the client reads (getValue is authoritative);
-        // guarantees the panel fills even if the bulk harvest never finds the map
-        if (typeof k === "string" && res !== undefined && (name === "getValue" || !(k in flags))) {
-          flags[k] = res;
-          if (!captured) {captured = true; if (source === "none") source = "live-read"}
-          schedcapture();
+        // lazily record flags the client reads (getValue is authoritative), but
+        // only re-broadcast when something actually changes - re-reading the same
+        // value must NOT re-render the panel (that was jumping the scroll position)
+        if (typeof k === "string" && res !== undefined) {
+          const fresh = !(k in flags);
+          if (fresh || (name === "getValue" && typeof res !== "object" && flags[k] !== res)) {
+            flags[k] = res;
+            if (!captured) {captured = true; if (source === "none") source = "live-read"}
+            schedcapture();
+          }
         }
         return res;
       };

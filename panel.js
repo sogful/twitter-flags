@@ -78,6 +78,7 @@
     if (Object.keys(incoming).length) flags = Object.assign(flags, incoming);
     source = p.source || source; overrides = p.overrides || {}; status = p.status || {};
     applied = p.applied || {}; markdirty();
+    if (p.theme) applytheme(p.theme);
     rafrender();
   }
 
@@ -227,6 +228,10 @@
   const header = query(".header"), footer = query(".footer"), reload = query(".reload"), undo = query(".undo");
   const flagcount = query(".flagcount");
   const panel = header.parentNode;
+  function applytheme(t) {
+    const root = query(".tfpanelwrap") || document.body;
+    if (root) root.classList.toggle("light", t === "light");
+  }
 
   const TICK = '<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9.64 18.952l-5.55-4.861 1.317-1.504 3.951 3.459 8.459-10.948L19.4 6.32 9.64 18.952z"></path></g></svg>';
   const WARN = '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M10.5 17a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0m1.5-3 1 .2.3-5.7h-2.6l.3 5.7zm10.6 6.7q.6-1.2 0-2.5L14.2 3.7q-.8-1.1-2.2-1.2c-1.4-.1-1.7.5-2.2 1.2L1.4 18.2q-.6 1.3 0 2.5.8 1.3 2.2 1.3h16.8q1.5 0 2.2-1.3m-10.2-16 8.4 14.6q.1.3 0 .4 0 .2-.4.3H3.6l-.4-.3q-.1 0 0-.4l8.4-14.6.4-.2z"/></svg>';

@@ -138,8 +138,7 @@
       }
       let s = document.getElementById("tf-chirp-force");
       if (!s) { s = document.createElement("style"); s.id = "tf-chirp-force"; (document.head || document.documentElement).appendChild(s) }
-      s.textContent = "*, ::before, ::after { font-family: " + stack + " !important }";
-      log("reapplied + forced TwitterChirp onto the page");
+      s.textContent = "*, ::before, ::after {font-family: " + stack + " !important}";
     } catch (e) {log("reapplychirp error:", e && e.message)}
   }
 
@@ -159,7 +158,7 @@
       if (!type) return;
       if (sw.controller) {sw.controller.postMessage({type}); log("sent", type)}
       else log("no active service worker controller");
-    } catch (e) {log("sw action failed:", e && e.message)}
+    } catch (e) {log("sw action failed?! ", e && e.message)}
   }
 
   window.addEventListener("message", e => {

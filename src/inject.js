@@ -172,7 +172,7 @@
       return osend.apply(this, arguments);
     };
     xhrhooked = true;
-  } catch (e) { log("could not hook xhr:", e && e.message) }
+  } catch (e) { log("couldn't hook xhr:", e && e.message) }
 
   /*//////////////////////////////////////////////////////////////////////*/
 
@@ -388,9 +388,47 @@
 
   const PCHAN = "twitterflagspage", UCHAN = "twitterflagspanel";
 
+  // slightly complex theme detection
+  function tfrgb(str) {
+    const m = /rgba?\(([^)]+)\)/.exec(str || "");
+    if (!m) return null;
+    const p = m[1].split(",").map(x => parseFloat(x));
+    if (p.length < 3) return null;
+    if (p.length >= 4 && p[3] === 0) return null;
+    return [p[0] || 0, p[1] || 0, p[2] || 0];
+  }
+  function tfhex(h) {
+    const m = /^#?([0-9a-f]{6})$/i.exec((h || "").trim());
+    if (!m) return null;
+    const n = parseInt(m[1], 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  function tflum(rgb) {
+    const c = rgb.map(v => {v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)});
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  }
+  function detecttheme() {
+    try {
+      let bg = document.body && tfrgb(getComputedStyle(document.body).backgroundColor);
+      if (!bg && document.documentElement) bg = tfrgb(getComputedStyle(document.documentElement).backgroundColor);
+      if (!bg) {const m = document.querySelector('meta[name="theme-color"]'); if (m) bg = tfhex(m.getAttribute("content"))}
+      if (!bg) return null;
+      return tflum(bg) > 0.5 ? "light" : "dark";
+    } catch {return null}
+  }
+  let lasttheme = detecttheme();
+  function themewatch() {const t = detecttheme(); if (t && t !== lasttheme) {lasttheme = t; if (onchange) onchange()}}
+  try {
+    const mo = new MutationObserver(themewatch);
+    const obs = () => {try {mo.observe(document.documentElement, {attributes: true, attributeFilter: ["style", "class"]}); if (document.body) mo.observe(document.body, {attributes: true, attributeFilter: ["style", "class"]})} catch {}};
+    obs();
+    if (!document.body) document.addEventListener("DOMContentLoaded", () => {obs(); themewatch()}, {once: true});
+  } catch {}
+
   function snapshot() {
     return {
       captured, source, dirty, flags, overrides,
+      theme: lasttheme || detecttheme(),
       applied: appliedoverrides,
       status: {count: Object.keys(flags).length, isInstalled, manInstalled, fetchhooked, xhrhooked}
     };

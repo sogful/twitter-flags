@@ -1,524 +1,537 @@
-    :root {color-scheme: dark}
-    * {box-sizing: border-box}
+body, .tfpanelwrap {
+  color-scheme: dark;
+  --bg: #000; --text: #E5EAEC;
+  --muted: #6B7F8E; --border: #242E36;
+  --fieldborder: #37434D; --raised: #16181c;
+  --hover: rgba(239,243,244,.1)
+}
+body.light, .tfpanelwrap.light {
+  color-scheme: light;
+  --bg: #fff; --text: #0f1419;
+  --muted: #536471; --border: #eff3f4;
+  --fieldborder: #cfd9de; --raised: #f7f9f9;
+  --hover: rgba(15,20,25,.1)
+}
 
-    @font-face {font-family: "Chirp"; font-weight: 400; font-display: swap; src: url("fonts/chirp.woff2") format("woff2")}
-    @font-face {font-family: "Chirp"; font-weight: 700; font-display: swap; src: url("fonts/chirpbold.woff2") format("woff2")}
-    @font-face {font-family: "Chirp"; font-weight: 800; font-display: swap; src: url("fonts/chirpheavy.woff2") format("woff2")}
+/*//////////////////////////////////////////////////////////////////////*/
 
-    html, body {
-      margin: 0;
-      height: 100%
-    }
+@font-face {font-family: "Chirp"; font-weight: 400; font-display: swap; src: url("fonts/chirp.woff2") format("woff2")}
+@font-face {font-family: "Chirp"; font-weight: 700; font-display: swap; src: url("fonts/chirpbold.woff2") format("woff2")}
+@font-face {font-family: "Chirp"; font-weight: 800; font-display: swap; src: url("fonts/chirpheavy.woff2") format("woff2")}
 
-    body {
-      background-color: #000; color: #E5EAEC;
-      font: 14px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-      display: flex; flex-direction: column;
-      overflow: hidden; user-select: none;
-    }
+html, body {margin: 0; height: 100%}
+:root {color-scheme: dark}
+* {box-sizing: border-box}
 
-    .header {
-      padding: 12px 14px;
-      border-bottom: 1px solid #242E36;
-      display: flex; flex-direction: column;
-      gap: 10px; flex-shrink: 0
-    }
 
-    /*//////////////////////////////////////////////////////////////////////*/
+body {
+  background-color: var(--bg); color: var(--text);
+  font: 14px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  display: flex; flex-direction: column;
+  overflow: hidden; user-select: none;
+}
 
-    .row1 {
-      display: flex; gap: 8px;
-      align-items: center
-    }
+.header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  gap: 10px; flex-shrink: 0
+}
 
-    .button {
-      background-color: #242E36; color: #E5EAEC;
-      border: none; cursor: pointer;
-      border-radius: 999px; padding: 8px 16px;
-      font: 700 14px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
+/*//////////////////////////////////////////////////////////////////////*/
 
-    .button.hot {
-      background-color: #1d9bf0;
-      color: #fff
-    }
+.row1 {
+  display: flex; gap: 8px;
+  align-items: center
+}
 
-    .search, .prefixfield {
-      background: black; color: #E5EAEC;
-      border: 1px solid #37434D;
-      border-radius: 999px; padding: 9px 14px;
-      font: 14px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    .searchbox {
-      position: relative; display: flex; flex: 1;
-      min-width: 0; align-items: center
-    }
-    .searchicon {
-      position: absolute;
-      left: 13px; width: 18px; height: 18px;
-      fill: #6B7F8E; pointer-events: none}
-    .search {width: 100%; min-width: 0; padding-left: 38px}
-    .prefixfield {
-      cursor: pointer; flex-shrink: 0;
-      max-width: 44%; display: flex; align-items: center;
-      padding-right: 34px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236B7F8E'%3E%3Cpath d='M3.543 8.96l1.414-1.42L12 14.59l7.043-7.05 1.414 1.42L12 17.41 3.543 8.96z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      background-size: 16px
-    }
-    .prefixlabel {overflow: hidden; text-overflow: ellipsis; white-space: nowrap}
-    .search::placeholder {color: #6B7F8E}
-    .search:focus, .prefixfield:focus {outline: none; border-color: #1d9bf0}
+.button {
+  background-color: var(--border); color: var(--text);
+  border: none; cursor: pointer;
+  border-radius: 999px; padding: 8px 16px;
+  font: 700 14px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
 
-    .row2 {
-      display: flex;
-      gap: 14px;
-      align-items: center;
-      color: #6B7F8E;
-      font-size: 13px;
-      flex-wrap: wrap
-    }
+.button.hot {
+  background-color: #1d9bf0;
+  color: #fff
+}
 
-    .row2 label {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-      cursor: pointer
-    }
-    .row2.filters {gap: 8px}
+.search, .prefixfield {
+  background: var(--bg); color: var(--text);
+  border: 1px solid var(--fieldborder);
+  border-radius: 999px; padding: 9px 14px;
+  font: 14px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+.searchbox {
+  position: relative; display: flex; flex: 1;
+  min-width: 0; align-items: center
+}
+.searchicon {
+  position: absolute;
+  left: 13px; width: 18px; height: 18px;
+  fill: var(--muted); pointer-events: none}
+.search {width: 100%; min-width: 0; padding-left: 38px}
+.prefixfield {
+  cursor: pointer; flex-shrink: 0;
+  max-width: 44%; display: flex; align-items: center;
+  padding-right: 34px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236B7F8E'%3E%3Cpath d='M3.543 8.96l1.414-1.42L12 14.59l7.043-7.05 1.414 1.42L12 17.41 3.543 8.96z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px
+}
+.prefixlabel {overflow: hidden; text-overflow: ellipsis; white-space: nowrap}
+.search::placeholder {color: var(--muted)}
+.search:focus, .prefixfield:focus {outline: none; border-color: #1d9bf0}
 
-    /*//////////////////////////////////////////////////////////////////////*/
+.row2 {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 13px;
+  flex-wrap: wrap
+}
 
-    .fswitch {
-      position: relative; display: inline-flex;
-      background: black; border-radius: 999px;
-      padding: 2px; flex-shrink: 0
-    }
-    .fhandle {
-      position: absolute; top: 2px; bottom: 2px;
-      left: 0; width: 0; z-index: 0;
-      border-radius: 999px; background-color: #6B7F8E;
-      transition: left .2s ease, width .2s ease, background-color .2s ease
-    }
-    .fseg {
-      position: relative; z-index: 1;
-      border: none; background: none; cursor: pointer;
-      color: #6B7F8E; padding: 4px 9px;
-      border-radius: 999px; font-size: 11px;
-      display: inline-flex; align-items: center; gap: 3px;
-      white-space: nowrap; transition: color .15s ease;
-      font-family: inherit
-    }
-    .fseg.on {color: #fff}
-    .fseg.on .fseglbl {font-weight: 700}
-    .fseg .fico {display: inline-flex; width: 12px; height: 12px}
-    .fseg .fico svg {width: 12px; height: 12px}
-    /* reserve the bold width so selecting a segment never shifts the layout */
-    .fseglbl {display: inline-grid}
-    .fseglbl::after {content: attr(data-label); font-weight: 700; height: 0; visibility: hidden}
-    .fseglbl, .fseglbl::after {grid-area: 1 / 1}
+.row2 label {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  cursor: pointer
+}
+.row2.filters {gap: 8px}
 
-    .note {
-      margin-left: auto;
-      color: #6B7F8E;
-      font-size: 12px
-    }
+/*//////////////////////////////////////////////////////////////////////*/
 
-    .bulk {
-      display: flex; gap: 8px;
-      align-items: center; flex-wrap: wrap
-    }
-    .flagcount {color: #6B7F8E; font-size: 12px}
-    .bulkbtn {
-      background: transparent; color: #E5EAEC;
-      border: 1px solid #6B7F8E; cursor: pointer;
-      border-radius: 999px; padding: 3px 10px;
-      font: 700 12px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    .bulkbtn:hover {background-color: rgba(239,243,244,.1)}
-    .bulkbtn.danger {color: #f4212e; border-color: #f4212e}
-    .bulkbtn.danger:hover {background-color: rgba(244,33,46,.1)}
+.fswitch {
+  position: relative; display: inline-flex;
+  background: var(--bg); border-radius: 999px;
+  padding: 2px; flex-shrink: 0
+}
+.fhandle {
+  position: absolute; top: 2px; bottom: 2px;
+  left: 0; width: 0; z-index: 0;
+  border-radius: 999px; background-color: var(--muted);
+  transition: left .2s ease, width .2s ease, background-color .2s ease
+}
+.fseg {
+  position: relative; z-index: 1;
+  border: none; background: none; cursor: pointer;
+  color: var(--muted); padding: 4px 9px;
+  border-radius: 999px; font-size: 11px;
+  display: inline-flex; align-items: center; gap: 3px;
+  white-space: nowrap; transition: color .15s ease;
+  font-family: inherit
+}
+.fseg.on {color: #fff}
+.fseg.on .fseglbl {font-weight: 700}
+.fseg .fico {display: inline-flex; width: 12px; height: 12px}
+.fseg .fico svg {width: 12px; height: 12px}
+.fseglbl {display: inline-grid}
+.fseglbl::after {content: attr(data-label); font-weight: 700; height: 0; visibility: hidden}
+.fseglbl, .fseglbl::after {grid-area: 1 / 1}
 
-    .tfmodal {
-      position: absolute; inset: 0; z-index: 20;
-      display: flex; align-items: center; justify-content: center;
-      padding: 24px; background: rgba(0,0,0,.6)
-    }
-    .tfmodalcard {
-      width: 100%; max-width: 300px;
-      background: #000; border: 1px solid #37434D;
-      border-radius: 16px; padding: 20px
-    }
-    .tfmodaltext {
-      color: #E5EAEC; font-size: 15px;
-      line-height: 1.4; margin-bottom: 18px
-    }
-    .tfmodalbtns {
-      display: flex; gap: 10px;
-      justify-content: flex-end; flex-wrap: wrap
-    }
-    .tfmodalbtn {
-      background: transparent; color: #E5EAEC;
-      border: 1px solid #6B7F8E; cursor: pointer;
-      border-radius: 999px; padding: 7px 16px;
-      font: 700 14px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    .tfmodalbtn.cancel:hover {background-color: rgba(239,243,244,.1)}
-    .tfmodalbtn.danger {
-      background-color: #f4212e; color: #fff;
-      border-color: #f4212e
-    }
-    .tfmodalbtn.danger:hover {background-color: #dc1e2a}
+.note {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px
+}
 
-    .isolationbar {
-      padding: 12px 14px; flex-shrink: 0;
-      border-bottom: 1px solid #242E36;
-      background-color: black
-    }
-    .isolationbar[hidden] {display: none}
-    .isotitle {
-      color: #E5EAEC; font-weight: 800;
-      font-size: 14px; margin-bottom: 4px
-    }
-    .isotext {
-      color: #6B7F8E; font-size: 13px;
-      line-height: 1.35; margin-bottom: 10px
-    }
-    .isoflag {
-      color: #E5EAEC; font-weight: 700;
-      word-break: break-all
-    }
-    .isobtns {display: flex; gap: 8px; flex-wrap: wrap}
-    .isobtn {
-      background: transparent; color: #E5EAEC;
-      border: 1px solid #6B7F8E; cursor: pointer;
-      border-radius: 999px; padding: 5px 12px;
-      font: 700 12px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    .isobtn:hover {background-color: rgba(239,243,244,.1)}
-    .isobtn.ok {color: #00ba7c; border-color: #00ba7c}
-    .isobtn.danger {color: #f4212e; border-color: #f4212e}
+.bulk {
+  display: flex; gap: 8px;
+  align-items: center; flex-wrap: wrap
+}
+.flagcount {color: var(--muted); font-size: 12px}
+.bulkbtn {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--muted); cursor: pointer;
+  border-radius: 999px; padding: 3px 10px;
+  font: 700 12px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+.bulkbtn:hover {background-color: var(--hover)}
+.bulkbtn.danger {color: #f4212e; border-color: #f4212e}
+.bulkbtn.danger:hover {background-color: rgba(244,33,46,.1)}
 
-    .flagrow {
-      display: flex; gap: 10px;
-      align-items: baseline; flex-wrap: wrap;
-      margin-top: -2px
-    }
-    .saveall {
-      color: #1d9bf0; font-size: 12px;
-      cursor: pointer
-    }
-    .saveall:hover {text-decoration: underline}
-    .histbtns {
-      display: inline-flex; gap: 2px;
-      margin-left: auto
-    }
-    .histbtn {
-      background: transparent; border: none; cursor: pointer;
-      padding: 2px; border-radius: 999px;
-      display: inline-flex
-    }
-    .histbtn svg {width: 17px; height: 17px; fill: #6B7F8E}
-    .histbtn:hover:not(:disabled) {background-color: rgba(239,243,244,.1)}
-    .histbtn:hover:not(:disabled) svg {fill: #E5EAEC}
-    .histbtn:disabled {cursor: default; opacity: .35}
+.tfmodal {
+  position: absolute; inset: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px; background: rgba(0,0,0,.6)
+}
+.tfmodalcard {
+  width: 100%; max-width: 300px;
+  background: var(--bg); border: 1px solid var(--fieldborder);
+  border-radius: 16px; padding: 20px
+}
+.tfmodaltext {
+  color: var(--text); font-size: 15px;
+  line-height: 1.4; margin-bottom: 18px
+}
+.tfmodalbtns {
+  display: flex; gap: 10px;
+  justify-content: flex-end; flex-wrap: wrap
+}
+.tfmodalbtn {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--muted); cursor: pointer;
+  border-radius: 999px; padding: 7px 16px;
+  font: 700 14px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+.tfmodalbtn.cancel:hover {background-color: var(--hover)}
+.tfmodalbtn.danger {
+  background-color: #f4212e; color: #fff;
+  border-color: #f4212e
+}
+.tfmodalbtn.danger:hover {background-color: #dc1e2a}
 
-    .newpill {
-      display: inline-block; vertical-align: middle;
-      background: #1d9bf0; color: #fff;
-      font-size: 9px; font-weight: 700;
-      padding: 1px 5px; border-radius: 999px;
-      margin-right: 6px; letter-spacing: .3px;
-      text-transform: uppercase;
-      user-select: none; -webkit-user-select: none
-    }
+.isolationbar {
+  padding: 12px 14px; flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--bg)
+}
+.isolationbar[hidden] {display: none}
+.isotitle {
+  color: var(--text); font-weight: 800;
+  font-size: 14px; margin-bottom: 4px
+}
+.isotext {
+  color: var(--muted); font-size: 13px;
+  line-height: 1.35; margin-bottom: 10px
+}
+.isoflag {
+  color: var(--text); font-weight: 700;
+  word-break: break-all
+}
+.isobtns {display: flex; gap: 8px; flex-wrap: wrap}
+.isobtn {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--muted); cursor: pointer;
+  border-radius: 999px; padding: 5px 12px;
+  font: 700 12px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+.isobtn:hover {background-color: var(--hover)}
+.isobtn.ok {color: #00ba7c; border-color: #00ba7c}
+.isobtn.danger {color: #f4212e; border-color: #f4212e}
 
-    /*//////////////////////////////////////////////////////////////////////*/
-    
-    .presetbar {
-      padding: 12px 14px; flex-shrink: 0;
-      border-bottom: 1px solid #242E36;
-      background-color: black
-    }
-    .presetbar[hidden] {display: none}
-    .presettitle {
-      color: #E5EAEC; font-weight: 800;
-      font-size: 14px; margin-bottom: 8px
-    }
-    .presetchips {
-      display: flex; gap: 6px;
-      flex-wrap: wrap; margin-bottom: 10px
-    }
-    .presetchip {
-      display: inline-flex; align-items: center; gap: 3px;
-      background: #242E36; color: #E5EAEC;
-      border: none; border-radius: 999px;
-      padding: 4px 6px 4px 11px; cursor: pointer;
-      font: 700 12px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    .presetchip:hover {background-color: #37434D}
-    .presetdel {
-      display: inline-flex; padding: 0;
-      background: transparent; border: none;
-      cursor: pointer; border-radius: 999px
-    }
-    .presetdel svg {width: 14px; height: 14px; fill: #6B7F8E}
-    .presetdel:hover svg {fill: #f4212e}
-    .presetempty {color: #6B7F8E; font-size: 12px}
-    .presetsave {display: flex; gap: 8px; flex-wrap: wrap}
-    .presetname {
-      flex: 1; min-width: 120px;
-      background: black; color: #E5EAEC;
-      border: 1px solid #37434D; border-radius: 999px;
-      padding: 6px 12px;
-      font: 13px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    .presetname:focus {outline: none; border-color: #1d9bf0}
+.flagrow {
+  display: flex; gap: 10px;
+  align-items: baseline; flex-wrap: wrap;
+  margin-top: -2px
+}
+.saveall {
+  color: #1d9bf0; font-size: 12px;
+  cursor: pointer
+}
+.saveall:hover {text-decoration: underline}
+.histbtns {
+  display: inline-flex; gap: 2px;
+  margin-left: auto
+}
+.histbtn {
+  background: transparent; border: none; cursor: pointer;
+  padding: 2px; border-radius: 999px;
+  display: inline-flex
+}
+.histbtn svg {width: 17px; height: 17px; fill: var(--muted)}
+.histbtn:hover:not(:disabled) {background-color: var(--hover)}
+.histbtn:hover:not(:disabled) svg {fill: var(--text)}
+.histbtn:disabled {cursor: default; opacity: .35}
 
-    .synctoggle {
-      display: flex; align-items: center;
-      gap: 5px; cursor: pointer;
-      color: #6B7F8E; font-size: 11px;
-      margin-top: 2px
-    }
-    .synctoggle[hidden] {display: none}
-    .synctoggle .checkbox {
-      width: 15px; height: 15px;
-      border-width: 1.5px; border-radius: 3px
-    }
-    .synctoggle .checkbox .tick {width: 15px; height: 15px}
+.newpill {
+  display: inline-block; vertical-align: middle;
+  background: #1d9bf0; color: #fff;
+  font-size: 9px; font-weight: 700;
+  padding: 1px 5px; border-radius: 999px;
+  margin-right: 6px; letter-spacing: .3px;
+  text-transform: uppercase;
+  user-select: none; -webkit-user-select: none
+}
 
-    /*//////////////////////////////////////////////////////////////////////*/
+/*//////////////////////////////////////////////////////////////////////*/
 
-    .devbar {
-      flex-shrink: 0;
-      padding: 10px 14px;
-      border-top: 1px solid #242E36;
-      display: flex; flex-direction: column; gap: 8px
-    }
-    .row2.dev {
-      font-size: 9.75px; gap: 10.5px
-    }
-    .row2.dev label {gap: 3.75px}
-    .row2.swrow {gap: 6px}
-    .swbtn {
-      background: transparent; color: #E5EAEC;
-      border: 1px solid #6B7F8E; cursor: pointer;
-      border-radius: 999px; padding: 3px 10px;
-      font: 700 10.5px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    .swbtn:hover {background-color: rgba(239,243,244,.1)}
-    .row2.swrow .checklabel {font-size: 11px; gap: 4px}
-    .row2.swrow .checkbox {
-      width: 15px; height: 15px;
-      border-width: 1.5px; border-radius: 3px
-    }
-    .row2.swrow .checkbox .tick {width: 15px; height: 15px}
-    .row2.dev .checkbox {
-      width: 15px; height: 15px;
-      border-width: 1.5px; border-radius: 3px
-    }
-    .row2.dev .checkbox .tick {width: 15px; height: 15px}
+.presetbar {
+  padding: 12px 14px; flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--bg)
+}
+.presetbar[hidden] {display: none}
+.presettitle {
+  color: var(--text); font-weight: 800;
+  font-size: 14px; margin-bottom: 8px
+}
+.presetchips {
+  display: flex; gap: 6px;
+  flex-wrap: wrap; margin-bottom: 10px
+}
+.presetchip {
+  display: inline-flex; align-items: center; gap: 3px;
+  background: var(--border); color: var(--text);
+  border: none; border-radius: 999px;
+  padding: 4px 6px 4px 11px; cursor: pointer;
+  font: 700 12px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+.presetchip:hover {background-color: var(--fieldborder)}
+.presetdel {
+  display: inline-flex; padding: 0;
+  background: transparent; border: none;
+  cursor: pointer; border-radius: 999px
+}
+.presetdel svg {width: 14px; height: 14px; fill: var(--muted)}
+.presetdel:hover svg {fill: #f4212e}
+.presetempty {color: var(--muted); font-size: 12px}
+.presetsave {display: flex; gap: 8px; flex-wrap: wrap}
+.presetname {
+  flex: 1; min-width: 120px;
+  background: var(--bg); color: var(--text);
+  border: 1px solid var(--fieldborder); border-radius: 999px;
+  padding: 6px 12px;
+  font: 13px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+.presetname:focus {outline: none; border-color: #1d9bf0}
 
-    /*//////////////////////////////////////////////////////////////////////*/
+.synctoggle {
+  display: flex; align-items: center;
+  gap: 5px; cursor: pointer;
+  color: var(--muted); font-size: 11px;
+  margin-top: 2px
+}
+.synctoggle[hidden] {display: none}
+.synctoggle .checkbox {
+  width: 15px; height: 15px;
+  border-width: 1.5px; border-radius: 3px
+}
+.synctoggle .checkbox .tick {width: 15px; height: 15px}
 
-    .footer {
-      display: flex; gap: 10px;
-      align-items: center;
-      padding: 0 14px; max-height: 0;
-      overflow: hidden; flex-shrink: 0;
-      background-color: #1d9bf0;
-      transition: max-height 0.22s ease, padding 0.22s ease
-    }
-    .footer.show {max-height: 80px; padding: 10px 14px}
-    .footer .button {background-color: white; color: black}
-    .footer .button.undo {background-color: red; color: white}
-    .footer .button.undo:hover {background-color: #f4212e}
+/*//////////////////////////////////////////////////////////////////////*/
 
-    .footermessage {flex: 1; color: white}
+.devbar {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 8px
+}
+.row2.dev {
+  font-size: 9.75px; gap: 10.5px
+}
+.row2.dev label {gap: 3.75px}
+.row2.swrow {gap: 6px}
+.swbtn {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--muted); cursor: pointer;
+  border-radius: 999px; padding: 3px 10px;
+  font: 700 10.5px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+.swbtn:hover {background-color: var(--hover)}
+.row2.swrow .checklabel {font-size: 11px; gap: 4px}
+.row2.swrow .checkbox {
+  width: 15px; height: 15px;
+  border-width: 1.5px; border-radius: 3px
+}
+.row2.swrow .checkbox .tick {width: 15px; height: 15px}
+.row2.dev .checkbox {
+  width: 15px; height: 15px;
+  border-width: 1.5px; border-radius: 3px
+}
+.row2.dev .checkbox .tick {width: 15px; height: 15px}
 
-    /*//////////////////////////////////////////////////////////////////////*/
+/*//////////////////////////////////////////////////////////////////////*/
 
-    .list {
-      overflow: auto;
-      padding: 4px 0; flex: 1;
-      scrollbar-width: thin; scrollbar-color: #6B7F8E transparent
-    }
-    .list::-webkit-scrollbar {width: 8px}
-    .list::-webkit-scrollbar-track {background: transparent}
-    .list::-webkit-scrollbar-thumb {background-color: #6B7F8E; border-radius: 999px;
-      border: 2px solid transparent; background-clip: padding-box;
-      min-height: 20px; max-height: 120px}
-    .list::-webkit-scrollbar-thumb:hover {background-color: #8b98a4}
+.footer {
+  display: flex; gap: 10px;
+  align-items: center;
+  padding: 0 14px; max-height: 0;
+  overflow: hidden; flex-shrink: 0;
+  background-color: #1d9bf0;
+  transition: max-height 0.22s ease, padding 0.22s ease
+}
+.footer.show {max-height: 80px; padding: 10px 14px}
+.footer .button {background-color: white; color: black}
+.footer .button.undo {background-color: red; color: white}
+.footer .button.undo:hover {background-color: #f4212e}
 
-    .item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 12px 14px;
-      border-bottom: 1px solid #242E36;
-      content-visibility: auto; contain-intrinsic-size: auto 46px
-    }
-    .item.danger {background: rgba(244, 33, 46, .10)}
-    .item.mod {position: relative}
-    .item.mod::before {content: ""; position: absolute;
-      left: 5px; top: 12px; bottom: 12px; width: 4px;
-      border-radius: 999px; background-color: #1d9bf0}
-    .item.mod.danger::before {background-color: #f4212e}
+.footermessage {flex: 1; color: white}
 
-    .info {flex: 1; min-width: 0}
+/*//////////////////////////////////////////////////////////////////////*/
 
-    .name {
-      font-weight: 700;
-      word-break: break-word
-    }
+.list {
+  overflow: auto;
+  padding: 4px 0; flex: 1;
+  scrollbar-width: thin; scrollbar-color: var(--muted) transparent
+}
+.list::-webkit-scrollbar {width: 8px}
+.list::-webkit-scrollbar-track {background: transparent}
+.list::-webkit-scrollbar-thumb {background-color: var(--muted); border-radius: 999px;
+  border: 2px solid transparent; background-clip: padding-box;
+  min-height: 20px; max-height: 120px}
+.list::-webkit-scrollbar-thumb:hover {background-color: #8b98a4}
 
-    .controls {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      flex-shrink: 0
-    }
+.item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  content-visibility: auto; contain-intrinsic-size: auto 46px
+}
+.item.danger {background: rgba(244, 33, 46, .10)}
+.item.mod {position: relative}
+.item.mod::before {content: ""; position: absolute;
+  left: 5px; top: 12px; bottom: 12px; width: 4px;
+  border-radius: 999px; background-color: #1d9bf0}
+.item.mod.danger::before {background-color: #f4212e}
 
-    /*//////////////////////////////////////////////////////////////////////*/
+.info {flex: 1; min-width: 0}
 
-    .editfield {
-      background: black; color: #E5EAEC;
-      border: 1px solid #37434D; border-radius: 8px;
-      padding: 6px 9px; width: 150px;
-      font: 13px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      white-space: pre-wrap; word-break: break-word;
-      resize: none; field-sizing: content; max-height: 160px; overflow: auto
-    }
-    .editfield:focus {outline: none; border-color: #1d9bf0}
-    .editfield.num {width: 90px; field-sizing: auto}
+.name {
+  font-weight: 700;
+  word-break: break-word
+}
 
-    .checkbox {
-      box-sizing: border-box; display: inline-flex;
-      align-items: center; justify-content: center;
-      width: 20px; height: 20px;
-      border: 2px solid #6B7F8E;
-      border-radius: 4px; cursor: pointer;
-      flex-shrink: 0; background: transparent
-    }
-    .checkbox .tick {
-      width: 20px;
-      height: 20px;
-      fill: #fff;
-      display: none
-    }
-    .checkbox.on {
-      background-color: #1d9bf0;
-      border-color: #1d9bf0
-    }
-    .checkbox.on .tick {
-      display: block
-    }
-    .item.danger .checkbox.on {
-      background-color: #f4212e;
-      border-color: #f4212e
-    }
+.controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0
+}
 
-    .reset {
-      background: none; border: none; cursor: pointer;
-      color: #1d9bf0; padding: 0;
-      width: 20px; height: 20px;
-      display: inline-flex; align-items: center; justify-content: center
-    }
-    .reset svg {width: 18px; height: 18px; fill: currentColor}
-    .item.danger .reset {color: #f4212e}
-    .reset.off {visibility: hidden; pointer-events: none}
+/*//////////////////////////////////////////////////////////////////////*/
 
-    /*//////////////////////////////////////////////////////////////////////*/
+.editfield {
+  background: var(--bg); color: var(--text);
+  border: 1px solid var(--fieldborder); border-radius: 8px;
+  padding: 6px 9px; width: 150px;
+  font: 13px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  white-space: pre-wrap; word-break: break-word;
+  resize: none; field-sizing: content; max-height: 160px; overflow: auto
+}
+.editfield:focus {outline: none; border-color: #1d9bf0}
+.editfield.num {width: 90px; field-sizing: auto}
 
-    .meta {
-      color: #6B7F8E;
-      margin-top: 4px;
-      font-size: 12px
-    }
+.checkbox {
+  box-sizing: border-box; display: inline-flex;
+  align-items: center; justify-content: center;
+  width: 20px; height: 20px;
+  border: 2px solid var(--muted);
+  border-radius: 4px; cursor: pointer;
+  flex-shrink: 0; background: transparent
+}
+.checkbox .tick {
+  width: 20px;
+  height: 20px;
+  fill: #fff;
+  display: none
+}
+.checkbox.on {
+  background-color: #1d9bf0;
+  border-color: #1d9bf0
+}
+.checkbox.on .tick {
+  display: block
+}
+.item.danger .checkbox.on {
+  background-color: #f4212e;
+  border-color: #f4212e
+}
 
-    .meta .dangerzone {
-      color: #f4212e;
-      display: inline-flex;
-      align-items: center; gap: 2px
-    }
-    .meta .dangerzone svg {width: 14px; height: 14px; fill: currentColor}
-    .ident {user-select: all}
+.reset {
+  background: none; border: none; cursor: pointer;
+  color: #1d9bf0; padding: 0;
+  width: 20px; height: 20px;
+  display: inline-flex; align-items: center; justify-content: center
+}
+.reset svg {width: 18px; height: 18px; fill: currentColor}
+.item.danger .reset {color: #f4212e}
+.reset.off {visibility: hidden; pointer-events: none}
 
-    .opts {
-      color: #6B7F8E; font-size: 12px;
-      margin-top: 4px; cursor: pointer; width: fit-content
-    }
-    .opts:hover {color: #6B7F8E; text-decoration: underline}
+/*//////////////////////////////////////////////////////////////////////*/
 
-    .optsdrop {
-      position: fixed; z-index: 2147483647;
-      display: none; padding: 4px;
-      background: #000; color: #E5EAEC;
-      font: 14px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      border: 1px solid #37434D; border-radius: 10px;
-      max-height: 240px; max-width: 280px; overflow: auto;
-      box-shadow: 0 4px 20px rgba(0,0,0,.7);
-      scrollbar-width: thin; scrollbar-color: #6B7F8E transparent
-    }
-    .optsitem {
-      padding: 6px 10px; border-radius: 6px; cursor: pointer;
-      display: flex; flex-direction: column; gap: 1px
-    }
-    .optsval {white-space: nowrap; overflow: hidden; text-overflow: ellipsis}
-    .optsdesc {font-size: 11px; color: #6B7F8E; line-height: 1.25}
-    .optsitem:hover {background-color: #16181c}
-    .optsitem.sel .optsval {color: #fff; font-weight: 800}
-    .optsempty {padding: 7px 10px; color: #6B7F8E; font-style: italic}
+.meta {
+  color: var(--muted);
+  margin-top: 4px;
+  font-size: 12px
+}
 
-    .empty {
-      font-style: italic;
-      padding: 4px 10px;
-      color: #6B7F8E;
-      line-height: 1.6
-    }
-    .empty.center {
-      font-style: normal; min-height: 100%;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 14px; padding: 16px; text-align: center
-    }
-    .empty.center .face {
-      font-size: 64px; line-height: 1;
-      font-weight: 700; color: #E5EAEC
-    }
+.meta .dangerzone {
+  color: #f4212e;
+  display: inline-flex;
+  align-items: center; gap: 2px
+}
+.meta .dangerzone svg {width: 14px; height: 14px; fill: currentColor}
+.ident {user-select: all}
 
-    .scan {
-      margin-top: 8px;
-      background-color: #1d9bf0;
-      color: #fff; border: none;
-      border-radius: 999px;
-      padding: 8px 14px;
-      font: 600 13px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      cursor: pointer
-    }
+.opts {
+  color: var(--muted); font-size: 12px;
+  margin-top: 4px; cursor: pointer; width: fit-content
+}
+.opts:hover {color: var(--muted); text-decoration: underline}
 
-    .copied {
-      color: #00ba7c;
-      margin-left: 8px;
-      font-size: 12px
-    }
+.optsdrop {
+  position: fixed; z-index: 2147483647;
+  display: none; padding: 4px;
+  background: var(--bg); color: var(--text);
+  font: 14px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  border: 1px solid var(--fieldborder); border-radius: 10px;
+  max-height: 240px; max-width: 280px; overflow: auto;
+  box-shadow: 0 4px 20px rgba(0,0,0,.7);
+  scrollbar-width: thin; scrollbar-color: var(--muted) transparent
+}
+.optsitem {
+  padding: 6px 10px; border-radius: 6px; cursor: pointer;
+  display: flex; flex-direction: column; gap: 1px
+}
+.optsval {white-space: nowrap; overflow: hidden; text-overflow: ellipsis}
+.optsdesc {font-size: 11px; color: var(--muted); line-height: 1.25}
+.optsitem:hover {background-color: var(--raised)}
+.optsitem.sel .optsval {color: var(--text); font-weight: 800}
+.optsempty {padding: 7px 10px; color: var(--muted); font-style: italic}
 
-    /*//////////////////////////////////////////////////////////////////////*/
+.empty {
+  font-style: italic;
+  padding: 4px 10px;
+  color: var(--muted);
+  line-height: 1.6
+}
+.empty.center {
+  font-style: normal; min-height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 14px; padding: 16px; text-align: center
+}
+.empty.center .face {
+  font-size: 64px; line-height: 1;
+  font-weight: 700; color: var(--text)
+}
 
-    .cachednote {
-      background-color: rgba(29,155,240,.1); color: #8ecdf8;
-      border-bottom: 1px solid #242E36;
-      padding: 8px 14px; font-size: 12px
-    }
+.scan {
+  margin-top: 8px;
+  background-color: #1d9bf0;
+  color: #fff; border: none;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font: 600 13px "Chirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  cursor: pointer
+}
 
-    @media (pointer: coarse) {
-      body {min-height: 480px}
-      .checkbox {width: 24px; height: 24px}
-      .checkbox .tick {width: 22px; height: 22px}
-      .row2.dev .checkbox {width: 18px; height: 18px}
-      .row2.dev .checkbox .tick {width: 18px; height: 18px}
-      .reset {width: 24px; height: 24px}
-      .reset svg {width: 21px; height: 21px}
-      .item {padding: 14px}
-    }
+.copied {
+  color: #00ba7c;
+  margin-left: 8px;
+  font-size: 12px
+}
+
+/*//////////////////////////////////////////////////////////////////////*/
+
+.cachednote {
+  background-color: rgba(29,155,240,.1); color: #8ecdf8;
+  border-bottom: 1px solid var(--border);
+  padding: 8px 14px; font-size: 12px
+}
+
+@media (pointer: coarse) {
+  body {min-height: 480px}
+  .checkbox {width: 24px; height: 24px}
+  .checkbox .tick {width: 22px; height: 22px}
+  .row2.dev .checkbox {width: 18px; height: 18px}
+  .row2.dev .checkbox .tick {width: 18px; height: 18px}
+  .reset {width: 24px; height: 24px}
+  .reset svg {width: 21px; height: 21px}
+  .item {padding: 14px}
+}

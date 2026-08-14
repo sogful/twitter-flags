@@ -74,14 +74,14 @@ const hostcss = `
       position: fixed; top: 0; right: var(--tfsb, 0px);
       width: 390px; max-width: 100vw;
       height: 100vh; height: 100dvh;
-      background-color: #000; color: #E5EAEC;
+      background-color: var(--bg); color: var(--text);
       font: 14px "TwitterChirp", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
       display: flex; flex-direction: column;
       overflow: hidden; user-select: none;
       z-index: 2147483647;
       pointer-events: auto; visibility: hidden;
-      border-left: 1px solid #242E36;
+      border-left: 1px solid var(--border);
       transform: translateX(100%);
       transition: transform 0.18s ease
     }
@@ -93,8 +93,8 @@ const hostcss = `
       display: inline-flex; align-items: center; justify-content: center;
       transition: background-color 0.15s ease
     }
-    .tfclose:hover {background-color: #2a2b2b}
-    .tfclose svg {width: 20px; height: 20px; fill: #fff}
+    .tfclose:hover {background-color: var(--hover)}
+    .tfclose svg {width: 20px; height: 20px; fill: var(--text)}
     /* keep the top row (search + prefix) from sliding under the close button */
     .row1 {padding-right: 30px}
 `;

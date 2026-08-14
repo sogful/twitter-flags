@@ -2,7 +2,6 @@
   "known": {
 
   // conference / spaces
-  "rweb_conf_only_enabled": "locks the whole site into conference-only mode at /i/conferences-room",
   "rweb_conf_dev_enabled": "conference debug overlay: per-feed grid, throttle states, spatial audio panning",
   "rweb_conf_composite_video_enabled": "canvas-composites two media streams into one conference feed",
   "rweb_conf_multi_video_enabled": "multi-video conference with simulcast + presentation tracks",

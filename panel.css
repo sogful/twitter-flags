@@ -228,10 +228,11 @@
     .newpill {
       display: inline-block; vertical-align: middle;
       background: #1d9bf0; color: #fff;
-      font-size: 9px; font-weight: 800;
+      font-size: 9px; font-weight: 700;
       padding: 1px 5px; border-radius: 999px;
       margin-right: 6px; letter-spacing: .3px;
-      text-transform: uppercase
+      text-transform: uppercase;
+      user-select: none; -webkit-user-select: none
     }
 
     /*//////////////////////////////////////////////////////////////////////*/

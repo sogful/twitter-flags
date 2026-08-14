@@ -211,6 +211,28 @@
       cursor: pointer
     }
     .saveall:hover {text-decoration: underline}
+    .histbtns {
+      display: inline-flex; gap: 2px;
+      margin-left: auto
+    }
+    .histbtn {
+      background: transparent; border: none; cursor: pointer;
+      padding: 2px; border-radius: 999px;
+      display: inline-flex
+    }
+    .histbtn svg {width: 17px; height: 17px; fill: #6B7F8E}
+    .histbtn:hover:not(:disabled) {background-color: rgba(239,243,244,.1)}
+    .histbtn:hover:not(:disabled) svg {fill: #E5EAEC}
+    .histbtn:disabled {cursor: default; opacity: .35}
+
+    .newpill {
+      display: inline-block; vertical-align: middle;
+      background: #1d9bf0; color: #fff;
+      font-size: 9px; font-weight: 800;
+      padding: 1px 5px; border-radius: 999px;
+      margin-right: 6px; letter-spacing: .3px;
+      text-transform: uppercase
+    }
 
     .devbar {
       flex-shrink: 0;

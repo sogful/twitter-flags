@@ -467,6 +467,8 @@
       return;
     }
     if (e.target.closest("[data-isolate]")) { e.preventDefault(); isostart(); return }
+    const hb = e.target.closest("[data-hist]");
+    if (hb) { e.preventDefault(); if (hb.getAttribute("data-hist") === "undo") histundo(); else histredo(); return }
     const dbtn = e.target.closest("[data-data]");
     if (dbtn) {
       e.preventDefault();
@@ -545,9 +547,43 @@
   const isMod = name => hasoverride(name) && !eq(overrides[name], flags[name]);
   function updateFoot() { footer.classList.toggle("show", dirty && !iso) }
 
-  let lasthtml = "";
-  let lastsig = "";
-  let renderraf = 0;
+  /*//////////////////////////////////////////////////////////////////////*/
+
+  // the NEW !
+  let seensnapshot = new Set(), seencount = -1;
+  function seenload() {try {const a = JSON.parse(localStorage.getItem("twitterflags.seen") || "[]"); seensnapshot = new Set(Array.isArray(a) ? a : [])} catch {seensnapshot = new Set()}}
+  function seenpersist() {try {localStorage.setItem("twitterflags.seen", JSON.stringify([...new Set([...seensnapshot, ...Object.keys(flags)])]))} catch {}}
+  const isNew = name => seensnapshot.size > 0 && !seensnapshot.has(name);
+
+  let hist = [], hpos = -1, histlock = false;
+  function painthist() {
+    const u = query('[data-hist="undo"]'), r = query('[data-hist="redo"]');
+    if (u) u.disabled = !(hpos > 0);
+    if (r) r.disabled = !(hpos >= 0 && hpos < hist.length - 1);
+  }
+  function histpush() {
+    if (histlock || iso) return;
+    const cur = clone(overrides);
+    if (hpos >= 0 && canon(cur) === canon(hist[hpos])) return;
+    hist = hist.slice(0, hpos + 1);
+    hist.push(cur);
+    if (hist.length > 60) hist.shift();
+    hpos = hist.length - 1;
+    painthist();
+  }
+  function histrestore(pos) {
+    histlock = true;
+    hpos = Math.max(0, Math.min(hist.length - 1, pos));
+    overrides = clone(hist[hpos]);
+    markdirty(); persist(); send("syncoverrides", {overrides});
+    render();
+    histlock = false;
+    painthist();
+  }
+  function histundo() {if (hpos > 0) histrestore(hpos - 1)}
+  function histredo() {if (hpos < hist.length - 1) histrestore(hpos + 1)}
+
+  let lasthtml = ""; let lastsig = ""; let renderraf = 0;
   function rafrender() {
     if (renderraf) return;
     const raf = typeof requestAnimationFrame === "function" ? requestAnimationFrame : (f => setTimeout(f, 16));
@@ -558,6 +594,11 @@
     updateFoot();
     paintchecks();
     if (flagcount) { const n = Object.keys(flags).length; flagcount.textContent = (!noTab && captured && n) ? n + " flags" : "??? flags" }
+    if (!noTab && captured) {
+      histpush();
+      const fn = Object.keys(flags).length;
+      if (fn !== seencount) { seencount = fn; seenpersist() }
+    }
     if (noTab) {
       lasthtml = "";
       list.innerHTML = `<div class="empty">open x.com/twitter.com first!</div>`;
@@ -602,9 +643,10 @@
       const meta = dangerinfo ? `<div class="meta"><span class="dangerzone">${WARN}<span>${escapehtml(dangerinfo)}</span></span></div>` : "";
       const opts = typeOf(flags[name]) !== "boolean" ? optionsmap[name] : null;
       const optsline = (opts && opts.length) ? `<div class="opts" data-name="${escapehtml(name)}">${opts.length} available option${opts.length === 1 ? "" : "s"}</div>` : "";
+      const newpill = isNew(name) ? '<span class="newpill">new</span>' : "";
       const title = d.auto
-        ? `<div class="name ident" data-name="${escapehtml(name)}">${escapehtml(name)}</div>`
-        : `<div class="name">${escapehtml(d.text)}</div><div class="ident" data-name="${escapehtml(name)}">${escapehtml(name)}</div>`;
+        ? `<div class="name ident" data-name="${escapehtml(name)}">${newpill}${escapehtml(name)}</div>`
+        : `<div class="name">${newpill}${escapehtml(d.text)}</div><div class="ident" data-name="${escapehtml(name)}">${escapehtml(name)}</div>`;
       html += `<div class="item${dangerinfo ? " danger" : ""}${mod ? " mod" : ""}" data-name="${escapehtml(name)}">
       <div class="info">${title}${meta}${optsline}</div>
       <div class="controls"><button class="reset${mod ? "" : " off"}" data-name="${escapehtml(name)}" title="reset to default" aria-hidden="${!mod}">${UNDO}</button>${control(name)}</div>
@@ -777,7 +819,7 @@
     optionsmap = (cfg.options && typeof cfg.options === "object") ? cfg.options : {};
 
     buildswitches(); paintchecks();
-    isoload(); renderiso(); refresh();
+    seenload(); isoload(); renderiso(); painthist(); refresh();
 
     setTimeout(paintswitches, 400);
     try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(paintswitches) } catch {}

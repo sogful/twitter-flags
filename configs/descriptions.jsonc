@@ -2,7 +2,7 @@
   "known": {
 
   // conference / spaces
-  "rweb_conf_only_enabled": "locks the whole site into conference-only mode (redirects to /i/conferences-room)",
+  "rweb_conf_only_enabled": "locks the whole site into conference-only mode at /i/conferences-room",
   "rweb_conf_dev_enabled": "conference debug overlay: per-feed grid, throttle states, spatial audio panning",
   "rweb_conf_composite_video_enabled": "canvas-composites two media streams into one conference feed",
   "rweb_conf_multi_video_enabled": "multi-video conference with simulcast + presentation tracks",
@@ -21,9 +21,8 @@
   "web_video_playback_rate_enabled": "video playback speed control",
   "web_video_transcribed_captions_enabled": "auto-transcribed captions on video",
   "web_video_caption_repositioning_enabled": "drag captions to reposition them",
-  "rweb_picture_in_picture_enabled": "picture-in-picture video",
-  "rweb_video_pip_enabled": "picture-in-picture video (alt flag)",
-  "rweb_save_video_progress_enabled": "remember playback position per video",
+  "rweb_video_pip_enabled": "picture-in-picture video (both this and rweb_picture_in_picture_enabled gate it)",
+  "rweb_save_video_progress_enabled": "remembers where you left off in each video",
   "rweb_live_broadcast_rewind_enabled": "rewind live broadcasts",
   "responsive_web_instream_video_redesign_enabled": "redesigned in-stream video player",
   "dm_video_downloads_enabled": "download videos sent in dms",
@@ -52,10 +51,12 @@
   "rweb_conversational_replies_downvote_enabled": "downvote button on replies",
   "responsive_web_pinned_replies_enabled": "pin a reply under your post",
   "responsive_web_reply_storm_enabled": "reply-storm (rapid threaded replies) ui",
+  "view_counts_everywhere_api_enabled": "attaches view/impression counts to tweets everywhere in the api",
+  "responsive_web_enhance_cards_enabled": "richer link/media card rendering on web",
+  "graphql_is_translatable_rweb_tweet_is_translatable_enabled": "marks tweets as translatable so the 'translate post' link shows",
 
   // grok / ai
   "responsive_web_grok_general_availability": "grok available to everyone",
-  "responsive_web_grok_voice_mode_enabled": "grok voice mode",
   "responsive_web_grok_image_edit": "edit images with grok",
   "responsive_web_grok_imagine_composer_enabled": "grok imagine image/video composer",
   "responsive_web_grok_imagine_in_composer_enabled": "grok imagine inside the post composer",
@@ -83,6 +84,8 @@
   "payments_web_external_app_enabled": "twitter money external app payments",
   "payments_transaction_search_enabled": "search payment transactions",
   "responsive_web_stripe_account_creation_enabled": "create a stripe account in-app",
+  "tweet_awards_web_tipping_enabled": "tweet awards / web tipping on posts",
+  "rweb_tipjar_consumption_enabled": "shows tip jar payment links on profiles",
 
   // profile
   "responsive_web_mobile_app_spotlight_v1_config": "profile app/play-store link card (local only unfortunately)",
@@ -93,6 +96,8 @@
   "xprofile_work_history_enabled": "work history section on profiles",
   "hidden_profile_subscriptions_enabled": "hide your subscriptions on profile",
   "profile_label_improvements_pcf_edit_profile_enabled": "edit professional category from profile",
+  "profile_label_improvements_pcf_label_in_post_enabled": "shows the profile category label (business etc.) inside posts",
+  "verified_phone_label_enabled": "shows the verified-phone label on accounts",
 
   // dm / chat / encryption
   "dm_secret_conversations_enabled": "encrypted dms (xchat secret conversations)",
@@ -100,7 +105,6 @@
   "av_chat_group_e2ee_creator_enabled": "create e2ee group calls",
   "av_chat_group_e2ee_joiner_enabled": "join e2ee group calls",
   "av_chat_xchat_emoji_reactions_enabled": "emoji reactions in calls",
-  "dm_bulk_delete_enabled": "bulk delete dms",
   "dm_edit_dms_overflow_menu_enabled": "edit sent dms",
   "dm_voice_rendering_enabled": "voice messages in dms",
   "rweb_xchat_standalone_avcall_enabled": "standalone audio/video calls in xchat",
@@ -113,13 +117,18 @@
   "responsive_web_birdwatch_note_writing_enabled": "write community notes",
   "responsive_web_birdwatch_media_notes_enabled": "community notes on media",
   "freedom_of_speech_not_reach_author_label_enabled": "show 'visibility limited' author labels",
+  "freedom_of_speech_not_reach_fetch_enabled": "fetches the 'visibility limited' (freedom of speech, not reach) labels",
 
   // creator / premium / jobs
   "creator_subscriptions_revamp_enabled": "revamped creator subscriptions",
+  "creator_subscriptions_tweet_preview_api_enabled": "fetch previews of subscriber-only (paid) posts",
   "super_follow_exclusive_tweet_creation_api_enabled": "create super-follower-only posts",
   "premium_content_api_read_enabled": "read paywalled premium posts",
+  "subscriptions_upsells_api_enabled": "returns premium/subscription upsell prompts from the api",
+  "subscriptions_verification_info_is_identity_verified_enabled": "surfaces 'identity verified' status in verification info",
+  "subscriptions_verification_info_verified_since_enabled": "surfaces the 'verified since' date in verification info",
+  "responsive_web_twitter_article_tweet_consumption_enabled": "read x articles embedded in tweets",
   "recruiting_premium_jobs_enabled": "premium job listings",
-  "recruiting_global_jobs_search_enabled": "global job search",
   "articles_rest_api_enabled": "long-form articles api",
   "highlights_tweets_tab_ui_enabled": "highlights tab on profile",
 

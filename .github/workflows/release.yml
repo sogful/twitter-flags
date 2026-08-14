@@ -1,0 +1,61 @@
+name: release userscript
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - manifest.json
+      - panel.js
+      - panel.css
+      - panel.html
+      - src/**
+      - configs/**
+      - fonts/**
+      - images/icon.svg
+      - userscript/builduserscript.js
+      - .github/workflows/release.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: build userscript
+        run: node userscript/builduserscript.js
+
+      - name: stage asset as userscript.js
+        run: cp userscript/twitterflags.user.js userscript.js
+
+      - name: read version from manifest
+        id: ver
+        run: echo "version=$(node -p "require('./manifest.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: write release notes
+        run: |
+          cat > notes.md <<'EOF'
+          install with [tampermonkey](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) or [violentmonkey](https://chromewebstore.google.com/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag).<br>
+          if you're on kiwi browser or any other mobile browser with extension support, tampermonkey might not work, please use [the legacy version](https://chromewebstore.google.com/detail/tampermonkey-legacy/lcmhijbkigalmkeommnijlpobloojgfn) instead!<br>
+          [*what is a userscript?*](https://en.wikipedia.org/wiki/Userscript)
+          EOF
+
+      - name: create or update the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v${{ steps.ver.outputs.version }}"
+          title="userscript (v${{ steps.ver.outputs.version }})"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release edit "$tag" --title "$title" --notes-file notes.md
+            gh release upload "$tag" userscript.js --clobber
+          else
+            gh release create "$tag" userscript.js --title "$title" --notes-file notes.md
+          fi

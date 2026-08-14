@@ -419,6 +419,61 @@
     bar.innerHTML = `<div class="isotitle">isolation #${iso.step}</div><div class="isotext">reverted <b>${iso.disabled.length}</b> of your changed flags to default and reloaded. is the problem still happening?</div><div class="isobtns"><button class="isobtn ok" data-iso="gone">fixed</button><button class="isobtn danger" data-iso="still">broken</button><button class="isobtn" data-iso="cancel">cancel</button></div>`;
   }
 
+  /*//////////////////////////////////////////////////////////////////////*/
+  // import / export / share: your changed flags travel as json, a share link,
+  // or a short code. works by clipboard + a paste box (file downloads are
+  // unreliable inside the userscript drawer and the extension side panel)
+
+  function b64url(s) {try {return btoa(unescape(encodeURIComponent(s))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")} catch {return ""}}
+  function unb64url(s) {try {return decodeURIComponent(escape(atob(s.replace(/-/g, "+").replace(/_/g, "/"))))} catch {return ""}}
+  function sharelink() {return "https://x.com/#tf=" + b64url(JSON.stringify(overrides))}
+  function parseimport(text) {
+    text = (text || "").trim();
+    if (!text) return null;
+    const m = text.match(/tf=([A-Za-z0-9\-_]+)/);
+    const code = m ? m[1] : (text.indexOf("{") < 0 && /^[A-Za-z0-9\-_]+$/.test(text) ? text : null);
+    if (code) {try {const o = JSON.parse(unb64url(code)); if (o && typeof o === "object" && !Array.isArray(o)) return o} catch {}}
+    try {const o = JSON.parse(text); if (o && typeof o === "object" && !Array.isArray(o)) return o} catch {}
+    return null;
+  }
+  function applyimport(o) {
+    overrides = {};
+    for (const k in o) overrides[k] = o[k];
+    markdirty(); persist(); send("syncoverrides", {overrides}); render();
+  }
+  function copytext(t) {try {if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).catch(() => {})} catch {}}
+
+  function opendata() {
+    closemodal();
+    modalel = document.createElement("div");
+    modalel.className = "tfmodal";
+    modalel.innerHTML = `<div class="tfmodalcard datacard"><div class="datatitle">import / export</div><textarea class="dataarea" spellcheck="false" placeholder="paste a config, share link or code here, then hit import - or export your changes below"></textarea><div class="databtns"><button class="isobtn" data-d="expov" type="button">export changes</button><button class="isobtn" data-d="expall" type="button">export all flags</button><button class="isobtn" data-d="share" type="button">copy share link</button><button class="isobtn ok" data-d="import" type="button">import</button><button class="isobtn" data-d="close" type="button">close</button></div><div class="datamsg"></div></div>`;
+    const area = modalel.querySelector(".dataarea"), msg = modalel.querySelector(".datamsg");
+    modalel.addEventListener("click", ev => {
+      if (ev.target === modalel) {closemodal(); return}
+      const b = ev.target.closest("[data-d]"); if (!b) return;
+      const a = b.getAttribute("data-d");
+      if (a === "close") {closemodal(); return}
+      if (a === "expov") {area.value = JSON.stringify(overrides, null, 2); copytext(area.value); msg.textContent = Object.keys(overrides).length + " changed flags copied as json"}
+      else if (a === "expall") {area.value = JSON.stringify(flags, null, 2); copytext(area.value); msg.textContent = Object.keys(flags).length + " captured flags copied as json"}
+      else if (a === "share") {const l = sharelink(); area.value = l; copytext(l); msg.textContent = "share link copied - opening it on x with the extension imports your changes"}
+      else if (a === "import") {const o = parseimport(area.value); if (!o) {msg.textContent = "couldn't read that - needs valid json, a share code, or a share link"; return} applyimport(o); msg.textContent = "imported " + Object.keys(o).length + " override" + (Object.keys(o).length === 1 ? "" : "s")}
+    });
+    panel.appendChild(modalel);
+  }
+
+  // a shared #tf= link opens x.com -> offer to import it (userscript context)
+  function checksharehash() {
+    try {
+      const m = (location.hash || "").match(/tf=([A-Za-z0-9\-_]+)/);
+      if (!m) return;
+      try {history.replaceState(history.state, "", location.pathname + location.search)} catch {}
+      const o = parseimport(m[1]); if (!o) return;
+      const n = Object.keys(o).length;
+      confirmdanger(`a shared link wants to import <b>${n}</b> flag change${n === 1 ? "" : "s"}. this replaces your current changes. import them?`, "import", () => applyimport(o));
+    } catch {}
+  }
+
   panel.addEventListener("click", e => {
     const isob = e.target.closest("[data-iso]");
     if (isob) {
@@ -432,6 +487,7 @@
       return;
     }
     if (e.target.closest("[data-isolate]")) { e.preventDefault(); isostart(); return }
+    if (e.target.closest("[data-data]")) { e.preventDefault(); opendata(); return }
     const sw = e.target.closest(".swbtn");
     if (sw) {
       e.preventDefault();
@@ -733,7 +789,7 @@
     optionsmap = (cfg.options && typeof cfg.options === "object") ? cfg.options : {};
 
     buildswitches(); paintchecks();
-    isoload(); renderiso(); refresh();
+    isoload(); renderiso(); checksharehash(); refresh();
 
     setTimeout(paintswitches, 400);
     try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(paintswitches) } catch {}

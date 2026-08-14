@@ -214,18 +214,18 @@
   const panel = header.parentNode;
 
   const TICK = '<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><g><path d="M9.64 18.952l-5.55-4.861 1.317-1.504 3.951 3.459 8.459-10.948L19.4 6.32 9.64 18.952z"></path></g></svg>';
-  const WARN = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.5 17c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5zm1.5-3c.5 0 1 .2 1 .2l.25-5.7h-2.5l.25 5.7s.5-.2 1-.2zm10.568 6.745c.451-.783.45-1.717-.002-2.496l-8.4-14.511C13.712 2.957 12.903 2.49 12 2.49s-1.711.467-2.165 1.249l-8.4 14.509c-.453.78-.454 1.714-.002 2.497C1.886 21.531 2.696 22 3.6 22h16.8c.905 0 1.715-.469 2.168-1.255zM12.435 4.741l8.4 14.511c.125.214.053.402 0 .495-.044.076-.174.253-.435.253H3.6c-.261 0-.391-.177-.435-.253-.053-.093-.125-.281 0-.495l8.4-14.51c.131-.228.348-.252.435-.252s.304.024.435.251z"/></svg>';
+  const WARN = '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M10.5 17a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0m1.5-3 1 .2.3-5.7h-2.6l.3 5.7zm10.6 6.7q.6-1.2 0-2.5L14.2 3.7q-.8-1.1-2.2-1.2c-1.4-.1-1.7.5-2.2 1.2L1.4 18.2q-.6 1.3 0 2.5.8 1.3 2.2 1.3h16.8q1.5 0 2.2-1.3m-10.2-16 8.4 14.6q.1.3 0 .4 0 .2-.4.3H3.6l-.4-.3q-.1 0 0-.4l8.4-14.6.4-.2z"/></svg>';
   const UNDO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.29 2.29l1.42 1.42L5.41 6H15c3.87 0 7 3.13 7 7s-3.13 7-7 7H8v-2h7c2.76 0 5-2.24 5-5s-2.24-5-5-5H5.41l2.3 2.29-1.42 1.42L1.59 7l4.7-4.71z"/></svg>';
 
   // switch option icons!
   const FICONS = {
-    check: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.75c-4.56 0-8.25 3.69-8.25 8.25s3.69 8.25 8.25 8.25 8.25-3.69 8.25-8.25S16.56 3.75 12 3.75zM1.75 12C1.75 6.34 6.34 1.75 12 1.75S22.25 6.34 22.25 12 17.66 22.25 12 22.25 1.75 17.66 1.75 12zM16.4 9.28l-5.21 7.15-4.1-3.27 1.25-1.57 2.47 1.98 3.97-5.47 1.62 1.18z"/></svg>',
-    pencil: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.543 4.04275C15.3142 2.27164 18.1858 2.27164 19.957 4.04275C21.7282 5.81396 21.7282 8.68558 19.957 10.4568L11.2314 19.1834C10.4044 20.0104 9.31319 20.5208 8.14844 20.6267L2.89551 21.1043L3.37305 15.8513C3.47901 14.6866 3.99039 13.5953 4.81738 12.7683L13.543 4.04275ZM6.23145 14.1824C5.73525 14.6786 5.42881 15.3341 5.36523 16.033L5.10449 18.8943L7.9668 18.6346C8.66565 18.571 9.32019 18.2645 9.81641 17.7683L16.585 10.9988L13 7.41385L6.23145 14.1824ZM18.543 5.45682C17.5528 4.46675 15.9472 4.46675 14.957 5.45682L14.4141 5.99979L17.999 9.58475L18.543 9.04275C19.5331 8.05257 19.5331 6.44698 18.543 5.45682Z" fill-rule="evenodd" clip-rule="evenodd"/><path d="M21 20.9998H12.207C12.3582 20.8723 12.5047 20.7382 12.6455 20.5974L14.2432 18.9998H21V20.9998Z"/></svg>',
+    check: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 3.8a8.2 8.2 0 1 0 0 16.4 8.2 8.2 0 0 0 0-16.4M1.8 12a10.3 10.3 0 1 1 20.5 0 10.3 10.3 0 0 1-20.5 0m14.6-2.7-5.2 7.1L7 13.2l1.2-1.6 2.5 2 4-5.5z"/></svg>',
+    pencil: '<svg fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M13.5 4a4.5 4.5 0 0 1 6.5 6.5l-8.8 8.7a5 5 0 0 1-3 1.4l-5.3.5.5-5.2a5 5 0 0 1 1.4-3.1zM6.2 14.2a3 3 0 0 0-.8 1.8L5 19l2.9-.3a3 3 0 0 0 1.8-.8l6.8-6.8L13 7.4zm12.3-8.7c-1-1-2.6-1-3.5 0l-.6.5L18 9.6l.5-.6c1-1 1-2.6 0-3.5" clip-rule="evenodd"/><path d="M21 21h-8.8l.4-.4 1.6-1.6H21z"/></svg>',
     close: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.75c-4.56 0-8.25 3.69-8.25 8.25s3.69 8.25 8.25 8.25 8.25-3.69 8.25-8.25S16.56 3.75 12 3.75zM1.75 12C1.75 6.34 6.34 1.75 12 1.75S22.25 6.34 22.25 12 17.66 22.25 12 22.25 1.75 17.66 1.75 12zm8.84 0l-2.3-2.29 1.42-1.42 2.29 2.3 2.29-2.3 1.42 1.42-2.3 2.29 2.3 2.29-1.42 1.42-2.29-2.3-2.29 2.3-1.42-1.42 2.3-2.29z"/></svg>',
     tick: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.64 18.952l-5.55-4.861 1.317-1.504 3.951 3.459 8.459-10.948L19.4 6.32 9.64 18.952z"/></svg>',
-    compose: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.938 4.5H9.9c-1.136 0-1.929 0-2.546.05-.605.05-.953.143-1.216.277-.564.288-1.023.747-1.31 1.31-.135.264-.228.612-.277 1.218C4.5 7.97 4.5 8.765 4.5 9.9v4.2c0 1.136 0 1.929.05 2.546.05.605.143.953.277 1.216.288.565.747 1.023 1.31 1.31.264.135.612.228 1.217.277.617.05 1.41.051 2.546.051h4.2c1.136 0 1.929 0 2.545-.05.606-.05.954-.143 1.217-.277.565-.288 1.023-.746 1.31-1.31.135-.264.228-.612.277-1.217.05-.617.051-1.41.051-2.546v-1.037h2V14.1c0 1.103.001 1.992-.058 2.709-.06.728-.185 1.368-.487 1.96-.48.941-1.245 1.707-2.185 2.186-.593.302-1.233.428-1.961.488-.718.058-1.606.057-2.71.057H9.9c-1.103 0-1.991.001-2.709-.058-.728-.06-1.368-.185-1.96-.487-.941-.48-1.707-1.245-2.186-2.185-.302-.593-.428-1.233-.487-1.961-.059-.718-.058-1.606-.058-2.71V9.9c0-1.103-.001-1.991.058-2.709.06-.728.185-1.368.487-1.96.48-.941 1.245-1.707 2.185-2.186.593-.302 1.233-.428 1.961-.487.718-.059 1.606-.058 2.71-.058h1.037v2z"/><path d="M16.293 3.293c1.219-1.219 3.195-1.219 4.414 0 1.219 1.219 1.219 3.195 0 4.414l-5.491 5.491c-.533.533-.89.896-1.31 1.179-.356.24-.742.433-1.148.574-.478.167-.983.234-1.729.341l-2.708.387.387-2.708c.107-.746.174-1.25.34-1.729.142-.405.335-.792.575-1.148.283-.42.646-.777 1.179-1.31l5.491-5.491zm3 1.414c-.438-.438-1.148-.438-1.586 0l-5.491 5.491c-.587.587-.784.79-.934 1.013-.144.214-.26.445-.345.688-.088.254-.131.533-.248 1.354l-.01.067.068-.008c.82-.118 1.1-.161 1.354-.25.243-.084.474-.2.688-.344.223-.15.426-.347 1.013-.934l5.491-5.491c.438-.438.438-1.148 0-1.586z" fill-rule="evenodd" clip-rule="evenodd"/></svg>',
-    chevron: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.543 8.96l1.414-1.42L12 14.59l7.043-7.05 1.414 1.42L12 17.41 3.543 8.96z"/></svg>',
-    shield: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.057L5 6.464v5.448c0 2.165.851 3.687 2.188 4.952 1.275 1.208 2.965 2.155 4.812 3.154 1.847-1 3.537-1.946 4.813-3.154C18.148 15.6 19 14.077 19 11.912V6.464zM11 15v-2.21c-.882-.386-1.5-1.265-1.5-2.29C9.5 9.12 10.62 8 12 8s2.5 1.12 2.5 2.5c0 1.025-.618 1.904-1.5 2.29V15c0 .552-.448 1-1 1s-1-.448-1-1zm10-3.088c0 2.807-1.149 4.83-2.813 6.405-1.615 1.53-3.745 2.66-5.712 3.72-.297.16-.653.16-.95 0-1.967-1.06-4.097-2.19-5.713-3.72C4.15 16.742 3 14.72 3 11.912V6.464c0-.854.542-1.614 1.35-1.892l7-2.406.16-.047c.375-.095.772-.08 1.14.047l7 2.406.149.058C20.524 4.945 21 5.663 21 6.464z"/></svg>',
+    compose: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M11 4.5H7.3L6 4.9a3 3 0 0 0-1.3 1.3q-.2.3-.2 1.3L4.4 10v6.7l.3 1.3q.5.8 1.3 1.3.3.2 1.3.2l2.5.1h6.7l1.3-.3a3 3 0 0 0 1.3-1.3q.2-.4.2-1.3l.1-2.5v-1h2v3.7q-.1 1-.5 2a5 5 0 0 1-2.2 2.2q-1 .4-2 .4l-2.7.1H7.2q-1-.1-2-.5A5 5 0 0 1 3 18.8q-.4-1-.4-2l-.1-2.7V7.2q.1-1 .5-2A5 5 0 0 1 5.2 3q1-.4 2-.4l2.7-.1h1z"/><path fill-rule="evenodd" d="M16.3 3.3a3.1 3.1 0 1 1 4.4 4.4l-5.5 5.5-1.3 1.2-1.1.6-1.8.3-2.7.4.4-2.7.3-1.8.6-1.1 1.2-1.3zm3 1.4q-.8-.6-1.6 0l-5.5 5.5-1 1-.3.7-.2 1.4 1.4-.2.7-.4 1-1 5.5-5.4q.6-.8 0-1.6" clip-rule="evenodd"/></svg>',
+    chevron: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M3.5 9 5 7.5l7 7 7-7L20.5 9 12 17.4z"/></svg>',
+    shield: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 4 5 6.6V12q.1 3.2 2.2 5 2 1.7 4.8 3.1 2.8-1.5 4.8-3.1a7 7 0 0 0 2.2-5V6.5zm-1 11v-2.2a2.5 2.5 0 1 1 2 0V15a1 1 0 0 1-2 0m10-3q-.1 4-2.8 6.3a27 27 0 0 1-5.7 3.7 1 1 0 0 1-1 0q-3-1.5-5.7-3.7A8 8 0 0 1 3 12V6.5a2 2 0 0 1 1.4-2l7-2.3h.1q.6-.3 1.1 0l7 2.4h.2A2 2 0 0 1 21 6.5z"/></svg>',
     warn: WARN
   };
   const FCOLORS = {default: "#536471", green: "#00ba7c", yellow: "#e0b219", red: "#f4212e", blue: "#1d9bf0"};
@@ -295,19 +295,25 @@
     });
   }
 
-  function bulksafe(mode) {
+  function bulkplan(mode) {
     const set = {}, clear = [];
     for (const name of Object.keys(flags)) {
       if (typeOf(flags[name]) !== "boolean" || dangerFor(name)) continue;
-      if (mode === "reset") { if (hasoverride(name)) { delete overrides[name]; clear.push(name) } }
+      if (mode === "reset") { if (hasoverride(name)) clear.push(name) }
       else {
         const val = mode === "on";
-        if (eq(val, flags[name])) { if (hasoverride(name)) { delete overrides[name]; clear.push(name) } }
-        else { overrides[name] = val; set[name] = val }
+        if (eq(val, flags[name])) { if (hasoverride(name)) clear.push(name) }
+        else set[name] = val;
       }
     }
+    return {set, clear};
+  }
+  function applybulk(mode) {
+    const {set, clear} = bulkplan(mode);
     if (!Object.keys(set).length && !clear.length) return;
-    markdirty(); persist(); send("setmany", { set, clear }); render();
+    for (const k of clear) delete overrides[k];
+    for (const k in set) overrides[k] = set[k];
+    markdirty(); persist(); send("setmany", {set, clear}); render();
   }
 
   function applyupsells(mode) {
@@ -321,7 +327,111 @@
     markdirty(); persist(); send("setmany", { set, clear }); render();
   }
 
+  function dopagereload() {
+    if (!EXT) {send("reload"); return}
+    if (tabId != null) try {chrome.tabs.reload(tabId)} catch {send("reload")}
+    else try {chrome.tabs.create({url: "https://x.com/"})} catch {}
+  }
+
+  // small in-panel confirm/notice overlay. position:absolute covers the panel
+  // in both the extension window and the userscript drawer (.tfpanelwrap)
+  let modalel = null;
+  function closemodal() {if (modalel) {modalel.remove(); modalel = null}}
+  function modal(message, buttons) {
+    closemodal();
+    modalel = document.createElement("div");
+    modalel.className = "tfmodal";
+    const btns = buttons.map(b => `<button class="tfmodalbtn ${b.cls || "cancel"}" type="button" data-mret="${b.ret}">${escapehtml(b.label)}</button>`).join("");
+    modalel.innerHTML = `<div class="tfmodalcard"><div class="tfmodaltext">${message}</div><div class="tfmodalbtns">${btns}</div></div>`;
+    modalel.addEventListener("click", ev => {
+      if (ev.target === modalel) {closemodal(); return}
+      const b = ev.target.closest("[data-mret]");
+      if (!b) return;
+      const ret = b.getAttribute("data-mret");
+      closemodal();
+      if (ret !== "cancel") { const fn = (buttons.find(x => x.ret === ret) || {}).onok; if (fn) fn() }
+    });
+    panel.appendChild(modalel);
+  }
+  const confirmdanger = (message, oklabel, onok) => modal(message, [{ret: "cancel", label: "cancel"}, {ret: "ok", cls: "danger", label: oklabel, onok}]);
+  const notify = message => modal(message, [{ret: "cancel", label: "got it"}]);
+
+  /*//////////////////////////////////////////////////////////////////////*/
+
+  // isolation thing
+
+  const ISOKEY = "twitterflags.isolation";
+  let iso = null;
+  function isoload() {try {iso = JSON.parse(localStorage.getItem(ISOKEY) || "null")} catch {iso = null}}
+  function isosave() {try {iso ? localStorage.setItem(ISOKEY, JSON.stringify(iso)) : localStorage.removeItem(ISOKEY)} catch {}}
+
+  function isopush(disabled, reload) {
+    overrides = clone(iso.original);
+    for (const k of disabled) delete overrides[k];
+    markdirty(); persist(); send("syncoverrides", {overrides}); isosave();
+    if (reload) setTimeout(dopagereload, 150);
+  }
+  function isostart() {
+    const suspects = Object.keys(overrides).filter(isMod);
+    if (suspects.length < 2) {notify("isolation needs at least 2 of your own changed flags to search through. flip a few flags first, then come back."); return}
+    iso = {original: clone(overrides), suspects, disabled: [], step: 0, found: null, done: false};
+    isonext(true);
+  }
+  function isonext(reload) {
+    if (iso.suspects.length <= 1) {iso.done = true; iso.found = iso.suspects[0] || null; iso.disabled = []; isosave(); renderiso(); return}
+    iso.step++;
+    iso.disabled = iso.suspects.slice(0, Math.ceil(iso.suspects.length / 2));
+    isopush(iso.disabled, reload);
+    renderiso();
+  }
+  function isoanswer(gone) {
+    if (!iso) return;
+    iso.suspects = gone ? iso.disabled.slice() : iso.suspects.filter(n => !iso.disabled.includes(n));
+    isonext(true);
+  }
+  function isofinish(keepoff) {
+    if (!iso) return;
+    const culprit = iso.found;
+    overrides = clone(iso.original);
+    if (keepoff && culprit) delete overrides[culprit];
+    iso = null; isosave();
+    markdirty(); persist(); send("syncoverrides", {overrides}); dopagereload();
+    renderiso();
+  }
+  function isocancel() {
+    if (!iso) return;
+    overrides = clone(iso.original);
+    iso = null; isosave();
+    markdirty(); persist(); send("syncoverrides", {overrides}); dopagereload();
+    renderiso();
+  }
+  function renderiso() {
+    const bar = query(".isolationbar");
+    if (!bar) return;
+    if (!iso) {bar.hidden = true; bar.innerHTML = ""; return}
+    bar.hidden = false;
+    if (iso.done) {
+      bar.innerHTML = iso.found
+        ? `<div class="isotitle">found!</div><div class="isotext"><span class="isoflag">${escapehtml(iso.found)}</span> is likely causing issues.</div><div class="isobtns"><button class="isobtn danger" data-iso="keepoff">disable</button><button class="isobtn" data-iso="restore">restore changes</button></div>`
+        : `<div class="isotitle">nothing isolated</div><div class="isotext">couldn't narrow it to a single flag.</div><div class="isobtns"><button class="isobtn" data-iso="restore">restore all my changes</button></div>`;
+      return;
+    }
+    bar.innerHTML = `<div class="isotitle">isolation #${iso.step}</div><div class="isotext">reverted <b>${iso.disabled.length}</b> of your changed flags to default and reloaded. is the problem still happening?</div><div class="isobtns"><button class="isobtn ok" data-iso="gone">fixed</button><button class="isobtn danger" data-iso="still">broken</button><button class="isobtn" data-iso="cancel">cancel</button></div>`;
+  }
+
   panel.addEventListener("click", e => {
+    const isob = e.target.closest("[data-iso]");
+    if (isob) {
+      e.preventDefault();
+      const a = isob.getAttribute("data-iso");
+      if (a === "gone") isoanswer(true);
+      else if (a === "still") isoanswer(false);
+      else if (a === "cancel") isocancel();
+      else if (a === "keepoff") isofinish(true);
+      else if (a === "restore") isofinish(false);
+      return;
+    }
+    if (e.target.closest("[data-isolate]")) { e.preventDefault(); isostart(); return }
     const sw = e.target.closest(".swbtn");
     if (sw) {
       e.preventDefault();
@@ -335,7 +445,17 @@
     const seg = e.target.closest(".fseg");
     if (seg) { e.preventDefault(); filters[seg.closest(".fswitch").getAttribute("data-filter")] = seg.getAttribute("data-val"); paintswitches(); render(); return }
     const bb = e.target.closest(".bulkbtn");
-    if (bb) { e.preventDefault(); bulksafe(bb.getAttribute("data-bulk")); return }
+    if (bb) {
+      e.preventDefault();
+      const mode = bb.getAttribute("data-bulk");
+      if (mode === "on" || mode === "off") {
+        const {set, clear} = bulkplan(mode);
+        const n = Object.keys(set).length + clear.length;
+        if (!n) return;
+        confirmdanger(`<h2 style='text-align: center'>this changes <b>${n}</b> flag${n === 1 ? "" : "s"}!</h2> flags marked as dangerous won't be enabled, but this can still break the site or log you out.`, "all " + mode, () => applybulk(mode));
+      } else applybulk(mode);
+      return;
+    }
     const lbl = e.target.closest(".checklabel");
     if (!lbl) return;
     e.preventDefault();
@@ -379,7 +499,7 @@
     try { return JSON.stringify(a) === JSON.stringify(b) } catch { return false }
   }
   const isMod = name => hasoverride(name) && !eq(overrides[name], flags[name]);
-  function updateFoot() { footer.classList.toggle("show", dirty) }
+  function updateFoot() { footer.classList.toggle("show", dirty && !iso) }
 
   let lasthtml = "";
   let lastsig = "";
@@ -595,11 +715,7 @@
   });
 
   search.oninput = () => rafrender();
-  reload.onclick = () => {
-    if (!EXT) {send("reload"); return}
-    if (tabId != null) try {chrome.tabs.reload(tabId)} catch {send("reload")}
-    else try {chrome.tabs.create({url: "https://x.com/"})} catch {}
-  };
+  reload.onclick = () => dopagereload();
   undo.onclick = () => {
     overrides = clone(applied);
     let devchanged = false;
@@ -615,9 +731,10 @@
     switchcfg = cfg.switches || {};
     upsellflags = Object.values(cfg.upsells || {}).filter(Array.isArray).flat();
     optionsmap = (cfg.options && typeof cfg.options === "object") ? cfg.options : {};
-    buildswitches();
-    paintchecks();
-    refresh();
+
+    buildswitches(); paintchecks();
+    isoload(); renderiso(); refresh();
+
     setTimeout(paintswitches, 400);
     try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(paintswitches) } catch {}
     window.addEventListener("resize", paintswitches);

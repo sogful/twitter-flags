@@ -12,7 +12,7 @@ on:
       - configs/**
       - fonts/**
       - images/icon.svg
-      - userscript/builduserscript.js
+      - .github/builduserscript.js
       - .github/workflows/release.yml
   workflow_dispatch:
 
@@ -30,10 +30,10 @@ jobs:
           node-version: 20
 
       - name: build userscript
-        run: node userscript/builduserscript.js
+        run: node .github/builduserscript.js
 
-      - name: stage asset as userscript.js
-        run: cp userscript/twitterflags.user.js userscript.js
+      - name: stage asset as userscript.user.js
+        run: cp .github/twitterflags.user.js userscript.user.js
 
       - name: read version from manifest
         id: ver
@@ -55,7 +55,7 @@ jobs:
           title="userscript (v${{ steps.ver.outputs.version }})"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release edit "$tag" --title "$title" --notes-file notes.md
-            gh release upload "$tag" userscript.js --clobber
+            gh release upload "$tag" userscript.user.js --clobber
           else
-            gh release create "$tag" userscript.js --title "$title" --notes-file notes.md
+            gh release create "$tag" userscript.user.js --title "$title" --notes-file notes.md
           fi

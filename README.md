@@ -13,7 +13,7 @@ if neither work, then the firefox versions you're installing are too gated and y
     <td>
       <a href="https://chromewebstore.google.com/detail/x-twitter-feature-flags/phioeneleonlckednejcmajbkmhhiepm"><b>X / Twitter Feature Flags</b></a><br>
       the original extension<br>
-      <sub><sup>(i made this one because changed settings don't properly persist across extension search results.. and also to add more stuff :p)</sup></sub>
+      <sub><sup>(i made this extension because this one's changed settings don't properly persist across extension search results.. and also to add more stuff :p)</sup></sub>
     </td>
     <td>
       <a href="https://gist.github.com/insin/48ad60824dcf85e4d72eb1e3a1819831"><b>@insin/script.js</b></a><br>

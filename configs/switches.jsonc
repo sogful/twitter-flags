@@ -1,13 +1,5 @@
 {
   // top row
-  "dev": [
-    {"key": "jfDev", "label": "jetfuel dev mode", "title": "sets sessionStorage jfDev, unlocking the super epic emusk rocket emoji mode"},
-    {"key": "inspect", "label": "inspector", "title": "not actually a twitter feature, but hover any element to see its data-testid!"},
-    {"key": "exposeDebug", "label": "expose audio", "title": "adds ?exposeDebug=1 so the media stream audio player is reachable"},
-    {"key": "forceDevEnv", "label": "force dev environment", "title": "tries to revive prod-gated developer code (needs a reload)"},
-    {"key": "forcechirp", "label": "on load", "title": "force-apply twitterchirp at the earliest moment of every page load so it never fails to appear", "row": "sw"}
-  ],
-  
   "filters": [
     {"key": "state", "options": [
       {"val": "all", "label": "all"},
@@ -27,10 +19,19 @@
       {"val": "danger", "label": "dangerous", "color": "red", "icon": "warn"}
     ]}
   ],
+
+  // bottom row
   "actions": [
     {"action": "unregister", "label": "unregister sw.js", "title": "unregister the service worker (fresh assets when reloading)"},
     {"action": "flush", "label": "flush cache", "title": "delete the cached html app shell"},
     {"action": "refresh", "label": "refresh cache", "title": "reprime the html app shell"},
     {"action": "chirp", "label": "reapply font", "title": "fetch + reapply the twitterchirp font (twitter's bundle sometimes quietly fails to load it)"}
+  ],
+  "dev": [
+    {"key": "jfDev", "label": "jetfuel dev mode", "title": "sets sessionStorage jfDev, unlocking the super epic emusk rocket emoji mode"},
+    {"key": "inspect", "label": "inspector", "title": "not actually a twitter feature, but hover any element to see its data-testid!"},
+    {"key": "exposeDebug", "label": "expose audio", "title": "adds ?exposeDebug=1 so the media stream audio player is reachable"},
+    {"key": "forceDevEnv", "label": "force dev environment", "title": "tries to revive prod-gated developer code (needs a reload)"},
+    {"key": "forcechirp", "label": "on load", "title": "force-apply twitterchirp at the earliest moment of every page load so it never fails to appear", "row": "sw"}
   ]
 }

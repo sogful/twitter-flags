@@ -252,7 +252,7 @@
   const filters = {state: "all", type: "all", danger: "all"};
 
   function buildswitches() {
-    const devrow = query(".row2.dev"), swrow = query(".row2.swrow"), filtrow = query(".row2.filters"), bulk = filtrow.querySelector(".bulk");
+    const devrow = query(".row2.dev"), swrow = query(".row2.swrow"), filtrow = query(".row2.filters");
     const mk = (s, defgroup) => {
       const lbl = document.createElement("label");
       lbl.className = "checklabel";
@@ -287,7 +287,7 @@
       swrow.appendChild(b);
     });
     (switchcfg.dev || []).forEach(s => (s.row === "sw" ? swrow : devrow).appendChild(mk(s, "dev")));
-    (switchcfg.filters || []).forEach(f => {if (!(f.key in filters)) filters[f.key] = ((f.options || [])[0] || {}).val || "all"; filtrow.insertBefore(mkswitch(f), bulk)});
+    (switchcfg.filters || []).forEach(f => {if (!(f.key in filters)) filters[f.key] = ((f.options || [])[0] || {}).val || "all"; filtrow.appendChild(mkswitch(f))});
     paintswitches();
   }
 

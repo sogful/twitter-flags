@@ -11,17 +11,32 @@
       </div>
       <div class="prefixfield" tabindex="0" role="button" aria-haspopup="listbox"><span class="prefixlabel">all prefixes</span></div>
     </div>
-    <div class="row2 filters">
-      <div class="bulk">
+
+    <div class="row2 filters"></div>
+
+    <div class="row2 actions">
+      <div class="btngroup">
         <button class="bulkbtn danger" data-bulk="on">all on</button>
         <button class="bulkbtn danger" data-bulk="off">all off</button>
         <button class="bulkbtn" data-bulk="reset">reset</button>
+      </div>
+      <div class="btngroup">
         <button class="bulkbtn" data-upsell="off">slop off</button>
         <button class="bulkbtn" data-upsell="on">slop on</button>
-        <button class="bulkbtn" data-isolate="start">isolate</button>
-        <button class="bulkbtn" data-presets>presets</button>
-        <button class="bulkbtn" data-data="import">import</button>
-        <button class="bulkbtn" data-data="export">export</button>
+      </div>
+      <div class="btngroup tools">
+        <button class="iconbtn" data-isolate="start" title="isolation mode (in case you can't find a flag)">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16m0-13a5 5 0 1 0 0 10 5 5 0 0 0 0-10"/></svg>
+        </button>
+        <button class="iconbtn" data-presets title="presets" aria-label="presets">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 0 0-2 2v16l7-3 7 3V5a2 2 0 0 0-2-2"/></svg>
+        </button>
+        <button class="iconbtn" data-data="import" title="import flag changes (.json)" aria-label="import">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 20h14v-2H5zm7-16-7 7h4v6h6v-6h4z"/></svg>
+        </button>
+        <button class="iconbtn" data-data="export" title="export flag changes (.json)" aria-label="export">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 20h14v-2H5zM19 9h-4V3H9v6H5l7 7z"/></svg>
+        </button>
       </div>
     </div>
     <div class="flagrow">

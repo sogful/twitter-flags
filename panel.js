@@ -10,7 +10,7 @@
   let devconfig = { jfDev: false, inspect: false }, applieddev = {};
   const hasoverride = k => Object.prototype.hasOwnProperty.call(overrides, k);
   const effective = k => (hasoverride(k) ? overrides[k] : flags[k]);
-  const persist = () => {if (EXT) try {chrome.storage.local.set({overrides})} catch {}};
+  const persist = () => {if (EXT) {try {chrome.storage.local.set({overrides})} catch {} syncpush()}};
   const canon = o => {try {return JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]]))} catch {return ""}};
   const clone = o => {try {return JSON.parse(JSON.stringify(o))} catch {return {}}};
   // dev toggles that need a reload to apply count toward unsaved
@@ -116,7 +116,12 @@
     };
     devconfig = {jfDev: false, inspect: false, exposeDebug: false};
     status = {count: Object.keys(flags).length, isInstalled: true, manInstalled: true, fetchHooked: true, xhrHooked: true};
-    applied = {}; markdirty(); render(); syncdev();
+    applied = {}; markdirty();
+    // mark one example flag as "new" so a standalone preview shows the badge
+    // (seencount frozen so this preview never writes to the real seen store)
+    seensnapshot = new Set(Object.keys(flags).filter(k => k !== "responsive_web_some_unknown_preview_enabled"));
+    seencount = Object.keys(flags).length;
+    render(); syncdev();
   }
 
   if (EXT) {
@@ -127,6 +132,16 @@
     });
     chrome.tabs.onActivated.addListener(refresh);
     chrome.tabs.onUpdated.addListener((id, info) => { if (id === tabId && info.status === "complete") refresh() });
+    // a change synced from another device -> adopt it here + push to the page
+    if (chrome.storage && chrome.storage.onChanged) chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== "sync" || !syncon || !changes.overrides) return;
+      const nv = changes.overrides.newValue;
+      if (nv && typeof nv === "object" && !Array.isArray(nv) && canon(nv) !== canon(overrides)) {
+        overrides = clone(nv); markdirty();
+        try {chrome.storage.local.set({overrides})} catch {}
+        send("syncoverrides", {overrides}); render();
+      }
+    });
     window.addEventListener("focus", refresh);
     window.addEventListener("pageshow", refresh);
     document.addEventListener("visibilitychange", () => {if (!document.hidden) refresh()});
@@ -478,6 +493,14 @@
       else exportoverrides();
       return;
     }
+    if (e.target.closest("[data-presets]")) { e.preventDefault(); togglepresets(); return }
+    const pdel = e.target.closest("[data-preset-del]");
+    if (pdel) { e.preventDefault(); presetdel(pdel.getAttribute("data-preset-del")); return }
+    const pload = e.target.closest("[data-preset-load]");
+    if (pload) { e.preventDefault(); presetload(pload.getAttribute("data-preset-load")); return }
+    if (e.target.closest("[data-preset-save]")) { e.preventDefault(); const inp = query(".presetname"); presetsave(inp ? inp.value : ""); if (inp) inp.value = ""; return }
+    if (e.target.closest("[data-preset-close]")) { e.preventDefault(); togglepresets(); return }
+    if (e.target.closest("[data-sync]")) { e.preventDefault(); setsync(!syncon); return }
     const sw = e.target.closest(".swbtn");
     if (sw) {
       e.preventDefault();
@@ -514,6 +537,10 @@
       else { overrides[f] = val; send("set", { name: f, value: val }) }
       markdirty(); persist(); render();
     }
+  });
+
+  panel.addEventListener("keydown", e => {
+    if (e.key === "Enter" && e.target && e.target.closest && e.target.closest(".presetname")) { e.preventDefault(); presetsave(e.target.value); e.target.value = "" }
   });
 
   function syncdev() {paintchecks(); markdirty(); updateFoot()}
@@ -582,6 +609,38 @@
   }
   function histundo() {if (hpos > 0) histrestore(hpos - 1)}
   function histredo() {if (hpos < hist.length - 1) histrestore(hpos + 1)}
+
+  /*//////////////////////////////////////////////////////////////////////*/
+  // presets: save the current changed flags under a name and reload them later
+  const PRESETKEY = "twitterflags.presets";
+  const XMARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.41 12l4.3-4.29-1.42-1.42L12 10.59 7.71 6.29 6.29 7.71 10.59 12l-4.3 4.29 1.42 1.42L12 13.41l4.29 4.3 1.42-1.42z"/></svg>';
+  let presets = {};
+  function presetsload() {try {const o = JSON.parse(localStorage.getItem(PRESETKEY) || "{}"); presets = (o && typeof o === "object" && !Array.isArray(o)) ? o : {}} catch {presets = {}}}
+  function presetsstore() {try {localStorage.setItem(PRESETKEY, JSON.stringify(presets))} catch {}}
+  function presetsave(name) {name = (name || "").trim(); if (!name) return; presets[name] = clone(overrides); presetsstore(); renderpresets()}
+  function presetload(name) {if (!presets[name]) return; overrides = clone(presets[name]); markdirty(); persist(); send("syncoverrides", {overrides}); render()}
+  function presetdel(name) {delete presets[name]; presetsstore(); renderpresets()}
+  function renderpresets() {
+    const bar = query(".presetbar"); if (!bar || bar.hidden) return;
+    const names = Object.keys(presets).sort();
+    const chips = names.length
+      ? names.map(n => `<span class="presetchip" data-preset-load="${escapehtml(n)}">${escapehtml(n)}<button class="presetdel" data-preset-del="${escapehtml(n)}" title="delete" aria-label="delete" type="button">${XMARK}</button></span>`).join("")
+      : `<span class="presetempty">no saved presets yet - save your current changes below</span>`;
+    bar.innerHTML = `<div class="presettitle">presets</div><div class="presetchips">${chips}</div><div class="presetsave"><input class="presetname" placeholder="name this set of changes" maxlength="40"><button class="isobtn ok" data-preset-save type="button">save current</button><button class="isobtn" data-preset-close type="button">close</button></div>`;
+  }
+  function togglepresets() {const bar = query(".presetbar"); if (!bar) return; bar.hidden = !bar.hidden; renderpresets()}
+
+  // cross-device sync (real extension only): mirror overrides through
+  // chrome.storage.sync when on, and pull in changes made on other devices
+  const HASSYNC = !!(typeof chrome !== "undefined" && chrome.storage && chrome.storage.sync && chrome.storage.onChanged);
+  let syncon = false;
+  function syncpush() {if (!HASSYNC || !syncon) return; try {chrome.storage.sync.set({overrides}, () => void chrome.runtime.lastError)} catch {}}
+  function paintsync() {const el = query(".synctoggle"); if (!el) return; el.hidden = !HASSYNC; const box = el.querySelector(".checkbox"); if (box) box.classList.toggle("on", syncon)}
+  function setsync(on) {syncon = !!on; try {chrome.storage.local.set({syncon})} catch {} if (syncon) syncpush(); paintsync()}
+  function syncload() {
+    if (!HASSYNC) {paintsync(); return}
+    try {chrome.storage.local.get(["syncon"], r => {void chrome.runtime.lastError; syncon = !!(r && r.syncon); paintsync()})} catch {paintsync()}
+  }
 
   let lasthtml = ""; let lastsig = ""; let renderraf = 0;
   function rafrender() {
@@ -819,7 +878,7 @@
     optionsmap = (cfg.options && typeof cfg.options === "object") ? cfg.options : {};
 
     buildswitches(); paintchecks();
-    seenload(); isoload(); renderiso(); painthist(); refresh();
+    seenload(); presetsload(); isoload(); renderiso(); painthist(); syncload(); refresh();
 
     setTimeout(paintswitches, 400);
     try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(paintswitches) } catch {}

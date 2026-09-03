@@ -1,17 +1,6 @@
 {
   "known": {
-
-  // conference / spaces
-  "rweb_conf_dev_enabled": "conference debug overlay: per-feed grid, throttle states, spatial audio panning",
-  "rweb_conf_composite_video_enabled": "canvas-composites two media streams into one conference feed",
-  "rweb_conf_multi_video_enabled": "multi-video conference with simulcast + presentation tracks",
-  "rweb_conf_rnnoise_enabled": "rnnoise ml noise suppression in conferences",
-  "rweb_conf_dummy_enabled": "inject a dummy publisher into conferences (testing)",
-  "spaces_conference_enabled": "enables the conference product (pair with rweb_conf_only_enabled)",
-  "spaces_video_speakers_enabled": "video for space speakers",
-  "spaces_video_admins_enabled": "video admin controls in spaces",
-  "spaces_video_consumption_enabled": "watch video in spaces",
-
+    
   // video / media / tv
   "rweb_video_screen_enabled": "video-only 'mixer' timeline (MediaTabVideoMixer) on profiles",
   "responsive_web_tv_cast_enabled": "cast video to a tv (chromecast/airplay)",
@@ -54,8 +43,18 @@
   "responsive_web_enhance_cards_enabled": "richer link/media card rendering on web",
   "graphql_is_translatable_rweb_tweet_is_translatable_enabled": "marks tweets as translatable so the 'translate post' link shows",
 
-  // grok / ai
-  "responsive_web_grok_general_availability": "grok available to everyone",
+  // conference / spaces
+  "rweb_conf_dev_enabled": "conference debug overlay: per-feed grid, throttle states, spatial audio panning",
+  "rweb_conf_composite_video_enabled": "canvas-composites two media streams into one conference feed",
+  "rweb_conf_multi_video_enabled": "multi-video conference with simulcast + presentation tracks",
+  "rweb_conf_rnnoise_enabled": "rnnoise ml noise suppression in conferences",
+  "rweb_conf_dummy_enabled": "inject a dummy publisher into conferences (testing)",
+  "spaces_conference_enabled": "enables the conference product (pair with rweb_conf_only_enabled)",
+  "spaces_video_speakers_enabled": "video for space speakers",
+  "spaces_video_admins_enabled": "video admin controls in spaces",
+  "spaces_video_consumption_enabled": "watch video in spaces",
+
+  // ..sigh
   "responsive_web_grok_image_edit": "edit images with grok",
   "responsive_web_grok_imagine_composer_enabled": "grok imagine image/video composer",
   "responsive_web_grok_imagine_in_composer_enabled": "grok imagine inside the post composer",
@@ -66,10 +65,8 @@
   "responsive_web_grok_show_grok_performance_metrics": "show grok latency/perf metrics",
   "responsive_web_grok_enable_deepersearch": "grok deepersearch mode",
   "responsive_web_grok_model_selector_in_input": "pick the grok model from the input box",
-  "responsive_web_grok_420_toggle_enabled": "grok 4.20 beta toggle",
   "responsive_web_grok_05221996": "internal grok codename toggle (dated)",
   "responsive_web_grok_05231996": "internal grok codename toggle (imagine)",
-  "responsive_web_grok_fun_mode_disabled": "disables grok fun mode",
   "responsive_web_grok_text_selection_enabled": "ask grok about selected text",
   "responsive_web_grok_analyze_post_followups_enabled": "follow-up questions after analyzing a post",
   "responsive_web_grok_profile_summary_enabled": "grok summary on profiles",
@@ -91,7 +88,7 @@
   "responsive_web_location_spotlight_v1_config": "profile location spotlight card",
   "responsive_web_profile_spotlight_v0_config": "profile spotlight card",
   "responsive_web_profile_about_enabled": "the new structured 'about' profile page",
-  "xprofile_editing_enabled": "desktop-only extended bio, which elon removed after it broke (LOL??)",
+  "xprofile_editing_enabled": "desktop-only extended bio, which was removed after it broke (LOL??)",
   "xprofile_work_history_enabled": "work history section on profiles",
   "hidden_profile_subscriptions_enabled": "hide your subscriptions on profile",
   "profile_label_improvements_pcf_edit_profile_enabled": "edit professional category from profile",
@@ -141,9 +138,7 @@
   "responsive_web_grok_user_seconds_debug": "debug grok active-seconds tracking",
 
   // extra debug / dev deciders
-  "rweb_xchat_debug_enabled": "xchat (encrypted dm) debug ui",
-  "rweb_xchat_dogfood_logs_enabled": "xchat dogfood logging",
-  "super_follow_web_debug_enabled": "super-follow debug ui",
+  "super_follow_web_debug_enabled": "subscription debug ui",
   "responsive_web_grok_dev_universal_search_id_enabled": "grok dev universal search id",
   "rweb_debugger_bug_report_email": "bug report email attached by the network logger",
   "responsive_web_birdwatch_note_internal_insights_enabled": "community notes internal insights panel",
@@ -156,6 +151,8 @@
   "blue_business_admin_sidebar_module_enabled": "verified-org admin sidebar module",
   "communities_moderation_log_enabled": "community moderation log",
   "oauth_trusted_developer_badge_enabled": "trusted-developer badge on apps",
+
+  "responsive_web_native_emojis_enabled": "removes twemojis :(",
 
   // scary stuff
   "responsive_web_api_transition_enabled": "routes api calls through the transition layer",

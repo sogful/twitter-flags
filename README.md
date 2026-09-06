@@ -1,8 +1,7 @@
 <img src="example.webp">
 <h3 align="center">an interface to change feature flag values!</h3>
 to install on chrome, simply clone the repository, enable developer mode in chrome extensions and "load unpacked", pointing to the cloned repo. <br><br>
-to install on firefox, first turn it into a <b>zip file</b>, and disable extension verification through <code>xpinstall.signatures.required = false</code> in config, or through firefox nightly/dev. <br>
-if neither work, then the firefox versions you're installing are too gated and you might need to find a workaround. you can try using the userscript version in releases!
+to install on firefox, use firefox nightly/dev. if those don't work, then the firefox versions you're installing are too gated and you might need to find a workaround. you can try using the userscript version in releases!
 <h5>see also:</h5>
 <table>
   <tr valign="center">

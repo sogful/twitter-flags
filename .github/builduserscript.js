@@ -44,7 +44,6 @@ function parsejsonc(text) {
   return JSON.parse(o.replace(/,(\s*[}\]])/g, "$1"));
 }
 const configsrc = "window.twitterflagsconfigs = " + JSON.stringify({
-  desc: parsejsonc(rd("configs/descriptions.jsonc")),
   switches: parsejsonc(rd("configs/switches.jsonc")),
   upsells: parsejsonc(rd("configs/upsells.jsonc")),
   options: parsejsonc(rd("configs/options.jsonc"))

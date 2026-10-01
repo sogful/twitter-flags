@@ -150,7 +150,7 @@
 
   /*//////////////////////////////////////////////////////////////////////*/
 
-  let knowndesc = {}, dangerknowndesc = {}, switchcfg = {}, upsellflags = [], optionsmap = {};
+  let switchcfg = {}, upsellflags = [], optionsmap = {};
 
   // minimal jsonc
   function parsejsonc(text) {
@@ -174,23 +174,12 @@
         return parsejsonc(await (await fetch(url)).text());
       } catch { return {} }
     };
-    const [desc, switches, upsells, options] = await Promise.all([get("descriptions.jsonc"), get("switches.jsonc"), get("upsells.jsonc"), get("options.jsonc")]);
-    return { desc, switches, upsells, options };
-  }
-
-  const prefixes = ["responsive_web_", "rweb_", "c9s_"];
-
-  function descFor(name) {
-    if (knowndesc[name]) return { text: knowndesc[name], auto: false };
-    let s = name;
-    for (const p of prefixes) { if (s.startsWith(p)) { s = s.slice(p.length); break } }
-    s = s.replace(/_enabled$/, "").replace(/_/g, " ").trim();
-    return { text: s, auto: true };
+    const [switches, upsells, options] = await Promise.all([get("switches.jsonc"), get("upsells.jsonc"), get("options.jsonc")]);
+    return { switches, upsells, options };
   }
 
   const dangerregex = /(_only_enabled|killswitch|_migration|api_transition|redux_use_fragment|maintenance_mode|session_binding|service_worker|503_backoff)/;
   function dangerFor(name) {
-    if (dangerknowndesc[name]) return dangerknowndesc[name];
     if (dangerregex.test(name)) return "matches a risky pattern";
     return null;
   }
@@ -647,7 +636,7 @@
     try {chrome.storage.local.get(["syncon"], r => {void chrome.runtime.lastError; syncon = !!(r && r.syncon); paintsync()})} catch {paintsync()}
   }
 
-  let lasthtml = ""; let lastsig = ""; let renderraf = 0;
+  let lasthtml = ""; let lastsig = ""; let lastcached = null; let renderraf = 0;
   function rafrender() {
     if (renderraf) return;
     const raf = typeof requestAnimationFrame === "function" ? requestAnimationFrame : (f => setTimeout(f, 16));
@@ -664,12 +653,12 @@
       if (fn !== seencount) { seencount = fn; seenpersist() }
     }
     if (noTab) {
-      lasthtml = "";
+      lasthtml = ""; lastsig = ""; lastcached = null;
       list.innerHTML = `<div class="empty">open x.com/twitter.com first!</div>`;
       return;
     }
     if (!captured) {
-      lasthtml = "";
+      lasthtml = ""; lastsig = ""; lastcached = null;
       const s = status || {};
       list.innerHTML = `<div class="empty">no flags captured yet, try reloading the page!</div>`;
       const sb = list.querySelector(".scan");
@@ -701,16 +690,13 @@
       // all / safe / dangerous
       if (filters.danger === "safe" && dangerinfo) continue;
       if (filters.danger === "danger" && !dangerinfo) continue;
-      const d = descFor(name);
-      if (term && !(name.toLowerCase().includes(term) || d.text.toLowerCase().includes(term))) continue;
+      if (term && !name.toLowerCase().includes(term)) continue;
       shown.push(name);
       const meta = dangerinfo ? `<div class="meta"><span class="dangerzone">${WARN}<span>${escapehtml(dangerinfo)}</span></span></div>` : "";
       const opts = typeOf(flags[name]) !== "boolean" ? optionsmap[name] : null;
       const optsline = (opts && opts.length) ? `<div class="opts" data-name="${escapehtml(name)}">${opts.length} available option${opts.length === 1 ? "" : "s"}</div>` : "";
       const newpill = isNew(name) ? '<span class="newpill">new</span>' : "";
-      const title = d.auto
-        ? `<div class="name ident" data-name="${escapehtml(name)}">${newpill}${escapehtml(name)}</div>`
-        : `<div class="name">${newpill}${escapehtml(d.text)}</div><div class="ident" data-name="${escapehtml(name)}">${escapehtml(name)}</div>`;
+      const title = `<div class="name ident" data-name="${escapehtml(name)}">${newpill}${escapehtml(name)}</div>`;
       html += `<div class="item${dangerinfo ? " danger" : ""}${mod ? " mod" : ""}" data-name="${escapehtml(name)}">
       <div class="info">${title}${meta}${optsline}</div>
       <div class="controls"><button class="reset${mod ? "" : " off"}" data-name="${escapehtml(name)}" title="reset to default" aria-hidden="${!mod}">${UNDO}</button>${control(name)}</div>
@@ -722,9 +708,31 @@
     lasthtml = out;
     
     const sig = shown.join("");
-    const samerows = sig === lastsig;
+    const samerows = shown.length > 0 && sig === lastsig && cached === lastcached && list.querySelectorAll(".item").length === shown.length;
     lastsig = sig;
-    const rawscroll = list.scrollTop;
+    lastcached = cached;
+    if (samerows) {
+      const rows = new Map([...list.querySelectorAll(".item")].map(el => [el.getAttribute("data-name"), el]));
+      for (const name of shown) {
+        const el = rows.get(name);
+        if (!el) continue;
+        const mod = isMod(name);
+        el.classList.toggle("mod", mod);
+        const reset = el.querySelector(".reset");
+        reset.classList.toggle("off", !mod);
+        reset.setAttribute("aria-hidden", String(!mod));
+        const checkbox = el.querySelector(".checkbox");
+        if (checkbox) {
+          const on = effective(name) === true;
+          checkbox.classList.toggle("on", on);
+          checkbox.setAttribute("aria-checked", String(on));
+        } else {
+          const field = el.querySelector(".editfield");
+          if (field && document.activeElement !== field) field.value = asInputValue(effective(name));
+        }
+      }
+      return;
+    }
     let anchorName = "", anchorTop = 0;
     if (!samerows) try {
       for (const it of list.querySelectorAll(".item")) {
@@ -733,7 +741,6 @@
       }
     } catch {}
     list.innerHTML = out;
-    if (samerows) { list.scrollTop = rawscroll; return }
     try {
       const sel = anchorName && (window.CSS && CSS.escape ? CSS.escape(anchorName) : anchorName);
       const el = sel && list.querySelector('.item[data-name="' + sel + '"]');
@@ -876,8 +883,6 @@
   };
 
   loadconfigs().then(cfg => {
-    knowndesc = (cfg.desc && cfg.desc.known) || {};
-    dangerknowndesc = (cfg.desc && cfg.desc.danger) || {};
     switchcfg = cfg.switches || {};
     upsellflags = Object.values(cfg.upsells || {}).filter(Array.isArray).flat();
     optionsmap = (cfg.options && typeof cfg.options === "object") ? cfg.options : {};

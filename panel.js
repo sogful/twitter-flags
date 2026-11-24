@@ -15,7 +15,7 @@
   const canon = o => {try {return JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]]))} catch {return ""}};
   const clone = o => {try {return JSON.parse(JSON.stringify(o))} catch {return {}}};
   // dev toggles that need a reload to apply count toward unsaved
-  const DEVPERSIST = ["jfDev", "exposeDebug", "forceDevEnv"];
+  const DEVPERSIST = ["jfDev"];
   const devkey = c => JSON.stringify(DEVPERSIST.map(k => [k, !!(c && c[k])]));
   const markdirty = () => {dirty = canon(overrides) !== canon(applied) || devkey(devconfig) !== devkey(applieddev)};
 
@@ -124,7 +124,7 @@
       rweb_conf_only_enabled: true,
       network_layer_503_backoff_mode: 5
     };
-    devconfig = {jfDev: false, inspect: false, exposeDebug: false};
+    devconfig = {jfDev: false, inspect: false};
     status = {count: Object.keys(flags).length, isInstalled: true, manInstalled: true, fetchHooked: true, xhrHooked: true};
     applied = {}; markdirty();
     // mark one example flag as "new" so a standalone preview shows the badge

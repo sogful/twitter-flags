@@ -3,7 +3,7 @@
 
   const PCHAN = "twitterflagspage", UCHAN = "twitterflagspanel";
   const KEY = "twitterflags.dev";
-  const DEFAULT = {jfDev: false, inspect: false, exposeDebug: false, forceDevEnv: false, forcechirp: false};
+  const DEFAULT = {jfDev: false, inspect: false, forcechirp: false};
   const log = (...a) => {try {console.log("%c[twitterflags:dev]", "color:#00ba7c;font-weight:700", ...a)} catch {}};
 
   let cfg;
@@ -14,14 +14,6 @@
   const save = () => {try {localStorage.setItem(KEY, JSON.stringify(cfg))} catch {}};
 
   try { if (cfg.jfDev) sessionStorage.setItem("jfDev", "true") } catch {}
-  function exposedebug(on) {
-    try {
-      const u = new URL(location.href), has = u.searchParams.has("exposeDebug");
-      if (on && !has) {u.searchParams.set("exposeDebug", "1"); history.replaceState(history.state, "", u.toString())}
-      else if (!on && has) {u.searchParams.delete("exposeDebug"); history.replaceState(history.state, "", u.toString())}
-    } catch {}
-  }
-  exposedebug(!!cfg.exposeDebug);
   if (cfg.forcechirp) try {reapplychirp()} catch {}
 
   /*//////////////////////////////////////////////////////////////////////*/
@@ -118,7 +110,6 @@
     cssensure();
     try {if (cfg.jfDev) sessionStorage.setItem("jfDev", "true");
     else if (sessionStorage.getItem("jfDev") === "true") sessionStorage.removeItem("jfDev")} catch {}
-    exposedebug(!!cfg.exposeDebug);
     inspectset(!!cfg.inspect);
     forcechirp(!!cfg.forcechirp);
   }

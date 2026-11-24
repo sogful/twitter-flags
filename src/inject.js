@@ -108,23 +108,6 @@
 
   /*//////////////////////////////////////////////////////////////////////*/
 
-  let forceenv = null;
-  try { const dc = JSON.parse(localStorage.getItem("twitterflags.dev") || "{}"); if (dc && dc.forceDevEnv) forceenv = "devel" } catch {}
-  if (forceenv) {
-    try {
-      let md = window.__META_DATA__;
-      const patch = v => { try { if (v && typeof v === "object" && v.env !== forceenv) v.env = forceenv } catch {} return v };
-      if (md !== undefined) patch(md);
-      Object.defineProperty(window, "__META_DATA__", {
-        configurable: true,
-        get() { return md },
-        set(v) { md = patch(v); log("forced __META_DATA__.env =", forceenv) }
-      });
-    } catch (e) { log("could not force env:", e && e.message) }
-  }
-
-  /*//////////////////////////////////////////////////////////////////////*/
-
   const IS = "__INITIAL_STATE__";
   function grabState(s, from) {
     try {

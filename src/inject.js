@@ -8,6 +8,8 @@
   const flags = {};
   let captured = false;
   let source = "none";
+  let client = "unknown";
+  let rewritefeatures = null;
   let onchange = null;
 
   /*//////////////////////////////////////////////////////////////////////*/
@@ -42,7 +44,7 @@
   }
 
   function configingest(cfg, from) {
-    if (!cfg || typeof cfg !== "object") return 0;
+    if (client === "new" || !cfg || typeof cfg !== "object") return 0;
     let hits = 0;
     for (const k in cfg) {
       const v = cfg[k];
@@ -51,12 +53,40 @@
       else if (typeof v === "boolean" || typeof v === "number" || typeof v === "string") { flags[k] = v; hits++ }
     }
     if (hits) {
+      client = "old";
       captured = true; source = from || source;
       log("ingested", hits, "flags from", from, "- total now", Object.keys(flags).length);
       if (onchange) onchange();
     }
     return hits;
   }
+
+  function applyrewrite() {
+    for (const key of Object.keys(flags)) rewritefeatures[key] = effective(key);
+  }
+
+  function grabrewrite(data) {
+    const features = data?.featureSwitchPayload?.features;
+    if (!features || typeof features !== "object" || Array.isArray(features) || features === rewritefeatures) return;
+    client = "new";
+    rewritefeatures = features;
+    for (const key of Object.keys(flags)) delete flags[key];
+    Object.assign(flags, features);
+    captured = true;
+    source = "new client";
+    applyrewrite();
+    if (onchange) onchange();
+  }
+
+  try {
+    let initialdata = window.__INITIAL_DATA__;
+    grabrewrite(initialdata);
+    Object.defineProperty(window, "__INITIAL_DATA__", {
+      configurable: true,
+      get() {return initialdata},
+      set(data) {initialdata = data; grabrewrite(data)}
+    });
+  } catch {}
 
   function manifestingest(d, from) {
     if (!d || typeof d !== "object") return 0;
@@ -99,7 +129,8 @@
   function grabState(s, from) {
     try {
       const fs = s && s.featureSwitch;
-      if (!fs) return 0;
+      if (!fs || client === "new") return 0;
+      client = "old";
       let n = 0;
       if (fs.defaultConfig) n += configingest(fs.defaultConfig, from + ":default");
       if (fs.customoverrides) n += configingest(fs.customoverrides, from + ":override");
@@ -203,7 +234,7 @@
     return null;
   }
   function scanhtmlsource() {
-    if (sourcegrabbed) return 0;
+    if (sourcegrabbed || client === "new") return 0;
     try {
       const scripts = document.getElementsByTagName("script");
       for (let i = 0; i < scripts.length; i++) {
@@ -222,7 +253,7 @@
   }
 
   function fetchsourcefallback() {
-    if (sourcegrabbed) return;
+    if (sourcegrabbed || client === "new") return;
     try {
       const f = ofetch || window.fetch;
       if (!f) return;
@@ -239,7 +270,7 @@
     let tries = 0, obs = null;
     const stop = () => {if (obs) {obs.disconnect(); obs = null}};
     try {obs = new MutationObserver(() => {if (scanhtmlsource()) stop()}); obs.observe(document.documentElement, {childList: true, subtree: true})} catch {}
-    const iv = setInterval(() => {if (scanhtmlsource() || ++tries > 40) {clearInterval(iv); stop(); if (!sourcegrabbed) fetchsourcefallback()}}, 150);
+    const iv = setInterval(() => {if (client === "new" || scanhtmlsource() || ++tries > 40) {clearInterval(iv); stop(); if (!sourcegrabbed) fetchsourcefallback()}}, 150);
     document.addEventListener("DOMContentLoaded", () => {scanhtmlsource()}, {once: true});
   }
   sourceloop();
@@ -342,14 +373,14 @@
   }
 
   let swhooked = false;
-  function trackswitches() {if (!swhooked) {const fsw = findswitches(); if (fsw) swhooked = hookswitches(fsw)}}
+  function trackswitches() {if (!swhooked && client !== "new") {const fsw = findswitches(); if (fsw) swhooked = hookswitches(fsw)}}
 
   trackswitches();
   if (!swhooked) {
     let obs = null, tries = 0;
     const stop = () => {if (obs) {obs.disconnect(); obs = null}};
     try {obs = new MutationObserver(() => {trackswitches(); if (swhooked) stop()}); obs.observe(document.documentElement, {childList: true, subtree: true})} catch {}
-    const iv = setInterval(() => {trackswitches(); if (swhooked || ++tries > 150) {clearInterval(iv); stop()}}, 100);
+    const iv = setInterval(() => {trackswitches(); if (client === "new" || swhooked || ++tries > 150) {clearInterval(iv); stop()}}, 100);
   }
 
   /*//////////////////////////////////////////////////////////////////////*/
@@ -365,7 +396,7 @@
     set: (k, v) => { overrides[k] = v; saveoverrides(); dirty = true; if (onchange) onchange(); return v },
     clear: k => { delete overrides[k]; saveoverrides(); dirty = true; if (onchange) onchange() },
     clearAll: () => { for (const k in overrides) delete overrides[k]; saveoverrides(); dirty = true; if (onchange) onchange() },
-    status: () => ({ captured, source, sourcegrabbed, count: Object.keys(flags).length, overrides: Object.keys(overrides).length, dirty, isInstalled, manInstalled, fetchhooked, xhrhooked }),
+    status: () => ({ captured, source, client, sourcegrabbed, count: Object.keys(flags).length, overrides: Object.keys(overrides).length, dirty, isInstalled, manInstalled, fetchhooked, xhrhooked }),
     rescan: () => scanhtmlsource(),
     scan: () => {
       let best = null, bestN = 0;
@@ -427,7 +458,7 @@
 
   function snapshot() {
     return {
-      captured, source, dirty, flags, overrides,
+      captured, source, client, dirty, flags, overrides,
       theme: lasttheme || detecttheme(),
       applied: appliedoverrides,
       status: {count: Object.keys(flags).length, isInstalled, manInstalled, fetchhooked, xhrhooked}
@@ -457,7 +488,8 @@
         Object.assign(overrides, inc);
         saveoverrides();
         if (captured) dirty = true;
-        applyoverrides(window[IS]);
+        if (rewritefeatures) applyrewrite();
+        else applyoverrides(window[IS]);
         log("synced", Object.keys(inc).length, "override(s) from extension storage");
         prostate(); break;
       }

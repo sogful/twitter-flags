@@ -6,6 +6,7 @@
   const EXT = typeof chrome !== "undefined" && !!(chrome.runtime && chrome.runtime.onMessage && chrome.tabs);
 
   let captured = false, source = "none", dirty = false, cached = false;
+  let client = "unknown";
   let flags = {}, overrides = {}, status = {}, applied = {};
   let devconfig = { jfDev: false, inspect: false }, applieddev = {};
   const hasoverride = k => Object.prototype.hasOwnProperty.call(overrides, k);
@@ -22,6 +23,15 @@
 
   let tabId = null;
 
+  function clearflags() {
+    captured = false;
+    cached = false;
+    client = "unknown";
+    flags = {};
+    status = {};
+    rafrender();
+  }
+
   async function resolveTab() {
     let t;
     try { [t] = await chrome.tabs.query({ active: true, lastFocusedWindow: true }) } catch {}
@@ -35,7 +45,9 @@
       try { all = await chrome.tabs.query({}) } catch {}
       t = all.find(x => HOST.test(x.url || "")) || t;
     }
-    tabId = t && HOST.test(t.url || "") ? t.id : null;
+    const selected = t && HOST.test(t.url || "") ? t.id : null;
+    if (selected !== tabId) clearflags();
+    tabId = selected;
     return tabId;
   }
 
@@ -47,36 +59,33 @@
   function ping() {
     if (tabId == null) return;
     try {
-      chrome.tabs.sendMessage(tabId, { source: UCHAN, cmd: "ping" }, resp => {
+      const id = tabId;
+      chrome.tabs.sendMessage(id, { source: UCHAN, cmd: "ping" }, resp => {
         void chrome.runtime.lastError;
-        if (resp && resp.source === PCHAN && resp.payload) stateapply(resp.payload);
+        if (tabId === id && resp && resp.source === PCHAN && resp.payload) stateapply(resp.payload);
       });
     } catch {}
   }
 
-  let livestamp = 0, cachetimer = 0;
+  let livestamp = 0;
 
   async function refresh() {
     if (!EXT) {loadplaceholder(); return}
     await resolveTab();
     if (tabId == null) {loadcached(() => {captured = false; render(true)}); return}
-    const before = livestamp;
     ping();
     send("getstate");
     send("devget");
-    clearTimeout(cachetimer);
-    cachetimer = setTimeout(() => {if (livestamp === before) loadcached()}, 800);
   }
 
   function stateapply(p, fromcache) {
     if (!p) return;
     if (fromcache) cached = true;
     else {cached = false; livestamp = Date.now()}
-    if (p.captured) captured = true; 
-    
-    const incoming = p.flags || {};
-    if (Object.keys(incoming).length) flags = Object.assign(flags, incoming);
-    source = p.source || source; overrides = p.overrides || {}; status = p.status || {};
+    captured = !!p.captured;
+    client = p.client || "unknown";
+    flags = p.flags || {};
+    source = p.source || "none"; overrides = p.overrides || {}; status = p.status || {};
     applied = p.applied || {}; markdirty();
     if (p.theme) applytheme(p.theme);
     rafrender();
@@ -87,7 +96,7 @@
     try {
       chrome.storage.local.get(["laststate", "overrides"], r => {
         void chrome.runtime.lastError;
-        if (livestamp !== before) return;
+        if (tabId !== null || livestamp !== before) return;
         const p = r && r.laststate;
         if (!p) {if (fallback) fallback(); return}
         if (r.overrides) p.overrides = r.overrides;
@@ -126,13 +135,18 @@
   }
 
   if (EXT) {
-    chrome.runtime.onMessage.addListener(msg => {
+    chrome.runtime.onMessage.addListener((msg, sender) => {
       if (!msg || msg.source !== PCHAN) return;
+      if (sender?.tab && sender.tab.id !== tabId) return;
       if (msg.type === "state") stateapply(msg.payload);
       else if (msg.type === "dev") { Object.assign(devconfig, msg.config || {}); if (msg.applied) applieddev = msg.applied; syncdev() }
     });
     chrome.tabs.onActivated.addListener(refresh);
-    chrome.tabs.onUpdated.addListener((id, info) => { if (id === tabId && info.status === "complete") refresh() });
+    chrome.tabs.onUpdated.addListener((id, info) => {
+      if (id !== tabId) return;
+      if (info.status === "loading") clearflags();
+      if (info.status === "complete") refresh();
+    });
     // a change synced from another device -> adopt it here + push to the page
     if (chrome.storage && chrome.storage.onChanged) chrome.storage.onChanged.addListener((changes, area) => {
       if (area !== "sync" || !syncon || !changes.overrides) return;

@@ -14,8 +14,14 @@
     if (d.type === "state") {
       last = d;
       if (d.payload && d.payload.overrides) {
-        syncedoverrides = JSON.stringify(d.payload.overrides);
-        try {chrome.storage.local.set({overrides: d.payload.overrides, laststate: d.payload})} catch {}
+        const current = JSON.stringify(d.payload.overrides);
+        if (syncedoverrides !== null && current !== syncedoverrides && d.payload.dirty) {
+          syncedoverrides = current;
+          try {chrome.storage.local.set({overrides: d.payload.overrides})} catch {}
+        }
+        if (d.payload.captured) {
+          try {chrome.storage.local.set({laststate: d.payload})} catch {}
+        }
       }
     }
     else if (d.type === "dev" && d.config) {
@@ -37,9 +43,11 @@
       chrome.storage.local.get(["overrides", "devconfig"], r => {
         void chrome.runtime.lastError;
         if (!r) return;
-        if (r.overrides) {
-          const j = JSON.stringify(r.overrides);
-          if (j !== syncedoverrides) {syncedoverrides = j; post({source: UCHAN, cmd: "syncoverrides", overrides: r.overrides})}
+        const overrides = r.overrides || {};
+        const j = JSON.stringify(overrides);
+        if (j !== syncedoverrides) {
+          syncedoverrides = j;
+          if (r.overrides) post({source: UCHAN, cmd: "syncoverrides", overrides});
         }
         if (r.devconfig) {
           const j = JSON.stringify(r.devconfig);

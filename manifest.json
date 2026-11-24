@@ -26,7 +26,7 @@
       "48": "images/action48.png"
     }
   },
-  "permissions": ["storage", "sidePanel", "tabs"],
+  "permissions": ["storage", "sidePanel", "tabs", "declarativeNetRequestWithHostAccess"],
   "host_permissions": ["https://x.com/*", "https://twitter.com/*"],
   "background": {
     "service_worker": "src/background.js",
@@ -46,7 +46,7 @@
   "content_scripts": [
     {
       "matches": ["https://x.com/*", "https://twitter.com/*"],
-      "js": ["src/inject.js", "src/dev.js"],
+      "js": ["src/inject.js", "src/dev.js", "src/client.js"],
       "run_at": "document_start",
       "world": "MAIN"
     },

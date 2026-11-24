@@ -230,6 +230,50 @@
   let prefixvalue = "", prefbig = [], prefhasother = false;
   const header = query(".header"), footer = query(".footer"), reload = query(".reload"), undo = query(".undo");
   const flagcount = query(".flagcount");
+  let clientpreferred = null;
+  let clientswitching = null;
+  const clientchecked = () => clientswitching ?? (client === "new" || clientpreferred === true);
+
+  async function clientpreference(enabled) {
+    const result = await chrome.runtime.sendMessage({source: UCHAN, cmd: "clientpreference", enabled});
+    if (!result || result.error) throw new Error(result?.error || "could not read client preference");
+    clientpreferred = result.enabled;
+    rafrender();
+  }
+
+  async function switchclient() {
+    if (clientswitching !== null || clientpreferred === null) return;
+    const enabled = !clientchecked();
+    const id = tabId;
+    clientswitching = enabled;
+    paintchecks();
+    try {
+      await clientpreference(enabled);
+      if (id == null || tabId !== id) return;
+      const tab = await chrome.tabs.get(id);
+      let target = new URL(tab.url);
+      if (target.origin === "https://x.com" && target.pathname === "/i/oauth2/authorize") {
+        if (target.hash.startsWith("#twitterflags=")) target = new URL(decodeURIComponent(target.hash.slice(14)), target.origin);
+        else if (target.hash.startsWith("#twitterflags-path=")) target = new URL(target.hash.slice(19), target.origin);
+      }
+      if (target.origin !== "https://x.com" || /^\/(?:i\/oauth|i\/flow|login|logout|account\/access)/i.test(target.pathname)) return;
+      target.searchParams.delete("twitterflags-default");
+      clearflags();
+      if (enabled) {
+        const path = target.pathname + target.search + target.hash;
+        await chrome.tabs.update(id, {url: "https://x.com/i/oauth2/authorize#twitterflags=" + encodeURIComponent(path)});
+      } else if (target.href !== tab.url) {
+        await chrome.tabs.update(id, {url: target.href});
+      } else {
+        await chrome.tabs.reload(id, {bypassCache: true});
+      }
+    } catch {
+      notify("could not switch clients");
+    } finally {
+      clientswitching = null;
+      paintchecks();
+    }
+  }
   const panel = header.parentNode;
   function applytheme(t) {
     const root = query(".tfpanelwrap") || document.body;
@@ -290,6 +334,18 @@
       swrow.appendChild(b);
     });
     (switchcfg.dev || []).forEach(s => (s.row === "sw" ? swrow : devrow).appendChild(mk(s, "dev")));
+    if (EXT && chrome.declarativeNetRequest) {
+      const control = mk({key: "new", label: "new client", title: "unchecked uses the client served by twitter"}, "client");
+      control.setAttribute("role", "checkbox");
+      control.tabIndex = 0;
+      control.onkeydown = event => {
+        if (![" ", "Enter"].includes(event.key)) return;
+        event.preventDefault();
+        void switchclient();
+      };
+      devrow.appendChild(control);
+      clientpreference().catch(() => {});
+    }
     (switchcfg.filters || []).forEach(f => {if (!(f.key in filters)) filters[f.key] = ((f.options || [])[0] || {}).val || "all"; filtrow.appendChild(mkswitch(f))});
     paintswitches();
   }
@@ -300,6 +356,11 @@
       let on;
       if (grp === "dev") on = !!devconfig[lbl.getAttribute("data-key")];
       else if (grp === "flag") on = effective(lbl.getAttribute("data-flag")) === true;
+      else if (grp === "client") {
+        on = clientchecked();
+        lbl.setAttribute("aria-checked", String(on));
+        lbl.setAttribute("aria-disabled", String(clientpreferred === null || clientswitching !== null));
+      }
       else return;
       lbl.querySelector(".checkbox").classList.toggle("on", on);
     });
@@ -538,6 +599,7 @@
     e.preventDefault();
     const grp = lbl.getAttribute("data-group"), k = lbl.getAttribute("data-key");
     if (grp === "dev") {devconfig[k] = !devconfig[k]; devpush(); syncdev()}
+    else if (grp === "client") void switchclient();
     else if (grp === "flag") {
       const f = lbl.getAttribute("data-flag");
       const base = flags[f], val = !(effective(f) === true);
